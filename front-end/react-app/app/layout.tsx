@@ -5,7 +5,7 @@ import { Provider } from '@/components/ui/provider';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Canvassing',
+  title: 'Canvassing - Participant',
   description: 'opinions pay, today'
 }
 
