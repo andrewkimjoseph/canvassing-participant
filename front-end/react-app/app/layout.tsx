@@ -1,6 +1,13 @@
 import '@/styles/globals.css';
 
 import { AppProvider } from '@/providers/AppProvider';
+import { Provider } from '@/components/ui/provider';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Canvassing',
+  description: 'opinions pay, today'
+}
 
 export default function RootLayout({
   children,
@@ -8,9 +15,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
-        <AppProvider>{children}</AppProvider>
+        <Provider>
+          <AppProvider>{children}</AppProvider>{' '}
+        </Provider>
       </body>
     </html>
   );
