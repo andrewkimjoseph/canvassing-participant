@@ -3,8 +3,8 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { Box, Flex, HStack, Link, IconButton, Circle } from '@chakra-ui/react';
 
-import { CanvassingLogo } from './Logo';
-import { HamburgerIconC } from './HamburgerC';
+import { LogoC } from './LogoC';
+import { HamburgerIconC } from './HamburgerIconC';
 
 export default function Header() {
   return (
@@ -19,7 +19,7 @@ export default function Header() {
             <HamburgerIconC />
           </IconButton>
             <Link href="/">
-              <CanvassingLogo />
+              <LogoC />
             </Link>
 
 

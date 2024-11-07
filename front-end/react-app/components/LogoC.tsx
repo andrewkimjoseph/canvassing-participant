@@ -1,7 +1,7 @@
 import { IconSvgProps } from '@/types/svgIcon';
 import * as React from 'react';
 
-export const CanvassingLogo: React.FC<IconSvgProps> = ({
+export const LogoC: React.FC<IconSvgProps> = ({
   size = 35,
   ...props
 }) => {
