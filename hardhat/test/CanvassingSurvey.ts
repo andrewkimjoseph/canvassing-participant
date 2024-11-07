@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import {
+    Address,
     createPublicClient,
     createWalletClient,
     http,
@@ -38,46 +39,52 @@ describe("CanvassingSurvey", () => {
         transport: http(INFURA_RPC_URL),
     });
 
+    let contractAddress: Address | null | undefined;
+
+    before(async function () {
+        const hash = await privateClient.deployContract({
+            abi,
+            account: mnemonicAccount,
+            args: [
+                mnemonicAccount.address,
+                parseEther("1"), // 1 cUSD reward
+                BigInt(100), // target participantsxq
+                CUSD_ADDRESS,
+            ],
+            bytecode: bytecode as `0x${string}`,
+        });
+
+        const receipt = await publicClient.waitForTransactionReceipt({ hash });
+        contractAddress = receipt.contractAddress;
+
+        console.log(contractAddress);
+
+        if (!contractAddress) throw new Error("Contract deployment failed");
+      });
+
     it("Should whitelist an address", async () => {
         // Deploy the contract
-        // const hash = await privateClient.deployContract({
-        //     abi,
-        //     account: mnemonicAccount,
-        //     args: [
-        //         mnemonicAccount.address,
-        //         parseEther("1"), // 1 cUSD reward
-        //         BigInt(100), // target participantsxq
-        //         CUSD_ADDRESS,
-        //     ],
-        //     bytecode: bytecode as `0x${string}`,
-        // });
 
-        // const receipt = await publicClient.waitForTransactionReceipt({ hash });
-        const contractAddress = "0x2F6c4f207Ed41f159C56d80ad25645c33C907fd3";
-
-        // console.log(contractAddress);
-
-        // if (!contractAddress) throw new Error("Contract deployment failed");
 
         const testAddress = "0xE49B05F2c7DD51f61E415E1DFAc10B80074B001A";
 
-        // const [address] = await privateClient.getAddresses();
+        const [address] = await privateClient.getAddresses();
 
-        // const whitelistTx = await privateClient.writeContract({
-        //     account: mnemonicAccount,
-        //     address: contractAddress,
-        //     abi: abi,
-        //     functionName: "whitelistOneAddress",
-        //     args: [testAddress],
-        // });
+        const whitelistTx = await privateClient.writeContract({
+            account: address,
+            address: contractAddress as Address,
+            abi: abi,
+            functionName: "whitelistOneAddress",
+            args: [testAddress],
+        });
 
-        // await publicClient.waitForTransactionReceipt({
-        //     hash: whitelistTx,
-        // });
+        await publicClient.waitForTransactionReceipt({
+            hash: whitelistTx,
+        });
 
 
         const isWhitelisted: boolean = (await publicClient.readContract({
-            address: contractAddress,
+            address: contractAddress as Address,
             abi: abi,
             functionName: "checkIfUserAddressIsWhitelisted",
             args: [testAddress],
