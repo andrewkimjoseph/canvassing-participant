@@ -5,7 +5,7 @@
 /.pnp
 .pnp.js
 
-/components/ui/
+# /components/ui/
 
 # testing
 /coverage
