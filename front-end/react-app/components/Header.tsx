@@ -13,15 +13,11 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerRoot,
-  DrawerTitle,
-  DrawerTrigger,
-  Button,
-  DrawerActionTrigger,
+  DrawerTrigger
 } from '@chakra-ui/react';
 
 import { LogoC } from './LogoC';
 import { HamburgerIconC } from './HamburgerIconC';
-import { useState } from 'react';
 import { DrawerLogoC } from './DrawerLogoC';
 
 export default function Header() {
@@ -37,7 +33,6 @@ export default function Header() {
             position="sticky"
             top="0"
             zIndex="1000"
-            // borderBottomLeftRadius={20}
           >
             <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
               <IconButton size={'md'} aria-label={'Open Menu'}>
@@ -48,7 +43,7 @@ export default function Header() {
               </Link>
               <Circle
                 size="10px"
-                bg={`${true ? 'green' : '#E6E8FA'}`}
+                bg={`${true ? 'green' : 'red'}`}
                 color="white"
               ></Circle>
             </Flex>
@@ -56,17 +51,10 @@ export default function Header() {
         </DrawerTrigger>
         <DrawerContent w={'60vw'} bgColor={'#1E1E49'}>
           <DrawerHeader>
-            {/* <DrawerTitle>Drawer Title</DrawerTitle> */}
-
             <DrawerLogoC />
           </DrawerHeader>
           <DrawerBody></DrawerBody>
-          <DrawerFooter>
-            <DrawerActionTrigger>
-              <Button variant="outline">Cancel</Button>
-            </DrawerActionTrigger>
-            <Button>Save</Button>
-          </DrawerFooter>
+          <DrawerFooter></DrawerFooter>
           <DrawerCloseTrigger />
         </DrawerContent>
       </DrawerRoot>

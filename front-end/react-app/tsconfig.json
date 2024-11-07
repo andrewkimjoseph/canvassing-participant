@@ -21,9 +21,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./*", "./src/*"],
-      "@local-contracts/*": ["../hardhat/*"]
-    }
+      "@/*": ["./*", "./src/*"]    }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]

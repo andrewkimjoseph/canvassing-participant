@@ -1,7 +1,7 @@
 import { IconSvgProps } from '@/types/svgIcon';
 import * as React from 'react';
 
-export const DrawerLogoC: React.FC<IconSvgProps> = ({ size = 35, ...props }) => {
+export const DrawerLogoC: React.FC<IconSvgProps> = ({ }) => {
   return (
     <svg
       width="85"
