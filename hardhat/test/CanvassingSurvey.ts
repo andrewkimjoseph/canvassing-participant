@@ -42,6 +42,10 @@ describe("CanvassingSurvey", () => {
   let contractAddress: Address | null | undefined;
 
   before(async function () {
+    const currentNonce = await publicClient.getTransactionCount({
+        address: mnemonicAccount.address,
+        blockTag:'latest'
+      });
 
     const hash = await privateClient.deployContract({
       abi,
@@ -53,6 +57,7 @@ describe("CanvassingSurvey", () => {
         CUSD_ADDRESS,
       ],
       bytecode: bytecode as `0x${string}`,
+      nonce: currentNonce
     });
 
     const receipt = await publicClient.waitForTransactionReceipt({ hash });
