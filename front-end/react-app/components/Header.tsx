@@ -55,22 +55,25 @@ export default function Header() {
             <DrawerLogoC />
           </DrawerHeader>
           <DrawerBody>
-          <Flex h={16}flexDirection={"column"}>
-          <DrawerActionTrigger>
-              <DrawerCardC SVGIcon={HomeIconC} text={'Home'} link={'/'} />
-            </DrawerActionTrigger>
-            <DrawerActionTrigger>
-              <DrawerCardC
-                SVGIcon={RewardHistoryIconC}
-                text={'Reward History'}
-                link={'/'}
-              />{' '}
-            </DrawerActionTrigger>
-            <DrawerActionTrigger>
-              <DrawerCardC SVGIcon={ProfileIconC} text={'Profile'} link={'/'} />
-            </DrawerActionTrigger>
-          </Flex>
-     
+            <Flex h={16} flexDirection={'column'} alignItems={'start'}>
+              <DrawerActionTrigger>
+                <DrawerCardC SVGIcon={HomeIconC} text={'Home'} link={'/'} />
+              </DrawerActionTrigger>
+              <DrawerActionTrigger>
+                <DrawerCardC
+                  SVGIcon={RewardHistoryIconC}
+                  text={'Reward History'}
+                  link={'/'}
+                />{' '}
+              </DrawerActionTrigger>
+              <DrawerActionTrigger>
+                <DrawerCardC
+                  SVGIcon={ProfileIconC}
+                  text={'Profile'}
+                  link={'/'}
+                />
+              </DrawerActionTrigger>
+            </Flex>
           </DrawerBody>
           <DrawerFooter></DrawerFooter>
           <DrawerCloseTrigger />
