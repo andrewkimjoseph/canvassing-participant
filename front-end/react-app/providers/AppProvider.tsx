@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   RainbowKitProvider,
   connectorsForWallets,
+  lightTheme,
 } from '@rainbow-me/rainbowkit';
 import { WagmiProvider, createConfig, http } from 'wagmi';
 import { celo, celoAlfajores } from 'wagmi/chains';
@@ -41,7 +42,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>
+        <RainbowKitProvider
+          theme={lightTheme({
+            accentColor: "#9D99B4",
+            accentColorForeground: "white",
+            borderRadius: "large",
+            fontStack: "rounded",
+            overlayBlur: "small",
+          })}
+        >
           <Layout>{children}</Layout>
         </RainbowKitProvider>
       </QueryClientProvider>
