@@ -3,6 +3,7 @@ import '@/styles/globals.css';
 import { AppProvider } from '@/providers/AppProvider';
 import { Provider } from '@/components/ui/provider';
 import { Metadata } from 'next';
+import { font } from "@/utils/font";
 
 export const metadata: Metadata = {
   title: 'Canvassing - Participant',
@@ -15,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={font.dmSans.className} suppressHydrationWarning>
       <body>
         <Provider>
           <AppProvider>{children}</AppProvider>

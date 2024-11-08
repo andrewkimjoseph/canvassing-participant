@@ -10,6 +10,7 @@ import {
   DrawerBody,
   DrawerCloseTrigger,
   DrawerContent,
+  DrawerActionTrigger,
   DrawerFooter,
   DrawerHeader,
   DrawerRoot,
@@ -19,6 +20,10 @@ import {
 import { LogoC } from './LogoC';
 import { HamburgerIconC } from './HamburgerIconC';
 import { DrawerLogoC } from './DrawerLogoC';
+import { DrawerCardC } from './DrawerCardC';
+import { HomeIconC } from './icons/homeIcon';
+import { RewardHistoryIconC } from './icons/rewardHistoryIcon';
+import { ProfileIconC } from './icons/profileIcon';
 
 export default function Header() {
   return (
@@ -49,7 +54,27 @@ export default function Header() {
           <DrawerHeader>
             <DrawerLogoC />
           </DrawerHeader>
-          <DrawerBody></DrawerBody>
+          <DrawerBody>
+            <Flex h={16} flexDirection={'column'} alignItems={'start'}>
+              <DrawerActionTrigger>
+                <DrawerCardC SVGIcon={HomeIconC} text={'Home'} link={'/'} />
+              </DrawerActionTrigger>
+              <DrawerActionTrigger>
+                <DrawerCardC
+                  SVGIcon={RewardHistoryIconC}
+                  text={'Reward History'}
+                  link={'/'}
+                />{' '}
+              </DrawerActionTrigger>
+              <DrawerActionTrigger>
+                <DrawerCardC
+                  SVGIcon={ProfileIconC}
+                  text={'Profile'}
+                  link={'/'}
+                />
+              </DrawerActionTrigger>
+            </Flex>
+          </DrawerBody>
           <DrawerFooter></DrawerFooter>
           <DrawerCloseTrigger />
         </DrawerContent>
