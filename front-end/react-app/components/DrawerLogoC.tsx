@@ -17,7 +17,7 @@ export const DrawerLogoC: React.FC<IconSvgProps> = ({ }) => {
         height="75"
         rx="7.5"
         stroke="#CFCED8"
-        stroke-width="5"
+        strokeWidth="5"
       />
       <path
         d="M70.2352 70.5C72.8667 70.5 75 68.3611 75 65.7226C75 63.0841 72.8667 60.9452 70.2352 60.9452C67.6037 60.9452 65.4705 63.0841 65.4705 65.7226C65.4705 68.3611 67.6037 70.5 70.2352 70.5Z"
