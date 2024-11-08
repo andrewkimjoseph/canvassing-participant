@@ -106,7 +106,7 @@ export default function Header() {
             />
 
             <Box className="flex flex-row items-left w-full mt-8 mb-8">
-              <Avatar variant={'solid'} size="lg" color={"white"} bgColor={"white"}/>
+              <Avatar variant={'solid'} size="lg" bgColor={"white"} />
 
               <Box className="flex flex-col items-left relative ml-4">
                 <Text fontSize={18} mb={2} color={"white"}>
