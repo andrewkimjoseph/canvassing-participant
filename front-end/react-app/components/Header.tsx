@@ -15,15 +15,20 @@ import {
   DrawerHeader,
   DrawerRoot,
   DrawerTrigger,
+  Text,
 } from '@chakra-ui/react';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { Avatar } from '@/components/ui/avatar';
 
 import { LogoC } from './LogoC';
 import { HamburgerIconC } from './HamburgerIconC';
 import { DrawerLogoC } from './DrawerLogoC';
 import { DrawerCardC } from './DrawerCardC';
-import { HomeIconC } from './icons/homeIcon';
-import { RewardHistoryIconC } from './icons/rewardHistoryIcon';
-import { ProfileIconC } from './icons/profileIcon';
+import { HomeIconC } from './icons/HomeIconC';
+import { RewardHistoryIconC } from './icons/RewardHistoryIconC';
+import { ProfileIconC } from './icons/ProfileIconC';
+import { CloseIconC } from './icons/CloseIconC';
+import { EditIconC } from './icons/EditIconC';
 
 export default function Header() {
   return (
@@ -50,12 +55,23 @@ export default function Header() {
 
         <DrawerBackdrop />
 
-        <DrawerContent w={'60vw'} bgColor={'#363062'}>
+        <DrawerContent w={'60vw'} bgColor={'#363062'} borderTopRightRadius={20}>
           <DrawerHeader>
-            <DrawerLogoC />
+            <Flex
+              flexDirection={'row'}
+              alignItems={'start'}
+              justify={'space-between'}
+              pt={8}
+            >
+              <DrawerLogoC />
+
+              <DrawerActionTrigger>
+                <CloseIconC />
+              </DrawerActionTrigger>
+            </Flex>
           </DrawerHeader>
           <DrawerBody>
-            <Flex h={16} flexDirection={'column'} alignItems={'start'}>
+            <Flex flexDirection={'column'} alignItems={'start'}>
               <DrawerActionTrigger>
                 <DrawerCardC SVGIcon={HomeIconC} text={'Home'} link={'/'} />
               </DrawerActionTrigger>
@@ -75,7 +91,37 @@ export default function Header() {
               </DrawerActionTrigger>
             </Flex>
           </DrawerBody>
-          <DrawerFooter></DrawerFooter>
+          <DrawerFooter flexDirection={'column'} alignItems={'center'} pb={16}>
+            <ConnectButton
+              chainStatus="none"
+              accountStatus={{
+                smallScreen: 'avatar',
+                largeScreen: 'avatar',
+              }}
+              showBalance={{
+                smallScreen: false,
+                largeScreen: true,
+              }}
+              label="Connect Wallet"
+            />
+
+            <Box className="flex flex-row items-left w-full mt-8 mb-8">
+              <Avatar variant={'solid'} size="lg" />
+
+              <Box className="flex flex-col items-left relative ml-4">
+                <Text fontSize={18} mb={2}>
+                  Userxxxx
+                </Text>
+                <Text fontSize={14} mb={2}>
+                  Participant
+                </Text>
+              </Box>
+
+              <Box className="flex flex-col items-left relative ml-4">
+                <EditIconC />
+              </Box>
+            </Box>
+          </DrawerFooter>
           <DrawerCloseTrigger />
         </DrawerContent>
       </DrawerRoot>
