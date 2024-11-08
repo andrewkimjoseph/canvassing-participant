@@ -24,7 +24,7 @@ export const DrawerCardC: React.FC<Props> = ({ SVGIcon, text, link }) => {
     >
       <Box className="flex flex-row items-center justify-center" m={2}>
         <SVGIcon />
-        <Text fontSize={20} pl={2}>
+        <Text fontSize={20} pl={2} color={"white"}>
           {text}
         </Text>
       </Box>
