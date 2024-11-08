@@ -106,13 +106,13 @@ export default function Header() {
             />
 
             <Box className="flex flex-row items-left w-full mt-8 mb-8">
-              <Avatar variant={'solid'} size="lg" />
+              <Avatar variant={'solid'} size="lg" color={"white"} bgColor={"white"}/>
 
               <Box className="flex flex-col items-left relative ml-4">
-                <Text fontSize={18} mb={2}>
+                <Text fontSize={18} mb={2} color={"white"}>
                   Userxxxx
                 </Text>
-                <Text fontSize={14} mb={2}>
+                <Text fontSize={14} mb={2} color={"white"}>
                   Participant
                 </Text>
               </Box>
