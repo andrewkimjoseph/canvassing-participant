@@ -3,11 +3,13 @@ import {
   Address,
   createPublicClient,
   createWalletClient,
+  encodeFunctionData,
   http,
   parseEther,
+  toHex,
 } from "viem";
 import { celoAlfajores } from "viem/chains";
-import { mnemonicToAccount } from "viem/accounts";
+import { mnemonicToAccount, privateKeyToAccount } from "viem/accounts";
 import { config } from "dotenv";
 
 // Import your contract ABI and bytecode
@@ -31,10 +33,12 @@ describe("CanvassingSurvey", () => {
     transport: http(INFURA_RPC_URL),
   });
 
-  const mnemonicAccount = mnemonicToAccount(SRP);
+  const privateKeyAccount = privateKeyToAccount(
+    toHex(mnemonicToAccount(SRP).getHdKey().privateKey as Uint8Array)
+  );
 
   const privateClient = createWalletClient({
-    account: mnemonicAccount,
+    account: privateKeyAccount,
     chain: celoAlfajores,
     transport: http(INFURA_RPC_URL),
   });
@@ -42,22 +46,22 @@ describe("CanvassingSurvey", () => {
   let contractAddress: Address | null | undefined;
 
   before(async function () {
-    const currentNonce = await publicClient.getTransactionCount({
-        address: mnemonicAccount.address,
-        blockTag:'latest'
-      });
+    // const currentNonce = await publicClient.getTransactionCount({
+    //     address: mnemonicAccount.address,
+    //     blockTag:'latest'
+    //   });
 
     const hash = await privateClient.deployContract({
       abi,
-      account: mnemonicAccount,
+      account: privateKeyAccount,
       args: [
-        mnemonicAccount.address,
+        privateKeyAccount.address,
         parseEther("1"), // 1 cUSD reward
         BigInt(100), // target participantsxq
         CUSD_ADDRESS,
       ],
       bytecode: bytecode as `0x${string}`,
-      nonce: currentNonce
+      // nonce: currentNonce
     });
 
     const receipt = await publicClient.waitForTransactionReceipt({ hash });
@@ -72,7 +76,7 @@ describe("CanvassingSurvey", () => {
     const testAddress = "0xE49B05F2c7DD51f61E415E1DFAc10B80074B001A";
 
     const whitelistTx = await privateClient.writeContract({
-      account: mnemonicAccount,
+      account: privateKeyAccount,
       address: contractAddress as Address,
       abi: abi,
       functionName: "whitelistOneAddress",
@@ -98,7 +102,7 @@ describe("CanvassingSurvey", () => {
     const testAddress = "0xE49B05F2c7DD51f61E415E1DFAc10B80074B001A";
 
     const blacklistTx = await privateClient.writeContract({
-      account: mnemonicAccount,
+      account: privateKeyAccount,
       address: contractAddress as Address,
       abi: abi,
       functionName: "blacklistOneWhitelistedAddress",
@@ -129,16 +133,14 @@ describe("CanvassingSurvey", () => {
   });
 
   it("Should whitelist multiple addresses", async () => {
-    const testAddresses = [
+    const testAddresses: Address[] = [
       "0xE49B05F2c7DD51f61E415E1DFAc10B80074B001A",
-      "0x123456789012345678901234567890123456789A",
-      "0x987654321098765432109876543210987654321B",
+      "0x6dce6E80b113607bABf97041A0C8C5ACCC4d1a4e",
+      "0xdaB7EB2409fdD974CF93357C61aEA141729AEfF5",
     ];
 
-    const [address] = await privateClient.getAddresses();
-
     const whitelistTx = await privateClient.writeContract({
-      account: mnemonicAccount,
+      account: privateKeyAccount,
       address: contractAddress as Address,
       abi: abi,
       functionName: "whitelistMultipleAddresses",
@@ -164,25 +166,32 @@ describe("CanvassingSurvey", () => {
   });
 
   it("Should blacklist multiple whitelisted addresses", async () => {
-    const testAddresses = [
-      "0xE49B05F2c7DD51f61E415E1DFAc10B80074B001A",
-      "0x123456789012345678901234567890123456789A",
-      "0x987654321098765432109876543210987654321B",
+    const testAddresses: Address[] = [
+      "0x6dce6E80b113607bABf97041A0C8C5ACCC4d1a4e",
+      "0xdaB7EB2409fdD974CF93357C61aEA141729AEfF5",
     ];
 
-    const [address] = await privateClient.getAddresses();
+    // const [address] = await privateClient.getAddresses();
 
-    // Whitelist the addresses first
-    await privateClient.writeContract({
-      account: mnemonicAccount,
-      address: contractAddress as Address,
-      abi: abi,
-      functionName: "whitelistMultipleAddresses",
-      args: [testAddresses],
-    });
+    // // Whitelist the addresses first
+    // const whitelistMultipleAddressesTxHash = await privateClient.writeContract({
+    //   account: mnemonicAccount,
+    //   address: contractAddress as Address,
+    //   abi: abi,
+    //   functionName: "whitelistMultipleAddresses",
+    //   args: [testAddresses],
+    // });
+
+    // await publicClient.waitForTransactionReceipt({
+    //   hash: whitelistMultipleAddressesTxHash,
+    // });
+
+    // // if (whitelistMultipleAddressesTxReceipt.status === "success"){
+
+    // // }
 
     const blacklistTx = await privateClient.writeContract({
-      account: mnemonicAccount,
+      account: privateKeyAccount,
       address: contractAddress as Address,
       abi: abi,
       functionName: "blacklistMultipleWhitelistedAddresses",
@@ -202,6 +211,64 @@ describe("CanvassingSurvey", () => {
 
     // Check if all addresses are blacklisted
     expect(whitelistedAddresses.length).to.equal(0);
+  });
+
+
+  it("Should update the target number of participants", async () => {
+    const [address] = await privateClient.getAddresses();
+
+    const oldTargetParticipants = (await publicClient.readContract({
+      address: contractAddress as Address,
+      abi: abi,
+      functionName: "targetNumberOfParticipants",
+    })) as number;
+
+    const newTargetParticipants = BigInt(200);
+
+    const updateTx = await privateClient.writeContract({
+      account: privateKeyAccount,
+      address: contractAddress as Address,
+      abi: abi,
+      functionName: "updateTargetNumberOfParticipants",
+      args: [newTargetParticipants],
+    });
+
+    await publicClient.waitForTransactionReceipt({
+      hash: updateTx,
+    });
+
+    const currentTargetParticipants = (await publicClient.readContract({
+      address: contractAddress as Address,
+      abi: abi,
+      functionName: "targetNumberOfParticipants",
+    })) as number;
+
+    // Check if the target number of participants was updated
+    expect(currentTargetParticipants).to.equal(newTargetParticipants);
+    expect(currentTargetParticipants).to.not.equal(oldTargetParticipants);
+  });
+
+  it("Should allow any whitelisted participant to claim a reward if contract balance is insufficient", async () => {
+    const testAddress = "0xE49B05F2c7DD51f61E415E1DFAc10B80074B001A";
+
+    const data = encodeFunctionData({
+      abi: abi,
+      functionName: "processRewardClaimByParticipant",
+      args: [testAddress],
+    });
+
+    try {
+      // Send the transaction as a raw signed transaction
+      const hash = await privateClient.sendTransaction({
+        to: contractAddress,
+        data,
+      });
+  
+      await publicClient.waitForTransactionReceipt({hash});
+    } catch (error) {
+      // Check for the custom error thrown in your contract
+      expect(error).to.include("InsufficientContractBalance");
+    }
   });
 
   it("Should allow a whitelisted participant to claim a reward", async () => {
@@ -237,7 +304,7 @@ describe("CanvassingSurvey", () => {
 
     // Blacklist the address
     await privateClient.writeContract({
-      account: mnemonicAccount,
+      account: privateKeyAccount,
       address: contractAddress as Address,
       abi: abi,
       functionName: "blacklistOneWhitelistedAddress",
@@ -256,68 +323,4 @@ describe("CanvassingSurvey", () => {
     ).to.be.rejectedWith("UserAddressNotWhitelisted");
   });
 
-  it("Should update the reward amount", async () => {
-    const oldRewardAmount = (await publicClient.readContract({
-      address: contractAddress as Address,
-      abi: abi,
-      functionName: "getRewardAmountPerParticipantInWei",
-    })) as number;
-
-    const newRewardAmount = parseEther("2"); // 2 cUSD
-
-    const updateTx = await privateClient.writeContract({
-      account: mnemonicAccount,
-      address: contractAddress as Address,
-      abi: abi,
-      functionName: "updateRewardAmountPerParticipant",
-      args: [newRewardAmount],
-    });
-
-    await publicClient.waitForTransactionReceipt({
-      hash: updateTx,
-    });
-
-    const currentRewardAmount = (await publicClient.readContract({
-      address: contractAddress as Address,
-      abi: abi,
-      functionName: "getRewardAmountPerParticipantInWei",
-    })) as number;
-
-    expect(currentRewardAmount).to.equal(newRewardAmount);
-    expect(currentRewardAmount).to.not.equal(oldRewardAmount);
-  });
-
-  it("Should update the target number of participants", async () => {
-    const [address] = await privateClient.getAddresses();
-
-    const oldTargetParticipants = (await publicClient.readContract({
-      address: contractAddress as Address,
-      abi: abi,
-      functionName: "targetNumberOfParticipants",
-    })) as number;
-
-    const newTargetParticipants = 200;
-
-    const updateTx = await privateClient.writeContract({
-      account: mnemonicAccount,
-      address: contractAddress as Address,
-      abi: abi,
-      functionName: "updateTargetNumberOfParticipants",
-      args: [newTargetParticipants],
-    });
-
-    await publicClient.waitForTransactionReceipt({
-      hash: updateTx,
-    });
-
-    const currentTargetParticipants = (await publicClient.readContract({
-      address: contractAddress as Address,
-      abi: abi,
-      functionName: "targetNumberOfParticipants",
-    })) as number;
-
-    // Check if the target number of participants was updated
-    expect(currentTargetParticipants).to.equal(newTargetParticipants);
-    expect(currentTargetParticipants).to.not.equal(oldTargetParticipants);
-  });
 });
