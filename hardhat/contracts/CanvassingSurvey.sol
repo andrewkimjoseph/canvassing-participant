@@ -176,7 +176,7 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
             if (walletAddresses[i] == address(0)) {
                 revert ZeroAddress();
             }
-            if (!participantsWhoHaveClaimedRewards[walletAddresses[i]]) {
+            if (!usersWhitelistedForSurvey[walletAddresses[i]]) {
                 revert UserAddressNotWhitelisted(walletAddresses[i]);
             }
             unchecked {
@@ -185,7 +185,7 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
         }
 
         for (uint256 i = 0; i < length; ) {
-            participantsWhoHaveClaimedRewards[walletAddresses[i]] = false;
+            usersWhitelistedForSurvey[walletAddresses[i]] = false;
             unchecked {
                 ++i;
             }
@@ -298,7 +298,7 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
 
     function getWhitelistedAddressesFromRegisteredAddresses(
         address[] calldata registeredAddresses
-    ) external view onlyOwner returns (address[] memory) {
+    ) external view returns (address[] memory) {
         uint256 length = registeredAddresses.length;
         if (length == 0) {
             revert InvalidArrayLength();
