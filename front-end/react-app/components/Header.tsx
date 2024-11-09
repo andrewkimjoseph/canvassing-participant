@@ -80,7 +80,7 @@ export default function Header() {
                   SVGIcon={RewardHistoryIconC}
                   text={'Reward History'}
                   link={'/'}
-                />{' '}
+                />
               </DrawerActionTrigger>
               <DrawerActionTrigger>
                 <DrawerCardC
