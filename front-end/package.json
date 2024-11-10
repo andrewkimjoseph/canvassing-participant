@@ -1,29 +1,45 @@
 {
-  "author": "Canvassing (c/o Andrew Kim Joseph)",
-  "bugs": {
-    "url": "https://github.com/celo-org/celo-composer/issues"
-  },
-  "description": "Custom Celo Composer project.",
-  "homepage": "https://github.com/celo-org/celo-composer/blob/main/README.md",
-  "keywords": [
-    "celo-composer",
-    "celo"
-  ],
-  "license": "MIT",
-  "name": "participant",
+  "name": "@participant/react-app",
+  "version": "0.1.0",
   "private": true,
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/celo-org/celo-composer.git"
-  },
   "scripts": {
-    "react-app:dev": "yarn workspace @participant/react-app dev",
-    "react-app:build": "yarn workspace @participant/react-app build",
-    "react-app:start": "yarn workspace @participant/react-app start",
-    "react-app:lint": "yarn workspace @participant/react-app lint"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
-  "version": "1.0.0",
-  "workspaces": [
-    "packages/*"
-  ]
+  "dependencies": {
+    "@chakra-ui/react": "^3.1.0",
+    "@emotion/react": "^11.13.3",
+    "@headlessui/react": "^2.1.10",
+    "@heroicons/react": "^2.1.5",
+    "@rainbow-me/rainbowkit": "^2.2.0",
+    "@tanstack/react-query": "^5.59.20",
+    "@wagmi/connectors": "5.3.3",
+    "encoding": "^0.1.13",
+    "ethers": "^6.13.4",
+    "next": "^15.0.1",
+    "next-themes": "^0.4.3",
+    "pino-pretty": "^11.3.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-icons": "^5.3.0",
+    "viem": "^2.21.42",
+    "wagmi": "^2.12.25"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.9",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.13.0",
+    "eslint-config-next": "^15.0.1",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
+    "typescript": "5.6.3"
+  },
+  "browser": {
+    "net": false
+  },
+  "author": "Canvassing (c/o Andrew Kim Joseph)"
 }
