@@ -6,6 +6,8 @@ import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 
+// Author: @andrewkimjoseph
+
 contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
     IERC20Metadata public immutable cUSD;
 
