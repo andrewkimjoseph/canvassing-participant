@@ -277,55 +277,32 @@ describe("CanvassingSurvey", () => {
     ).to.be.rejected;
   });
 
-  // it("Should allow a whitelisted participant to claim a reward", async () => {
+  // it("Should allow a whitelisted participant to claim a reward if the contract balance is sufficient", async () => {
   //   const testAddress = "0xE49B05F2c7DD51f61E415E1DFAc10B80074B001A";
-
-  //   const rewardClaimTx = await privateClient.writeContract({
-  //     account: testAddress,
-  //     address: contractAddress as Address,
-  //     abi: abi,
-  //     functionName: "processRewardClaimByParticipant",
-  //     args: [testAddress],
-  //   });
-
-  //   await publicClient.waitForTransactionReceipt({
-  //     hash: rewardClaimTx,
-  //   });
-
-  //   const hasClaimedReward = (await publicClient.readContract({
-  //     address: contractAddress as Address,
-  //     abi: abi,
-  //     functionName: "checkIfParticipantHasAlreadyClaimedReward",
-  //     args: [testAddress],
-  //   })) as boolean;
-
-  //   // Check if the participant has claimed the reward
-  //   expect(hasClaimedReward).to.be.true;
-  // });
-
-  // it("Should not allow a blacklisted participant to claim a reward", async () => {
-  //   const testAddress = "0xE49B05F2c7DD51f61E415E1DFAc10B80074B001A";
-
-  //   const [address] = await privateClient.getAddresses();
-
-  //   // Blacklist the address
-  //   await privateClient.writeContract({
-  //     account: privateKeyAccount,
-  //     address: contractAddress as Address,
-  //     abi: abi,
-  //     functionName: "blacklistOneWhitelistedAddress",
-  //     args: [testAddress],
-  //   });
-
-  //   // Try to claim the reward
   //   await expect(
-  //     privateClient.writeContract({
-  //       account: testAddress,
-  //       address: contractAddress as Address,
-  //       abi: abi,
-  //       functionName: "processRewardClaimByParticipant",
-  //       args: [testAddress],
-  //     })
-  //   ).to.be.rejectedWith("UserAddressNotWhitelisted");
+  //     (async () => {
+  //       const data = encodeFunctionData({
+  //         abi: abi,
+  //         functionName: "processRewardClaimByParticipant",
+  //         args: [testAddress],
+  //       });
+
+  //       // Send the transaction as a raw signed transaction
+  //       const request = await privateClient.prepareTransactionRequest({
+  //         to: contractAddress,
+  //         data,
+  //       });
+
+  //       const serializedTransaction = await privateClient.signTransaction(
+  //         request
+  //       );
+
+  //       const hash = await privateClient.sendRawTransaction({
+  //         serializedTransaction,
+  //       });
+
+  //       return await publicClient.waitForTransactionReceipt({ hash });
+  //     })()
+  //   ).to.be.rejected;
   // });
 });
