@@ -28,7 +28,7 @@ const CanvassingSurveyModule = buildModule("CanvassingSurveyModule", (imb) => {
     CUSD_TOKEN_ADDRESS
   );
 
-  const canvassingSurvey = imb.contract("CanvassingSurveyModule", [
+  const canvassingSurvey = imb.contract("CanvassingSurvey", [
     researcherWalletAddress,
     _rewardAmountPerParticipantInWei,
     _targetNumberOfParticipants,
