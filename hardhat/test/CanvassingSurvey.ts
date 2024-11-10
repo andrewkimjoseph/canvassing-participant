@@ -15,6 +15,7 @@ import { config } from "dotenv";
 // Import your contract ABI and bytecode
 import { abi } from "../artifacts/contracts/CanvassingSurvey.sol/CanvassingSurvey.json";
 import { bytecode } from "../artifacts/contracts/CanvassingSurvey.sol/CanvassingSurvey.json";
+import { cUSDAlfajoresContractABI } from "./utils/cUSDAlfajoresContractABI";
 
 config();
 
@@ -33,12 +34,10 @@ describe("CanvassingSurvey", () => {
     transport: http(INFURA_RPC_URL),
   });
 
-  const privateKeyAccount = privateKeyToAccount(
-    toHex(mnemonicToAccount(SRP).getHdKey().privateKey as Uint8Array)
-  );
+  const mnemonicAccount = mnemonicToAccount(SRP);
 
   const privateClient = createWalletClient({
-    account: privateKeyAccount,
+    account: mnemonicAccount,
     chain: celoAlfajores,
     transport: http(INFURA_RPC_URL),
   });
@@ -46,18 +45,14 @@ describe("CanvassingSurvey", () => {
   let contractAddress: Address | null | undefined;
 
   before(async function () {
-    // const currentNonce = await publicClient.getTransactionCount({
-    //     address: mnemonicAccount.address,
-    //     blockTag:'latest'
-    //   });
 
     const hash = await privateClient.deployContract({
       abi,
-      account: privateKeyAccount,
+      account: mnemonicAccount,
       args: [
-        privateKeyAccount.address,
-        parseEther("1"), // 1 cUSD reward
-        BigInt(100), // target participantsxq
+        mnemonicAccount.address,
+        parseEther("0.25"), // 0.25 cUSD reward
+        BigInt(1), // target participants
         CUSD_ADDRESS,
       ],
       bytecode: bytecode as `0x${string}`,
@@ -67,7 +62,7 @@ describe("CanvassingSurvey", () => {
     const receipt = await publicClient.waitForTransactionReceipt({ hash });
     contractAddress = receipt.contractAddress;
 
-    console.log(contractAddress);
+    console.log("Deployed contract address: ", contractAddress);
 
     if (!contractAddress) throw new Error("Contract deployment failed");
   });
@@ -76,7 +71,7 @@ describe("CanvassingSurvey", () => {
     const testAddress = "0xE49B05F2c7DD51f61E415E1DFAc10B80074B001A";
 
     const whitelistTx = await privateClient.writeContract({
-      account: privateKeyAccount,
+      account: mnemonicAccount,
       address: contractAddress as Address,
       abi: abi,
       functionName: "whitelistOneAddress",
@@ -102,7 +97,7 @@ describe("CanvassingSurvey", () => {
     const testAddress = "0xE49B05F2c7DD51f61E415E1DFAc10B80074B001A";
 
     const blacklistTx = await privateClient.writeContract({
-      account: privateKeyAccount,
+      account: mnemonicAccount,
       address: contractAddress as Address,
       abi: abi,
       functionName: "blacklistOneWhitelistedAddress",
@@ -140,7 +135,7 @@ describe("CanvassingSurvey", () => {
     ];
 
     const whitelistTx = await privateClient.writeContract({
-      account: privateKeyAccount,
+      account: mnemonicAccount,
       address: contractAddress as Address,
       abi: abi,
       functionName: "whitelistMultipleAddresses",
@@ -191,7 +186,7 @@ describe("CanvassingSurvey", () => {
     // // }
 
     const blacklistTx = await privateClient.writeContract({
-      account: privateKeyAccount,
+      account: mnemonicAccount,
       address: contractAddress as Address,
       abi: abi,
       functionName: "blacklistMultipleWhitelistedAddresses",
@@ -225,7 +220,7 @@ describe("CanvassingSurvey", () => {
     const newTargetParticipants = BigInt(200);
 
     const updateTx = await privateClient.writeContract({
-      account: privateKeyAccount,
+      account: mnemonicAccount,
       address: contractAddress as Address,
       abi: abi,
       functionName: "updateTargetNumberOfParticipants",
@@ -247,7 +242,7 @@ describe("CanvassingSurvey", () => {
     expect(currentTargetParticipants).to.not.equal(oldTargetParticipants);
   });
 
-  it("Should not allow any whitelisted participant to claim a reward if contract balance is insufficient", async () => {
+  it("Should not allow any reward claim if contract balance is insufficient", async () => {
     const testAddress = "0xE49B05F2c7DD51f61E415E1DFAc10B80074B001A";
 
     await expect(
@@ -277,32 +272,47 @@ describe("CanvassingSurvey", () => {
     ).to.be.rejected;
   });
 
-  // it("Should allow a whitelisted participant to claim a reward if the contract balance is sufficient", async () => {
-  //   const testAddress = "0xE49B05F2c7DD51f61E415E1DFAc10B80074B001A";
-  //   await expect(
-  //     (async () => {
-  //       const data = encodeFunctionData({
-  //         abi: abi,
-  //         functionName: "processRewardClaimByParticipant",
-  //         args: [testAddress],
-  //       });
+  it("Should allow a whitelisted participant to claim a reward once the contract balance is sufficient", async () => {
+    const testAddress = "0xE49B05F2c7DD51f61E415E1DFAc10B80074B001A";
 
-  //       // Send the transaction as a raw signed transaction
-  //       const request = await privateClient.prepareTransactionRequest({
-  //         to: contractAddress,
-  //         data,
-  //       });
+    // Send 0.25 cUSD to the contract
+    const sendCUSDTx = await privateClient.writeContract({
+      account: mnemonicAccount,
+      address: CUSD_ADDRESS as Address,
+      abi: cUSDAlfajoresContractABI,
+      functionName: "transfer",
+      args: [contractAddress, parseEther("0.25")],
+    });
 
-  //       const serializedTransaction = await privateClient.signTransaction(
-  //         request
-  //       );
+    await publicClient.waitForTransactionReceipt({
+      hash: sendCUSDTx,
+    });
 
-  //       const hash = await privateClient.sendRawTransaction({
-  //         serializedTransaction,
-  //       });
+    // This should execute without throwing an error
+    await expect(
+      (async () => {
+        const data = encodeFunctionData({
+          abi: abi,
+          functionName: "processRewardClaimByParticipant",
+          args: [testAddress],
+        });
 
-  //       return await publicClient.waitForTransactionReceipt({ hash });
-  //     })()
-  //   ).to.be.rejected;
-  // });
+        // Send the transaction as a raw signed transaction
+        const request = await privateClient.prepareTransactionRequest({
+          to: contractAddress,
+          data,
+        });
+
+        const serializedTransaction = await privateClient.signTransaction(
+          request
+        );
+
+        const hash = await privateClient.sendRawTransaction({
+          serializedTransaction,
+        });
+
+        return await publicClient.waitForTransactionReceipt({ hash });
+      })()
+    ).to.not.be.rejected;
+  });
 });
