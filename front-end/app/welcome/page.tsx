@@ -40,7 +40,7 @@ export default function WelcomePageOne() {
           src="welcomePage.jpg" // Replace with your image URL
           alt="Background"
           width="100vw"
-          height="65vh"
+          height="60vh"
           objectFit="cover"
           blur={"md"}
         />

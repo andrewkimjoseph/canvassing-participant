@@ -37,16 +37,16 @@ export default function SignUpPage() {
 
   const genders = createListCollection({
     items: [
-      { label: 'Male', value: 'M' },
-      { label: 'Female', value: 'F' },
+      { label: '♂️ Male', value: 'M' },
+      { label: '♀️ Female', value: 'F' },
     ],
   });
 
   const country = createListCollection({
     items: [
-      { label: 'Nigeria', value: 'NIG' },
-      { label: 'Kenya', value: 'KEN' },
-      { label: 'Uganda', value: 'UGN' },
+      { label: '🇳🇬 Nigeria', value: 'NIG' },
+      { label: '🇰🇪 Kenya', value: 'KEN' },
+      { label: '🇺🇬 Uganda', value: 'UGN' },
     ],
   });
 

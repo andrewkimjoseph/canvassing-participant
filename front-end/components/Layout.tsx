@@ -1,5 +1,6 @@
 import { FC, ReactNode } from 'react';
 import Header from './Header';
+import { Box } from '@chakra-ui/react';
 
 interface Props {
   children: ReactNode;
@@ -7,14 +8,17 @@ interface Props {
 const Layout: FC<Props> = ({ children }) => {
   return (
     <>
-      <div className="bg-white overflow-hidden flex flex-col min-h-screen">
+      <div className="bg-white overflow-hidden flex flex-col">
         <Header />
-        <div className="max-w-7xl mx-auto space-y-8 sm:px-6 lg:px-8">
+        <Box w={"100wh"} h={"100vh"} >
           {children}
-        </div>
+        </Box>
       </div>
     </>
   );
 };
 
 export default Layout;
+
+
+// className="max-w-7xl mx-auto space-y-8 sm:px-6 lg:px-8"
