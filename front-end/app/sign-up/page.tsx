@@ -68,7 +68,7 @@ export default function SignUpPage() {
     <VStack width="100vw" h={'100vh'}>
       <Box position="relative" width="100%" height="50%" overflow="hidden">
         <Image
-          src="signUpPage.png" // Replace with your image URL
+          src="signUpPage.jpg" // Replace with your image URL
           alt="Background"
           width="100vw"
           objectFit="cover"
