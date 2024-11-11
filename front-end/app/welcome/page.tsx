@@ -11,7 +11,7 @@ import {
   VStack,
   Text,
 } from '@chakra-ui/react';
-import { WelcomePageOneIconC } from '../../components/icons/WelcomePageOneIconC';
+import { WelcomePageIconC } from '../../components/icons/WelcomePageIconC';
 
 export default function WelcomePageOne() {
   const [userAddress, setUserAddress] = useState('');
@@ -37,7 +37,7 @@ export default function WelcomePageOne() {
       {/* Background Image */}
       <Box position="relative" width="100%" height="50%" overflow="hidden" borderBottomLeftRadius={30} borderBottomRightRadius={30}>
         <Image 
-          src="welcomePageOneImage.png" // Replace with your image URL
+          src="welcomePage.png" // Replace with your image URL
           alt="Background"
           width="100vw"
           height="65vh"
@@ -47,7 +47,7 @@ export default function WelcomePageOne() {
 
         {/* Logo at the top center of the image */}
         <Box position="absolute" top="10%" width="100%" display="flex" justifyContent="center">
-          <WelcomePageOneIconC /> {/* Adjust the logo scale if needed */}
+          <WelcomePageIconC /> {/* Adjust the logo scale if needed */}
         </Box>
       </Box>
 
