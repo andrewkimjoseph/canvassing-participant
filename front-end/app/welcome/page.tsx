@@ -37,7 +37,7 @@ export default function WelcomePageOne() {
       {/* Background Image */}
       <Box position="relative" width="100%" height="50%" overflow="hidden" borderBottomLeftRadius={30} borderBottomRightRadius={30}>
         <Image 
-          src="welcomePage.png" // Replace with your image URL
+          src="welcomePage.jpg" // Replace with your image URL
           alt="Background"
           width="100vw"
           height="65vh"
