@@ -9,6 +9,8 @@ export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
 
+
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -25,7 +27,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col justify-center items-center">
-  
+
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { IconSvgProps } from '@/types/svgIcon';
 import * as React from 'react';
 
-export const WelcomePageOneIconC: React.FC<IconSvgProps> = ({}) => {
+export const WelcomePageIconC: React.FC<IconSvgProps> = ({}) => {
   return (
     <svg
       width="85"
