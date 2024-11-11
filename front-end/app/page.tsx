@@ -128,8 +128,6 @@ export default function Home() {
           </Box>
         ))}
       </Box>
-
-      
     </Flex>
   );
 }
