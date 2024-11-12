@@ -5,7 +5,7 @@ import { Box } from '@chakra-ui/react';
 interface Props {
   children: ReactNode;
 }
-const Layout: FC<Props> = ({ children }) => {
+const CustomLayout: FC<Props> = ({ children }) => {
   return (
     <>
       <div className="bg-white overflow-hidden flex flex-col">
@@ -18,4 +18,4 @@ const Layout: FC<Props> = ({ children }) => {
   );
 };
 
-export default Layout;
+export default CustomLayout;
