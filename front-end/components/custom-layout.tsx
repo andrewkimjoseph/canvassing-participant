@@ -8,7 +8,7 @@ interface Props {
 const CustomLayout: FC<Props> = ({ children }) => {
   return (
     <>
-      <div className="bg-white overflow-hidden flex flex-col">
+      <div className="bg-white flex flex-col">
         <CustomHeader />
         <Box w={"100wh"} h={"100vh"} >
           {children}

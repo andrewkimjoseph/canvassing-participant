@@ -34,7 +34,7 @@ const CustomHeader = () => {
   return (
     <DrawerRoot size={'full'} placement={'start'}>
       <DrawerBackdrop />
-      <Box bg="#363062" px={4} position="sticky" top="0" zIndex="1000" >
+      <Box bg="#363062" px={4} position="sticky" top="0" left="0" zIndex="1000" >
         <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
           <DrawerTrigger asChild>
             <IconButton size={'md'} aria-label={'Open Menu'}>
