@@ -34,7 +34,7 @@ export default function TransactionSuccessfulPage() {
   }
 
   return (
-    <Flex flexDirection={'column'} w={'100%'} h={'100%'} bgColor={'#ECECEC'}>
+    <Flex flexDirection={'column'} w={'100%'} h={"100vh"} bgColor={'#ECECEC'}>
       <Box
         width="100%"
         height={'35%'}
