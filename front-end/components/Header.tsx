@@ -20,15 +20,15 @@ import {
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { Avatar } from '@/components/ui/avatar';
 
-import { LogoC } from './LogoC';
-import { HamburgerIconC } from './HamburgerIconC';
-import { DrawerLogoC } from './DrawerLogoC';
-import { DrawerCardC } from './DrawerCardC';
-import { HomeIconC } from './icons/HomeIconC';
-import { RewardHistoryIconC } from './icons/RewardHistoryIconC';
-import { ProfileIconC } from './icons/ProfileIconC';
-import { CloseIconC } from './icons/CloseIconC';
-import { EditIconC } from './icons/EditIconC';
+import { LogoC } from './logo';
+import { HamburgerIconC } from './hamburger-icon';
+import { DrawerLogoC } from './drawer-logo';
+import { DrawerCardC } from './drawer-card';
+import { HomeIconC } from './icons/home-icon';
+import { RewardHistoryIconC } from './icons/reward-history-icon';
+import { ProfileIconC } from './icons/profile-icon';
+import { CloseIconC } from './icons/close-icon';
+import { EditIconC } from './icons/edit-icon';
 
 export default function Header() {
   return (

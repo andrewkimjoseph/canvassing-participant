@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 
 import { Box, Image, Button, VStack, Text, Flex } from '@chakra-ui/react';
-import { EditIconC } from '@/components/icons/EditIconC';
+import { EditIconC } from '@/components/icons/edit-icon';
 
 import { Avatar } from '@/components/ui/avatar';
 export default function Home() {

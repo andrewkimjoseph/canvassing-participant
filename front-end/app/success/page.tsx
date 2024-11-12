@@ -13,7 +13,7 @@ import {
   Flex,
   Separator,
 } from '@chakra-ui/react';
-import { EditIconC } from '@/components/icons/EditIconC';
+import { EditIconC } from '@/components/icons/edit-icon';
 
 import {
   AccordionItem,

@@ -11,7 +11,7 @@ import {
   VStack,
   Text,
 } from '@chakra-ui/react';
-import { WelcomePageIconC } from '../../components/icons/WelcomePageIconC';
+import { WelcomePageIconC } from '../../components/icons/welcome-page-icon';
 
 export default function WelcomePage() {
   const [userAddress, setUserAddress] = useState('');

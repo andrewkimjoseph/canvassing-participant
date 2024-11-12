@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 
 import { Box, Image, Button, VStack, Text, Flex, Separator } from '@chakra-ui/react';
-import { EditIconC } from '@/components/icons/EditIconC';
+import { EditIconC } from '@/components/icons/edit-icon';
 
 import {  AccordionItem,
     AccordionItemContent,
@@ -68,7 +68,7 @@ export default function SurveyPage() {
         borderBottomRightRadius={15}
       >
         <Image
-          src="instructionalManual.png" // Replace with your image URL
+          src="instructional-manual.png" // Replace with your image URL
           alt="Background"
           width="100%"
           height="35vh"

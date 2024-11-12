@@ -13,7 +13,7 @@ import {
   Flex,
   Separator,
 } from '@chakra-ui/react';
-import { EditIconC } from '@/components/icons/EditIconC';
+import { EditIconC } from '@/components/icons/edit-icon';
 
 import {
   AccordionItem,
@@ -72,7 +72,7 @@ export default function TransactionSuccessfulPage() {
         mt={16}
       >
         <Image
-          src="transactionSuccessful.png" // Replace with your image URL
+          src="transaction-successful.png" // Replace with your image URL
           alt="Background"
           width="100%"
           height="35vh"

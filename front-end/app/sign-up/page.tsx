@@ -26,9 +26,9 @@ import {
   SelectValueText,
 } from '@/components/ui/select';
 
-import { WelcomePageIconC } from '../../components/icons/WelcomePageIconC';
-import { SignUpPageIconC } from '@/components/icons/SignUpPageIconC';
-import { DateIconC } from '@/components/icons/DateIconC';
+import { WelcomePageIconC } from '../../components/icons/welcome-page-icon';
+import { SignUpPageIconC } from '@/components/icons/signup-page-icon';
+import { DateIconC } from '@/components/icons/date-icon';
 
 export default function SignUpPage() {
   const [userAddress, setUserAddress] = useState('');
@@ -68,7 +68,7 @@ export default function SignUpPage() {
     <VStack width="100vw" h={'100vh'}>
       <Box position="relative" width="100%" height="50%" overflow="hidden">
         <Image
-          src="signUpPage.jpg" // Replace with your image URL
+          src="signup-page.jpg" // Replace with your image URL
           alt="Background"
           width="100vw"
           objectFit="cover"
