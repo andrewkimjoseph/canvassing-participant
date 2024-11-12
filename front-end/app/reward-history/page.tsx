@@ -70,8 +70,6 @@ export default function RewardHistory() {
               25-10-2024 23:20
             </Text>
 
-       
-
             <Flex
               flexDirection="row"
               justifyContent={'space-between'}
@@ -82,7 +80,7 @@ export default function RewardHistory() {
               </Text>
 
               <Text fontSize={'sm'} mb={2} color="black" mr={2}>
-               cUSD 0.25
+                cUSD 0.25
               </Text>
             </Flex>
 
