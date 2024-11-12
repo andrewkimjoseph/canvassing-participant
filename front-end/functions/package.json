@@ -14,10 +14,6 @@
     "node": "18"
   },
   "main": "lib/index.js",
-  "dependencies": {
-    "firebase-admin": "^11.11.1",
-    "firebase-functions": "^4.9.0"
-  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.12.0",
     "@typescript-eslint/parser": "^5.12.0",
