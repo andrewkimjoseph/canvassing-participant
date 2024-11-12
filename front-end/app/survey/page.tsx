@@ -56,6 +56,7 @@ export default function SurveyPage() {
     <Flex
       flexDirection={'column'}
       w={'100%'}
+      h={"100vh"}
       bgColor={'#ECECEC'}
     >
       <Box
@@ -184,7 +185,7 @@ export default function SurveyPage() {
         ))}
       </AccordionRoot>
       </Box>
-      <Button bgColor={"#363062"} borderRadius={15} px={6} w={"3/6"} mt={5} alignSelf={"center"} mb={16} onClick={()=>router.push("https://tally.so/r/w2bjZV")}>
+      <Button bgColor={"#363062"} borderRadius={15} px={6} w={"3/6"} mt={16} alignSelf={"center"} onClick={()=>router.push("https://tally.so/r/w2bjZV")}>
         <Text fontSize="16" fontWeight="bold" color="white">
         Start Survey
       </Text>
