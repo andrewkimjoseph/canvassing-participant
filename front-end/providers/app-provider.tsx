@@ -11,8 +11,8 @@ import {
 import { WagmiProvider, createConfig, http } from 'wagmi';
 import { celo, celoAlfajores } from 'wagmi/chains';
 
-import Layout from '../components/Layout';
 import { injectedWallet } from '@rainbow-me/rainbowkit/wallets';
+import CustomLayout from '@/components/custom-layout';
 
 const connectors = connectorsForWallets(
   [
@@ -51,7 +51,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             overlayBlur: "small",
           })}
         >
-          <Layout>{children}</Layout>
+          <CustomLayout>{children}</CustomLayout>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

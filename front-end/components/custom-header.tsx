@@ -20,17 +20,17 @@ import {
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { Avatar } from '@/components/ui/avatar';
 
-import { LogoC } from './LogoC';
-import { HamburgerIconC } from './HamburgerIconC';
-import { DrawerLogoC } from './DrawerLogoC';
-import { DrawerCardC } from './DrawerCardC';
-import { HomeIconC } from './icons/HomeIconC';
-import { RewardHistoryIconC } from './icons/RewardHistoryIconC';
-import { ProfileIconC } from './icons/ProfileIconC';
-import { CloseIconC } from './icons/CloseIconC';
-import { EditIconC } from './icons/EditIconC';
+import { LogoC } from './logo';
+import { HamburgerIconC } from './hamburger-icon';
+import { DrawerLogoC } from './drawer-logo';
+import { DrawerCardC } from './drawer-card';
+import { HomeIconC } from './icons/home-icon';
+import { RewardHistoryIconC } from './icons/reward-history-icon';
+import { ProfileIconC } from './icons/profile-icon';
+import { CloseIconC } from './icons/close-icon';
+import { EditIconC } from './icons/edit-icon';
 
-export default function Header() {
+const CustomHeader = () => {
   return (
     <DrawerRoot size={'full'} placement={'start'}>
       <DrawerBackdrop />
@@ -77,12 +77,12 @@ export default function Header() {
               <DrawerCardC
                 SVGIcon={RewardHistoryIconC}
                 text={'Reward History'}
-                link={'/'}
+                link={'/reward-history'}
               />
             </DrawerActionTrigger>
-            <DrawerActionTrigger>
+            {/* <DrawerActionTrigger>
               <DrawerCardC SVGIcon={ProfileIconC} text={'Profile'} link={'/'} />
-            </DrawerActionTrigger>
+            </DrawerActionTrigger> */}
           </Flex>
         </DrawerBody>
         <DrawerFooter flexDirection={'column'} alignItems={'center'} pb={16}>
@@ -111,9 +111,9 @@ export default function Header() {
               </Text>
             </Box>
 
-            <Box className="flex flex-col items-left relative ml-4">
+            {/* <Box className="flex flex-col items-left relative ml-4">
               <EditIconC />
-            </Box>
+            </Box> */}
           </Box>
         </DrawerFooter>
         <DrawerCloseTrigger />
@@ -121,3 +121,5 @@ export default function Header() {
     </DrawerRoot>
   );
 }
+
+export default CustomHeader;

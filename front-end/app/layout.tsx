@@ -1,6 +1,6 @@
 import '@/styles/globals.css';
 
-import { AppProvider } from '@/providers/AppProvider';
+import { AppProvider } from '@/providers/app-provider';
 import { Provider } from '@/components/ui/provider';
 import { Metadata } from 'next';
 import { font } from "@/utils/font";
