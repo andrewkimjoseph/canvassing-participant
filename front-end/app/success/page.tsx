@@ -8,45 +8,17 @@ import {
   Box,
   Image,
   Button,
-  VStack,
   Text,
   Flex,
-  Separator,
 } from '@chakra-ui/react';
-import { EditIconC } from '@/components/icons/edit-icon';
 
-import {
-  AccordionItem,
-  AccordionItemContent,
-  AccordionItemTrigger,
-  AccordionRoot,
-} from '@/components/ui/accordion';
+
+import { useRouter } from 'next/navigation'
 export default function SuccessPage() {
   const [userAddress, setUserAddress] = useState('');
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
-
-  const [value, setValue] = useState(['survey-instructions']);
-
-  const firstItem = [
-    {
-      value: 'survey-instructions',
-      title: 'Survey instructions',
-      text: '✅Select your primary stablecoin.',
-    },
-  ];
-
-  const secondItem = [
-    {
-      value: 'time-duration',
-      title: 'Time Duration',
-      text: 'Estimated Completion Time: 2–3 minutes',
-    },
-  ];
-
-  const thirdItem = [
-    { value: 'researcher', title: 'Researcher', text: 'MiniPay' },
-  ];
+  const router = useRouter();
 
   useEffect(() => {
     setIsMounted(true);
@@ -120,6 +92,7 @@ export default function SuccessPage() {
         mt={5}
         alignSelf={'center'}
         mb={16}
+        onClick={()=>router.push("/transaction-successful")}
       >
         <Text fontSize="16" fontWeight="bold" color="white">
           Claim

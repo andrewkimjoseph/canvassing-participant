@@ -77,12 +77,12 @@ export default function Header() {
               <DrawerCardC
                 SVGIcon={RewardHistoryIconC}
                 text={'Reward History'}
-                link={'/'}
+                link={'/reward-history'}
               />
             </DrawerActionTrigger>
-            <DrawerActionTrigger>
+            {/* <DrawerActionTrigger>
               <DrawerCardC SVGIcon={ProfileIconC} text={'Profile'} link={'/'} />
-            </DrawerActionTrigger>
+            </DrawerActionTrigger> */}
           </Flex>
         </DrawerBody>
         <DrawerFooter flexDirection={'column'} alignItems={'center'} pb={16}>
@@ -111,9 +111,9 @@ export default function Header() {
               </Text>
             </Box>
 
-            <Box className="flex flex-col items-left relative ml-4">
+            {/* <Box className="flex flex-col items-left relative ml-4">
               <EditIconC />
-            </Box>
+            </Box> */}
           </Box>
         </DrawerFooter>
         <DrawerCloseTrigger />

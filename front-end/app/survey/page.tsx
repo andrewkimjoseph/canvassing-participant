@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 
 import { Box, Image, Button, VStack, Text, Flex, Separator } from '@chakra-ui/react';
-import { EditIconC } from '@/components/icons/edit-icon';
+import { useRouter } from 'next/navigation'
 
 import {  AccordionItem,
     AccordionItemContent,
@@ -15,6 +15,8 @@ export default function SurveyPage() {
   const [userAddress, setUserAddress] = useState('');
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
+
+  const router = useRouter();
 
   const [value, setValue] = useState(["survey-instructions"])
 
@@ -130,7 +132,7 @@ export default function SurveyPage() {
       <AccordionRoot value={value} onValueChange={(e) => setValue(e.value)} multiple>
         {firstItem.map((item, index) => (
           <AccordionItem key={index} value={item.value} color={"black"} pb={1}>
-            <AccordionItemTrigger>{item.title}</AccordionItemTrigger>
+            <AccordionItemTrigger fontWeight={"bold"}>{item.title}</AccordionItemTrigger>
             <AccordionItemContent>{item.text}</AccordionItemContent>
           </AccordionItem>
         ))}
@@ -154,7 +156,7 @@ export default function SurveyPage() {
       <AccordionRoot value={value} onValueChange={(e) => setValue(e.value)} multiple>
         {secondItem.map((item, index) => (
           <AccordionItem key={index} value={item.value} color={"black"} pb={1}>
-            <AccordionItemTrigger>{item.title}</AccordionItemTrigger>
+            <AccordionItemTrigger fontWeight={"bold"}>{item.title}</AccordionItemTrigger>
             <AccordionItemContent>{item.text}</AccordionItemContent>
           </AccordionItem>
         ))}
@@ -180,13 +182,13 @@ export default function SurveyPage() {
         {thirdItem.map((item, index) => (
           <AccordionItem key={index} value={item.value} color={"black"} pb={1}>
      
-            <AccordionItemTrigger>{item.title}</AccordionItemTrigger>
+            <AccordionItemTrigger fontWeight={"bold"}>{item.title}</AccordionItemTrigger>
             <AccordionItemContent>{item.text}</AccordionItemContent>
           </AccordionItem>
         ))}
       </AccordionRoot>
       </Box>
-      <Button bgColor={"#363062"} borderRadius={15} px={6} w={"3/6"} mt={5} alignSelf={"center"} mb={16}>
+      <Button bgColor={"#363062"} borderRadius={15} px={6} w={"3/6"} mt={5} alignSelf={"center"} mb={16} onClick={()=>router.push("https://tally.so/r/w2bjZV")}>
         <Text fontSize="16" fontWeight="bold" color="white">
         Start Survey
       </Text>

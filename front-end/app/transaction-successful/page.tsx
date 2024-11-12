@@ -8,46 +8,17 @@ import {
   Box,
   Image,
   Button,
-  VStack,
   Text,
   Flex,
-  Separator,
 } from '@chakra-ui/react';
-import { EditIconC } from '@/components/icons/edit-icon';
+import { useRouter } from 'next/navigation'
 
-import {
-  AccordionItem,
-  AccordionItemContent,
-  AccordionItemTrigger,
-  AccordionRoot,
-} from '@/components/ui/accordion';
+
 export default function TransactionSuccessfulPage() {
   const [userAddress, setUserAddress] = useState('');
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
-
-  const [value, setValue] = useState(['survey-instructions']);
-
-  const firstItem = [
-    {
-      value: 'survey-instructions',
-      title: 'Survey instructions',
-      text: '✅Select your primary stablecoin.',
-    },
-  ];
-
-  const secondItem = [
-    {
-      value: 'time-duration',
-      title: 'Time Duration',
-      text: 'Estimated Completion Time: 2–3 minutes',
-    },
-  ];
-
-  const thirdItem = [
-    { value: 'researcher', title: 'Researcher', text: 'MiniPay' },
-  ];
-
+  const router = useRouter();
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -80,7 +51,7 @@ export default function TransactionSuccessfulPage() {
           blur={'md'}
         />
       </Box>
-      <Text fontSize={'x-large'} mb={2} color="#363062" fontWeight="bold" alignSelf={'center'} mt={4}>
+      <Text fontSize={'x-large'} mb={2} color="#363062" fontWeight="bold" textAlign={'center'} mt={4}>
         Your transaction was successful!
       </Text>
 
@@ -92,6 +63,7 @@ export default function TransactionSuccessfulPage() {
         mt={5}
         alignSelf={'center'}
         mb={16}
+        onClick={()=>router.push("/")}
       >
         <Text fontSize="16" fontWeight="bold" color="white">
           Back to Homepage
