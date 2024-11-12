@@ -10,7 +10,7 @@ const CustomLayout: FC<Props> = ({ children }) => {
     <>
       <div className="bg-white flex flex-col">
         <CustomHeader />
-        <Box w={"100wh"} h={"100vh"} >
+        <Box w={"100wh"}  >
           {children}
         </Box>
       </div>

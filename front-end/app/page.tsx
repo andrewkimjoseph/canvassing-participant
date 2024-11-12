@@ -31,7 +31,6 @@ export default function Home() {
     <Flex
       flexDirection={'column'}
       w={'100%'}
-      h={'100vh'}
       bgColor={'#ECECEC'}
       px={4}
     >
