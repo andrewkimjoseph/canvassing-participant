@@ -30,7 +30,7 @@ import { ProfileIconC } from './icons/profile-icon';
 import { CloseIconC } from './icons/close-icon';
 import { EditIconC } from './icons/edit-icon';
 
-export default function Header() {
+export default function CustomHeader() {
   return (
     <DrawerRoot size={'full'} placement={'start'}>
       <DrawerBackdrop />
