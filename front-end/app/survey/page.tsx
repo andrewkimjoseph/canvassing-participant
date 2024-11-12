@@ -11,7 +11,7 @@ import {  AccordionItem,
     AccordionItemContent,
     AccordionItemTrigger,
     AccordionRoot } from '@/components/ui/accordion';
-export default function Home() {
+export default function SurveyPage() {
   const [userAddress, setUserAddress] = useState('');
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
