@@ -38,8 +38,8 @@ export default function SuccessPage() {
     <Flex
       flexDirection={'column'}
       w={'100%'}
-      h={'100%'}
       bgColor={'#ECECEC'}
+      h={"100vh"}
     >
       <Box
         bgColor="white"

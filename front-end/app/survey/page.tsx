@@ -56,16 +56,12 @@ export default function SurveyPage() {
     <Flex
       flexDirection={'column'}
       w={'100%'}
-      h={'100%'}
       bgColor={'#ECECEC'}
-      className='h-svh'
-
     >
       <Box
         width="100%"
-        height={"35%"}
+        height={300}
         bgColor={"#CEDDF9"}
-        overflow="hidden"
         borderBottomLeftRadius={15}
         borderBottomRightRadius={15}
       >
@@ -73,7 +69,7 @@ export default function SurveyPage() {
           src="instructional-manual.png" // Replace with your image URL
           alt="Background"
           width="100%"
-          height="35vh"
+          height={300}
           objectFit={"contain"}
           blur={'md'}
         />

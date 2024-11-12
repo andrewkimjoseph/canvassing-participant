@@ -31,7 +31,7 @@ export default function Home() {
     <Flex
       flexDirection={'column'}
       w={'100%'}
-      h={'100%'}
+      h={'100vh'}
       bgColor={'#ECECEC'}
       px={4}
     >
@@ -89,7 +89,7 @@ export default function Home() {
         </Text>
       </Flex>
 
-      <Box h="100%" overflowY="auto" w={"full"}>
+      <Box w={"full"}>
         {[1, 2, 3, 4, 5].map((donation) => (
           <Link key={donation + 1} href={"/survey"}>
             <Box

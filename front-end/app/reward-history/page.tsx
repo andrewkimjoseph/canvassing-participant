@@ -31,7 +31,6 @@ export default function RewardHistory() {
     <Flex
       flexDirection={'column'}
       w={'100%'}
-      h={'100%'}
       bgColor={'#ECECEC'}
       px={4}
     >
