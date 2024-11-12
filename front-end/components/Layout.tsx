@@ -19,6 +19,3 @@ const Layout: FC<Props> = ({ children }) => {
 };
 
 export default Layout;
-
-
-// className="max-w-7xl mx-auto space-y-8 sm:px-6 lg:px-8"
