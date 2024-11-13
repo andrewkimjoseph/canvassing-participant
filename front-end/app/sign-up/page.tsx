@@ -1,9 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
+import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
-
 import {
   Box,
   Image,
@@ -12,53 +11,84 @@ import {
   Text,
   Flex,
   createListCollection,
-  Input,
-  InputAddon,
-  Group,
 } from '@chakra-ui/react';
+
+import { Toaster, toaster } from '@/components/ui/toaster';
 
 import {
   SelectContent,
   SelectItem,
-  SelectLabel,
   SelectRoot,
   SelectTrigger,
   SelectValueText,
 } from '@/components/ui/select';
 
-import { WelcomePageIconC } from '../../components/icons/welcome-page-icon';
 import { SignUpPageIconC } from '@/components/icons/signup-page-icon';
-import { DateIconC } from '@/components/icons/date-icon';
+import useParticipantStore from '@/stores/useParticipantStore';
 
 export default function SignUpPage() {
-  const [userAddress, setUserAddress] = useState('');
+  const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
-
-  const genders = createListCollection({
-    items: [
-      { label: '♂️ Male', value: 'M' },
-      { label: '♀️ Female', value: 'F' },
-    ],
-  });
-
-  const country = createListCollection({
-    items: [
-      { label: '🇳🇬 Nigeria', value: 'NIG' },
-      { label: '🇰🇪 Kenya', value: 'KEN' },
-      { label: '🇺🇬 Uganda', value: 'UGN' },
-    ],
-  });
+  const { setParticipant,} =
+    useParticipantStore();
+  const [country, setCountry] = useState<string | null>(null);
+  const [gender, setGender] = useState<string | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (isConnected && address) {
-      setUserAddress(address);
+  // // Check if participant exists and redirect to /welcome if not
+  // useEffect(() => {
+  //   const checkAndRedirect = async () => {
+  //     // Ensure that we call checkParticipant only when address is present and participant is undefined
+  //     if (address && !participant) {
+  //       await checkParticipant(address); // Check participant using wallet address
+
+  //       // Redirect to /welcome if no participant found
+  //       if (!participant) {
+  //         router.push('/welcome');
+  //       }
+  //     }
+  //   };
+
+  //   checkAndRedirect();
+  // }, [participant, address, checkParticipant, router]);
+
+  const handleSubmit = async () => {
+    if (!gender || !country) {
+      toaster.create({
+        description: 'Please select all required fields',
+        duration: 3000,
+        type: 'info',
+      });
+      return;
     }
-  }, [address, isConnected]);
+
+    try {
+      await setParticipant({
+        gender,
+        country,
+        walletAddress: 'address',
+        username: `user_${'address'.slice(2, 1)}`,
+      });
+
+      toaster.create({
+        description: 'Account created successfully!',
+        duration: 3000,
+        type: 'success',
+      });
+
+      router.push('/');
+    } catch (error) {
+      toaster.create({
+        description: 'Failed to create account. Please try again.',
+        duration: 3000,
+        type: 'error',
+      });
+    }
+  };
 
   if (!isMounted) {
     return null;
@@ -66,9 +96,11 @@ export default function SignUpPage() {
 
   return (
     <VStack width="100vw" h={'100vh'}>
+      <Toaster />
+
       <Box position="relative" width="100%" height="50%" overflow="hidden">
         <Image
-          src="signup-page.jpg" // Replace with your image URL
+          src="signup-page.jpg"
           alt="Background"
           width="100vw"
           objectFit="cover"
@@ -97,9 +129,20 @@ export default function SignUpPage() {
         <Text fontSize="3xl" fontWeight="bold" color="#363062" py={5}>
           Get Started
         </Text>
-
         <Box w={'4/6'}>
-          <SelectRoot collection={genders} bgColor={'white'} borderRadius={10}>
+          <SelectRoot
+            collection={genders}
+            bgColor={'white'}
+            borderRadius={10}
+            onValueChange={(selectedGender) => {
+              const gender: string = selectedGender.items[0].value;
+
+              setGender(gender);
+              // setGender(selectedGender.value);
+              // console.log(gender);
+              console.log(gender);
+            }}
+          >
             <SelectTrigger>
               <SelectValueText
                 placeholder="Select Gender"
@@ -118,7 +161,18 @@ export default function SignUpPage() {
         </Box>
 
         <Box w={'4/6'} pt={6}>
-          <SelectRoot collection={country} bgColor={'white'} borderRadius={10}>
+          <SelectRoot
+            collection={countries}
+            bgColor={'white'}
+            borderRadius={10}
+            onValueChange={(selectedCountry) => {
+              const country: string = selectedCountry.items[0].value;
+
+              setCountry(country);
+
+              console.log(country);
+            }}
+          >
             <SelectTrigger>
               <SelectValueText
                 placeholder="Select Country"
@@ -126,33 +180,25 @@ export default function SignUpPage() {
                 ml={3}
               />
             </SelectTrigger>
-            <SelectContent >
-              {country.items.map((country) => (
+            <SelectContent>
+              {countries.items.map((country) => (
                 <SelectItem item={country} key={country.value}>
                   {country.label}
-                
                 </SelectItem>
               ))}
             </SelectContent>
           </SelectRoot>
         </Box>
 
-        {/* <Box w={'4/6'}  pt={6}>
-          <Group attached>
-            <Input
-              placeholder="Select Year of Birth"
-              type="month"
-              bgColor={'white'}
-              color={'black'}
-              borderRadius={10}
-              _placeholder={{ color: "inherit" }}
-              value={new Date().toISOString().slice(0, 7)}
-            />
-            <InputAddon bgColor={"white"} borderRadius={10}><DateIconC/></InputAddon>
-          </Group>
-        </Box> */}
-
-        <Button bgColor={'#363062'} borderRadius={15} px={6} w={'3/6'} mt={20}>
+        <Button
+          bgColor={'#363062'}
+          borderRadius={15}
+          px={6}
+          w={'3/6'}
+          mt={20}
+          onClick={handleSubmit}
+          disabled={!gender || !country}
+        >
           <Text fontSize="16" fontWeight="bold" color="white">
             Done
           </Text>
@@ -161,3 +207,18 @@ export default function SignUpPage() {
     </VStack>
   );
 }
+
+const genders = createListCollection({
+  items: [
+    { label: '♂️ Male', value: 'M' },
+    { label: '♀️ Female', value: 'F' },
+  ],
+});
+
+const countries = createListCollection({
+  items: [
+    { label: '🇳🇬 Nigeria', value: 'NIG' },
+    { label: '🇰🇪 Kenya', value: 'KEN' },
+    { label: '🇺🇬 Uganda', value: 'UGN' },
+  ],
+});
