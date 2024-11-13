@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { Reward } from '@/entities/reward';
-import { db } from '@/app/firebase';
+import { db } from '@/firebase';
 
 interface RewardStoreState {
   rewards: Reward[];
