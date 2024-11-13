@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { Box, Image, Button, VStack, Text } from '@chakra-ui/react';
@@ -17,26 +17,32 @@ export default function WelcomePage() {
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
   // Check for participant when wallet is connected
-  useEffect(() => {
+  const checkParticipantStatus = useCallback(() => {
     if (isConnected && address) {
       checkParticipant(address);
     }
   }, [isConnected, address, checkParticipant]);
 
+  useEffect(() => {
+    checkParticipantStatus();
+  }, [checkParticipantStatus]);
+
   // Handle redirect
   useEffect(() => {
-    if (isMounted  && participant) {
-      router.push('/');
+    if (isMounted && participant) {
+      router.replace('/');
     }
-  }, [isMounted, isConnected, participant, router]);
+  }, [isMounted, participant, router]);
 
-
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleGetStarted = () => {
     router.push('/sign-up');
   };
+
 
   return (
     <VStack width="100vw" h="100vh">
