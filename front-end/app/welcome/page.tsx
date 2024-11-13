@@ -1,64 +1,84 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
+import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
-
-import {
-  Box,
-  Image,
-  Button,
-  VStack,
-  Text,
-} from '@chakra-ui/react';
-import { WelcomePageIconC } from '../../components/icons/welcome-page-icon';
+import { Box, Image, Button, VStack, Text } from '@chakra-ui/react';
+import useParticipantStore from '@/stores/useParticipantStore';
+import { WelcomePageIconC } from '@/components/icons/welcome-page-icon';
 
 export default function WelcomePage() {
-  const [userAddress, setUserAddress] = useState('');
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
+  const { participant, checkParticipant, loading } = useParticipantStore();
+  const router = useRouter();
 
+  // Handle mounting
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
+  // Check for participant when wallet is connected
   useEffect(() => {
     if (isConnected && address) {
-      setUserAddress(address);
+      checkParticipant(address);
     }
-  }, [address, isConnected]);
+  }, [isConnected, address, checkParticipant]);
 
-  if (!isMounted) {
-    return null;
-  }
+  // Handle redirect
+  useEffect(() => {
+    if (isMounted  && participant) {
+      router.push('/');
+    }
+  }, [isMounted, isConnected, participant, router]);
+
+
+
+  const handleGetStarted = () => {
+    router.push('/sign-up');
+  };
 
   return (
-    <VStack  width="100vw">
+    <VStack width="100vw" h="100vh">
       {/* Background Image */}
-      <Box position="relative" width="100%" height="50%" overflow="hidden" borderBottomLeftRadius={30} borderBottomRightRadius={30}>
-        <Image 
-          src="welcomePage.jpg" // Replace with your image URL
+      <Box
+        position="relative"
+        width="100%"
+        height="60vh"
+        overflow="hidden"
+        borderBottomLeftRadius={30}
+        borderBottomRightRadius={30}
+      >
+        <Image
+          src="welcomePage.jpg"
           alt="Background"
           width="100vw"
           height="60vh"
           objectFit="cover"
-          blur={"md"}
         />
 
-        {/* Logo at the top center of the image */}
         <Box position="absolute" top="10%" width="100%" display="flex" justifyContent="center">
-          <WelcomePageIconC /> {/* Adjust the logo scale if needed */}
+          <WelcomePageIconC />
         </Box>
       </Box>
 
-      {/* Text and Button below the image */}
-      <Text fontSize="3xl" fontWeight="bold" color={"#363062"}>
-        Welcome to Canvassing
+      <Text fontSize="3xl" fontWeight="bold" color="#363062" pt="10">
+        Welcome to
       </Text>
-      <Button bgColor={"#363062"} borderRadius={15} px={6} w={"3/6"} mt={5}>
+      <Text fontSize="3xl" fontWeight="bold" color="#363062">
+        Canvassing
+      </Text>
+      <Button 
+        bgColor="#363062" 
+        borderRadius={15} 
+        px={6} 
+        w="3/6" 
+        mt={5}
+        onClick={handleGetStarted}
+      >
         <Text fontSize="16" fontWeight="bold" color="white">
-        Get Started
-      </Text>
+          Get Started
+        </Text>
       </Button>
     </VStack>
   );
