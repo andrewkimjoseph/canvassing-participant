@@ -1,20 +1,27 @@
 import { FC, ReactNode } from 'react';
+import { usePathname } from 'next/navigation';  // Changed to next/navigation
 import { Box } from '@chakra-ui/react';
 import CustomHeader from './custom-header';
 
 interface Props {
   children: ReactNode;
 }
+
 const CustomLayout: FC<Props> = ({ children }) => {
+  const pathname = usePathname();  // Use usePathname instead of useRouter
+  const noHeaderRoutes = ['/welcome', '/sign-up'];
+  const showHeader = !noHeaderRoutes.includes(pathname);
+
+
+  
+
   return (
-    <>
-      <div className="bg-white flex flex-col">
-        <CustomHeader />
-        <Box w={"100wh"}  >
-          {children}
-        </Box>
-      </div>
-    </>
+    <div className="bg-white flex flex-col">
+      {showHeader && <CustomHeader />}
+      <Box w="100vw">
+        {children}
+      </Box>
+    </div>
   );
 };
 

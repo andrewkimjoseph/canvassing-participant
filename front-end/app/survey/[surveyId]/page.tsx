@@ -67,7 +67,7 @@ export default function SurveyPage() {
         borderBottomRightRadius={15}
       >
         <Image
-          src="instructional-manual.png" // Replace with your image URL
+          src="/instructional-manual.png" // Replace with your image URL
           alt="Background"
           width="100%"
           height={300}

@@ -12,6 +12,9 @@ import { WagmiProvider, createConfig, http } from 'wagmi';
 import { celo, celoAlfajores } from 'wagmi/chains';
 
 import { injectedWallet } from '@rainbow-me/rainbowkit/wallets';
+import { useEffect } from 'react';
+
+import useParticipantStore from '@/stores/useParticipantStore';
 import CustomLayout from '@/components/custom-layout';
 
 const connectors = connectorsForWallets(
@@ -22,8 +25,8 @@ const connectors = connectorsForWallets(
     },
   ],
   {
-    appName: 'Celo Composer',
-    projectId: process.env.WC_PROJECT_ID ?? '044601f65212332475a09bc14ceb3c34',
+    appName: 'Canvassing - Participant',
+    projectId: String(),
   }
 );
 
@@ -39,6 +42,7 @@ const config = createConfig({
 const queryClient = new QueryClient();
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
