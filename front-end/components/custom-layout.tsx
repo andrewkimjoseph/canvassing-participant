@@ -1,19 +1,22 @@
 import { FC, ReactNode } from 'react';
-import { usePathname } from 'next/navigation';  // Changed to next/navigation
+import { usePathname } from 'next/navigation';
 import { Box } from '@chakra-ui/react';
 import CustomHeader from './custom-header';
+import useParticipantStore from '@/stores/useParticipantStore';
 
 interface Props {
   children: ReactNode;
 }
 
 const CustomLayout: FC<Props> = ({ children }) => {
-  const pathname = usePathname();  // Use usePathname instead of useRouter
+  const pathname = usePathname();
+  const { participant } = useParticipantStore();
   const noHeaderRoutes = ['/welcome', '/sign-up'];
-  const showHeader = !noHeaderRoutes.includes(pathname);
-
-
   
+  // Show header only if:
+  // 1. Not on a no-header route AND
+  // 2. Participant exists
+  const showHeader = !noHeaderRoutes.includes(pathname) && !!participant;
 
   return (
     <div className="bg-white flex flex-col">

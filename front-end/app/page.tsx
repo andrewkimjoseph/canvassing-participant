@@ -3,42 +3,83 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
-import { Box, Button, VStack, Text, Flex, Link, Spinner } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  VStack,
+  Text,
+  Flex,
+  Link,
+  Spinner,
+} from '@chakra-ui/react';
 import { Avatar } from '@/components/ui/avatar';
 import useParticipantStore from '@/stores/useParticipantStore';
 import useSurveyStore from '@/stores/useSurveyStore';
 
 export default function Home() {
-  const [isMounted, setIsMounted] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const { address, isConnected } = useAccount();
-  const { participant, loading: participantLoading, checkParticipant } = useParticipantStore();
+  const {
+    participant,
+    loading: participantLoading,
+    checkParticipant,
+  } = useParticipantStore();
   const { surveys, fetchSurveys, loading: surveyLoading } = useSurveyStore();
   const router = useRouter();
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-  
-  const checkAndRedirect = useCallback(async () => {
-    if (address && !participant) {
+  // Check participant status when wallet is connected
+  const checkParticipantStatus = useCallback(async () => {
+    if (isConnected && address) {
       await checkParticipant(address);
-      if (!participant) {
-        router.replace('/welcome');
+    }
+  }, [isConnected, address, checkParticipant]);
+
+  // Initial setup effect
+  useEffect(() => {
+    const initialize = async () => {
+      await checkParticipantStatus();
+      if (!surveys.length) {
+        await fetchSurveys();
       }
-    }
-  }, [address, checkParticipant, participant, router]);
+      setIsInitialized(true);
+    };
 
-  useEffect(() => {
-    if (isConnected) {
-      checkAndRedirect();
-    }
-  }, [isConnected, checkAndRedirect]);
+    initialize();
+  }, [checkParticipantStatus, fetchSurveys, surveys.length]);
 
+  // Handle redirect after initialization
   useEffect(() => {
-    if (isMounted && !surveys.length) {
-      fetchSurveys();
+    if (isInitialized && !participantLoading && !participant) {
+      router.replace('/welcome');
     }
-  }, [isMounted, surveys, fetchSurveys]);
+  }, [isInitialized, participant, participantLoading, router]);
+
+  // Show loading state while initializing or checking participant
+  if (!isInitialized || participantLoading) {
+    return (
+      <Flex 
+        position="fixed"
+        top="0"
+        left="0"
+        right="0"
+        bottom="0"
+        justify="center" 
+        align="center" 
+        bg="white"
+        zIndex="50"
+      >
+        <Spinner 
+          size="xl" 
+          color="#363062" 
+
+        />
+      </Flex>
+    );
+  }
+
+  if (!participant) {
+    return null;
+  }
 
   return (
     <Flex flexDirection={'column'} w={'100%'} bgColor={'#ECECEC'} px={4}>
@@ -120,7 +161,7 @@ export default function Home() {
                     mt={1}
                   >
                     <Text fontSize={'lg'} mb={2} color="#363062">
-                      {survey.smartContractAddress}
+                      {survey.topic}
                     </Text>
                     <Text fontSize={'sm'} mb={2} color="black">
                       {survey.brief}
@@ -137,7 +178,12 @@ export default function Home() {
                   <Text fontSize={'lg'} color="green">
                     ${survey.rewardAmountIncUSD}
                   </Text>
-                  <Button bgColor={'#363062'} borderRadius={20} w={'1/6'} mr={1}>
+                  <Button
+                    bgColor={'#363062'}
+                    borderRadius={20}
+                    w={'1/6'}
+                    mr={1}
+                  >
                     <Text fontSize="8" color="white">
                       Start
                     </Text>
