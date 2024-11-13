@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { Box, Button, VStack, Text, Flex, Link, Spinner } from '@chakra-ui/react';
@@ -9,7 +9,6 @@ import useParticipantStore from '@/stores/useParticipantStore';
 import useSurveyStore from '@/stores/useSurveyStore';
 
 export default function Home() {
-  const [userAddress, setUserAddress] = useState('');
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
   const { participant, loading: participantLoading, checkParticipant } = useParticipantStore();
@@ -19,19 +18,21 @@ export default function Home() {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+  
+  const checkAndRedirect = useCallback(async () => {
+    if (address && !participant) {
+      await checkParticipant(address);
+      if (!participant) {
+        router.replace('/welcome');
+      }
+    }
+  }, [address, checkParticipant, participant, router]);
 
   useEffect(() => {
-    const checkAndRedirect = async () => {
-      if (address && !participant) {
-        await checkParticipant(address);
-        if (!participant) {
-          router.push('/welcome');
-        }
-      }
-    };
-
-    checkAndRedirect();
-  }, [address, checkParticipant]);
+    if (isConnected) {
+      checkAndRedirect();
+    }
+  }, [isConnected, checkAndRedirect]);
 
   useEffect(() => {
     if (isMounted && !surveys.length) {
