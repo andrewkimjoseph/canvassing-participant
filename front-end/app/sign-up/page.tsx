@@ -6,12 +6,13 @@ import { useAccount } from 'wagmi';
 import {
   Box,
   Image,
-  Button,
   VStack,
   Text,
   Flex,
   createListCollection,
 } from '@chakra-ui/react';
+
+import { Button } from '@/components/ui/button';
 
 import { Toaster, toaster } from '@/components/ui/toaster';
 
@@ -30,10 +31,11 @@ export default function SignUpPage() {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
-  const { setParticipant,} =
-    useParticipantStore();
+  const { setParticipant } = useParticipantStore();
   const [country, setCountry] = useState<string | null>(null);
   const [gender, setGender] = useState<string | null>(null);
+
+  const [isCreatingParticipant, setIsCreatingParticipant] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -57,6 +59,7 @@ export default function SignUpPage() {
         username: `user_${address.slice(2, 7)}`,
       });
 
+      setIsCreatingParticipant(false);
       toaster.create({
         description: 'Account created successfully!',
         duration: 3000,
@@ -65,6 +68,7 @@ export default function SignUpPage() {
 
       router.push('/');
     } catch (error) {
+      setIsCreatingParticipant(false);
       toaster.create({
         description: 'Failed to create account. Please try again.',
         duration: 3000,
@@ -121,9 +125,6 @@ export default function SignUpPage() {
               const gender: string = selectedGender.items[0].value;
 
               setGender(gender);
-              // setGender(selectedGender.value);
-              // console.log(gender);
-              console.log(gender);
             }}
           >
             <SelectTrigger>
@@ -152,8 +153,6 @@ export default function SignUpPage() {
               const country: string = selectedCountry.items[0].value;
 
               setCountry(country);
-
-              console.log(country);
             }}
           >
             <SelectTrigger>
@@ -176,14 +175,18 @@ export default function SignUpPage() {
         <Button
           bgColor={'#363062'}
           borderRadius={15}
+          color={"white"}
           px={6}
           w={'3/6'}
           mt={20}
           onClick={handleSubmit}
           disabled={!gender || !country}
+          loading={isCreatingParticipant}
+          loadingText="Creating account ..."
+  
         >
           <Text fontSize="16" fontWeight="bold" color="white">
-            Done
+            Create account
           </Text>
         </Button>
       </Flex>
