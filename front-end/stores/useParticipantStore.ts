@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { collection, getDocs, query, where, addDoc, doc, updateDoc } from 'firebase/firestore';
 import { Participant } from '@/entities/participant';
-import { db } from '@/firebase';
+import { db } from '@/app/firebase';
 
 interface ParticipantStoreState {
   participant: Participant | null;

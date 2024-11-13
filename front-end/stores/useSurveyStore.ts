@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import { collection, getDocs } from 'firebase/firestore';
 import { Survey } from '@/entities/survey';
-import { db } from '@/firebase';
+import { db } from '@/app/firebase';
 
 
 interface SurveyStoreState {
