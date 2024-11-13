@@ -45,7 +45,7 @@ const CustomHeader = () => {
       setIsMiniPay(true);
       connect({ connector: injected({ target: "metaMask" }) });
     }
-  }, []);
+  }, [connect]);
 
 
   return (
