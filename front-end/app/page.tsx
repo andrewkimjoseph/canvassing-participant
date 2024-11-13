@@ -23,7 +23,7 @@ export default function Home() {
   useEffect(() => {
     const checkAndRedirect = async () => {
       if (address && !participant) {
-        await checkParticipant("address");
+        await checkParticipant(address);
         if (!participant) {
           router.push('/welcome');
         }
