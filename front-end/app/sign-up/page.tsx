@@ -39,25 +39,8 @@ export default function SignUpPage() {
     setIsMounted(true);
   }, []);
 
-  // // Check if participant exists and redirect to /welcome if not
-  // useEffect(() => {
-  //   const checkAndRedirect = async () => {
-  //     // Ensure that we call checkParticipant only when address is present and participant is undefined
-  //     if (address && !participant) {
-  //       await checkParticipant(address); // Check participant using wallet address
-
-  //       // Redirect to /welcome if no participant found
-  //       if (!participant) {
-  //         router.push('/welcome');
-  //       }
-  //     }
-  //   };
-
-  //   checkAndRedirect();
-  // }, [participant, address, checkParticipant, router]);
-
   const handleSubmit = async () => {
-    if (!gender || !country) {
+    if (!gender || !country || !address) {
       toaster.create({
         description: 'Please select all required fields',
         duration: 3000,
@@ -70,8 +53,8 @@ export default function SignUpPage() {
       await setParticipant({
         gender,
         country,
-        walletAddress: 'address',
-        username: `user_${'address'.slice(2, 1)}`,
+        walletAddress: address,
+        username: `user_${address.slice(2, 7)}`,
       });
 
       toaster.create({

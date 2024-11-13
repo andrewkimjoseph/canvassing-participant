@@ -31,7 +31,7 @@ export default function Home() {
     };
 
     checkAndRedirect();
-  }, [participant, address, checkParticipant, router]);
+  }, [address, checkParticipant]);
 
   useEffect(() => {
     if (isMounted && !surveys.length) {
