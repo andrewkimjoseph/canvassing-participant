@@ -59,12 +59,21 @@ export default function SignUpPage() {
         username: `user_${address.slice(2, 7)}`,
       });
 
-      setIsCreatingParticipant(false);
       toaster.create({
         description: 'Account created successfully!',
         duration: 3000,
         type: 'success',
       });
+
+      router.push('/');
+
+      // Wait for 1 second to show the success message
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      setIsCreatingParticipant(false);
+
+      // Wait a bit more before navigation to ensure the user sees the success message
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       router.push('/');
     } catch (error) {
@@ -175,7 +184,7 @@ export default function SignUpPage() {
         <Button
           bgColor={'#363062'}
           borderRadius={15}
-          color={"white"}
+          color={'white'}
           px={6}
           w={'3/6'}
           mt={20}
@@ -183,7 +192,6 @@ export default function SignUpPage() {
           disabled={!gender || !country}
           loading={isCreatingParticipant}
           loadingText="Creating account ..."
-  
         >
           <Text fontSize="16" fontWeight="bold" color="white">
             Create account
