@@ -13,14 +13,12 @@ import useRewardStore from '@/stores/useRewardStore';
 export default function RewardHistory() {
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
-  const { rewards, fetchRewards } = useRewardStore();
+  const { rewards } = useRewardStore();
 
   useEffect(() => {
     setIsMounted(true);
-    if (address) {
-      fetchRewards(address);
-    }
-  }, [address, isConnected, fetchRewards]);
+
+  }, [address, isConnected]);
 
   if (!isMounted) {
     return (
