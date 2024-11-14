@@ -20,7 +20,7 @@ export default function RewardHistory() {
     if (address) {
       fetchRewards(address);
     }
-  }, [address, isConnected]);
+  }, [address, isConnected, fetchRewards]);
 
   if (!isMounted) {
     return (
