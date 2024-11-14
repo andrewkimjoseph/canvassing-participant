@@ -14,17 +14,15 @@ export default function RewardHistory() {
   const [userAddress, setUserAddress] = useState('');
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
-  // const { rewards, fetchRewards } = useRewardStore();
-  const { surveys, loading, fetchSurveys } = useSurveyStore();
+  const { rewards, fetchRewards } = useRewardStore();
   
 
-  useEffect(() => {
-    fetchSurveys();
-  }, [fetchSurveys]);
 
-  // useEffect(() => {
-  //   fetchRewards(address?.toString()!);
-  // }, [address, isConnected]);
+  useEffect(() => {
+    if (address){
+      fetchRewards(address);
+    }
+  }, [address, isConnected]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -56,10 +54,10 @@ export default function RewardHistory() {
 
       <Box h="100%" overflowY="auto">
         <Box h="100%" overflowY="auto">
-          {surveys.length > 0 ? (
-            surveys.map((donation) => (
+          {rewards.length > 0 ? (
+            rewards.map((reward) => (
               <Box
-                key={donation.id}
+                key={reward.id}
                 bgColor="white"
                 h="25"
                 w="full"
