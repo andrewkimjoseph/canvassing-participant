@@ -13,7 +13,7 @@ import {
 import useSingleSurveyStore from '@/stores/useSingleSurveyStore';
 
 import useParticipantStore from '@/stores/useParticipantStore';
-import {useRouter} from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function SurveyPage() {
   const [userAddress, setUserAddress] = useState('');
@@ -22,7 +22,6 @@ export default function SurveyPage() {
   const { address, isConnected } = useAccount();
   const pathname = usePathname();
   const surveyId = pathname?.split('/').pop(); // Extract surveyId from the URL
-
 
   const router = useRouter();
 
@@ -46,7 +45,12 @@ export default function SurveyPage() {
     }
   }, [isMounted, surveyId, fetchSurvey]);
 
-  if (!isMounted) return null;
+  if (!isMounted)
+    return (
+      <Flex justify="center" align="center" minH="100vh">
+        <Spinner size="xl" color="#363062" />
+      </Flex>
+    );
   if (loading)
     return (
       <Flex justify="center" align="center" minH="100vh">
@@ -182,14 +186,16 @@ export default function SurveyPage() {
         mt={16}
         alignSelf="center"
         onClick={() => {
-          //  console.log(participant);
 
           router.push(
-            `https://tally.so/r/w2bjZV?walletAddress=${participant?.walletAddress}&surveyId=${survey.id}` ||
+            `${survey.formLink}?walletAddress=${participant?.walletAddress}&surveyId=${survey.id}` ||
               '#'
           );
         }}
-        disabled={!survey.isAvailable}
+        // disabled={
+        //   window.ethereum &&
+        //   (!window.ethereum.isMiniPay || !window.ethereum.isMinipay)
+        // }
       >
         <Text fontSize="16" fontWeight="bold" color="white">
           {survey.isAvailable ? 'Start Survey' : 'Survey Unavailable'}
