@@ -19,7 +19,6 @@ import {
 } from '@chakra-ui/react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { Avatar } from '@/components/ui/avatar';
-
 import { LogoC } from './logo';
 import { HamburgerIconC } from './hamburger-icon';
 import { DrawerLogoC } from './drawer-logo';
@@ -27,15 +26,21 @@ import { DrawerCardC } from './drawer-card';
 import { HomeIconC } from './icons/home-icon';
 import { RewardHistoryIconC } from './icons/reward-history-icon';
 import { CloseIconC } from './icons/close-icon';
-import useParticipantStore from '@/stores/useParticipantStore'; // Import the participant store
+import useParticipantStore from '@/stores/useParticipantStore';
 import { useState, useEffect } from 'react';
 import { injected } from 'wagmi/connectors';
-import { useConnect } from 'wagmi';
+import { useAccount, useConnect } from 'wagmi';
 
 const CustomHeader = () => {
-  const { participant } = useParticipantStore(); // Access participant data from the store
+  const { participant } = useParticipantStore();
   const [isMiniPay, setIsMiniPay] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { connect } = useConnect();
+  const { address, isConnected } = useAccount();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (
@@ -43,10 +48,9 @@ const CustomHeader = () => {
       (window.ethereum.isMiniPay || window.ethereum.isMinipay)
     ) {
       setIsMiniPay(true);
-      connect({ connector: injected({ target: "metaMask" }) });
+      connect({ connector: injected({ target: 'metaMask' }) });
     }
   }, [connect]);
-
 
   return (
     <DrawerRoot size={'full'} placement={'start'}>
@@ -62,7 +66,12 @@ const CustomHeader = () => {
           <Link href="/">
             <LogoC />
           </Link>
-          <Circle size="10px" bg={`${true ? 'green' : 'red'}`} color="white" />
+
+          {mounted ? (
+            <Circle size="10px" bgColor={isConnected ? 'green.500' : 'red.500'} />
+          ) : (
+            <Box w="10px" h="10px" /> // Placeholder with same dimensions
+          )}
         </Flex>
       </Box>
 
@@ -95,19 +104,20 @@ const CustomHeader = () => {
           </Flex>
         </DrawerBody>
         <DrawerFooter flexDirection={'column'} alignItems={'center'} pb={16}>
-          <ConnectButton
-            chainStatus="none"
-            accountStatus={{
-              smallScreen: 'avatar',
-              largeScreen: 'avatar',
-            }}
-            showBalance={{
-              smallScreen: false,
-              largeScreen: true,
-            }}
-            label="Connect Wallet"
-          />
-
+          {!isMiniPay ? (
+            <ConnectButton
+              chainStatus="none"
+              accountStatus={{
+                smallScreen: 'avatar',
+                largeScreen: 'avatar',
+              }}
+              showBalance={{
+                smallScreen: false,
+                largeScreen: true,
+              }}
+              label="Connect Wallet"
+            />
+          ) : null}
           <Box className="flex flex-row items-left w-full mt-8 mb-8">
             <Avatar variant={'solid'} size="lg" bgColor={'white'} />
 
