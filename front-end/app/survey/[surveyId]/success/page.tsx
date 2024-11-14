@@ -4,16 +4,9 @@ import { useEffect, useState } from 'react';
 
 import { useAccount } from 'wagmi';
 
-import {
-  Box,
-  Image,
-  Button,
-  Text,
-  Flex,
-} from '@chakra-ui/react';
+import { Box, Image, Button, Text, Flex, Spinner } from '@chakra-ui/react';
 
-
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
 export default function SuccessPage() {
   const [userAddress, setUserAddress] = useState('');
   const [isMounted, setIsMounted] = useState(false);
@@ -30,17 +23,15 @@ export default function SuccessPage() {
     }
   }, [address, isConnected]);
 
-  if (!isMounted) {
-    return null;
-  }
+  if (!isMounted)
+    return (
+      <Flex justify="center" align="center" minH="100vh">
+        <Spinner size="xl" color="#363062" />
+      </Flex>
+    );
 
   return (
-    <Flex
-      flexDirection={'column'}
-      w={'100%'}
-      bgColor={'#ECECEC'}
-      h={"100vh"}
-    >
+    <Flex flexDirection={'column'} w={'100%'} bgColor={'#ECECEC'} h={'100vh'}>
       <Box
         bgColor="white"
         h="25"
@@ -72,11 +63,17 @@ export default function SuccessPage() {
                 blur={'md'}
               />
             </Box>
-            <Text fontSize={'lg'} mb={2} color="#363062" alignSelf={'center'} mt={4}>
+            <Text
+              fontSize={'lg'}
+              mb={2}
+              color="#363062"
+              alignSelf={'center'}
+              mt={4}
+            >
               You earned 0.25 cUSD
             </Text>
 
-            <Text fontSize={'sm'} mb={2} color="black" textAlign={"center"}>
+            <Text fontSize={'sm'} mb={2} color="black" textAlign={'center'}>
               Once claimed, this amount will be transferred to your Minipay
               wallet.
             </Text>
@@ -92,7 +89,7 @@ export default function SuccessPage() {
         mt={5}
         alignSelf={'center'}
         mb={16}
-        onClick={()=>router.push("/transaction-successful")}
+        onClick={() => router.push('/transaction-successful')}
       >
         <Text fontSize="16" fontWeight="bold" color="white">
           Claim

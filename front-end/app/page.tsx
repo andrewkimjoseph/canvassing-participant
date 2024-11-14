@@ -25,14 +25,17 @@ export default function Home() {
     loading: participantLoading,
     checkParticipant,
   } = useParticipantStore();
-  const { surveys, fetchSurveys, loading: surveyLoading } = useMultipleSurveysStore();
+  const {
+    surveys,
+    fetchSurveys,
+    loading: surveyLoading,
+  } = useMultipleSurveysStore();
   const router = useRouter();
 
   const { rewards, fetchRewards } = useRewardStore();
-  
 
   useEffect(() => {
-    if (address){
+    if (address) {
       fetchRewards(address);
     }
   }, [address, isConnected]);
@@ -41,6 +44,8 @@ export default function Home() {
   const checkParticipantStatus = useCallback(async () => {
     if (isConnected && address) {
       await checkParticipant(address);
+
+      await fetchSurveys(address);
     }
   }, [isConnected, address, checkParticipant]);
 
@@ -49,7 +54,6 @@ export default function Home() {
     const initialize = async () => {
       await checkParticipantStatus();
       if (!surveys.length) {
-        await fetchSurveys();
       }
       setIsInitialized(true);
     };
@@ -215,15 +219,7 @@ export default function Home() {
             h="25"
             w="full"
             borderRadius={10}
-            flexDirection="column"
-            pb={2}
-            mb={4}
-            mt={0}
-            pt={2}
-            pl={3}
-            border="solid"
-            borderColor="gray.300"
-            borderWidth={1}
+            p={4}
             display="flex"
             justifyContent="center"
             alignItems="center"
