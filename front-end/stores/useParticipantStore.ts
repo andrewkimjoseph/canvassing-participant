@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { 
   collection, 
   getDocs, 
@@ -18,73 +19,76 @@ interface ParticipantStoreState {
   setParticipant: (participantData: Omit<Participant, 'id'>) => Promise<void>;
 }
 
-const useParticipantStore = create<ParticipantStoreState>((set) => ({
-  participant: null,
-  loading: false,
+const useParticipantStore = create<ParticipantStoreState>()(
+  persist(
+    (set, get) => ({
+      participant: null,
+      loading: false,
 
-  checkParticipant: async (walletAddress) => {
-    set({ loading: true });
-    try {
-      const q = query(
-        collection(db, 'participants'),
-        where('walletAddress', '==', walletAddress)
-      );
-      const snapshot = await getDocs(q);
+      checkParticipant: async (walletAddress) => {
+        set({ loading: true });
+        try {
+          const q = query(
+            collection(db, 'participants'),
+            where('walletAddress', '==', walletAddress)
+          );
+          const snapshot = await getDocs(q);
 
-      if (!snapshot.empty) {
-        const data = snapshot.docs[0].data() as Participant;
-        set({ participant: data, loading: false });
-        return data;
-      } else {
-        set({ participant: null, loading: false });
-        return null;
-      }
-    } catch (error) {
-      console.error('Error checking participant:', error);
-      set({ loading: false });
-      return null;
+          if (!snapshot.empty) {
+            const data = snapshot.docs[0].data() as Participant;
+            set({ participant: data, loading: false });
+            return data;
+          } else {
+            set({ participant: null, loading: false });
+            return null;
+          }
+        } catch (error) {
+          console.error('Error checking participant:', error);
+          set({ loading: false });
+          return null;
+        }
+      },
+
+      setParticipant: async (participantData) => {
+        set({ loading: true });
+        try {
+          const existingParticipant = await get().checkParticipant(participantData.walletAddress);
+
+          if (existingParticipant) {
+            set({ participant: existingParticipant, loading: false });
+            return;
+          }
+
+          const participantsRef = collection(db, 'participants');
+          const docRef = await addDoc(participantsRef, {
+            ...participantData,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          });
+
+          const newParticipant: Participant = {
+            ...participantData,
+            id: docRef.id,
+          };
+
+          await updateDoc(doc(db, 'participants', docRef.id), {
+            id: docRef.id,
+            updatedAt: new Date().toISOString()
+          });
+
+          set({ participant: newParticipant, loading: false });
+        } catch (error) {
+          console.error('Error creating participant:', error);
+          set({ loading: false });
+          throw error;
+        }
+      },
+    }),
+    {
+      name: 'participant-storage', // Unique name for localStorage
+      partialize: (state) => ({ participant: state.participant }), // Only persist participant data
     }
-  },
-
-  setParticipant: async (participantData) => {
-    set({ loading: true });
-    try {
-      // Check if participant already exists
-      const existingParticipant = await useParticipantStore
-        .getState()
-        .checkParticipant(participantData.walletAddress);
-
-      if (existingParticipant) {
-        // If participant exists, just set it in state and return
-        set({ participant: existingParticipant, loading: false });
-        return;
-      }
-
-      // Create new participant if they don't exist
-      const participantsRef = collection(db, 'participants');
-      const docRef = await addDoc(participantsRef, {
-        ...participantData,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      });
-      
-      const newParticipant: Participant = {
-        ...participantData,
-        id: docRef.id,
-      };
-      
-      await updateDoc(doc(db, 'participants', docRef.id), {
-        id: docRef.id,
-        updatedAt: new Date().toISOString()
-      });
-      
-      set({ participant: newParticipant, loading: false });
-    } catch (error) {
-      console.error('Error creating participant:', error);
-      set({ loading: false });
-      throw error;
-    }
-  },
-}));
+  )
+);
 
 export default useParticipantStore;
