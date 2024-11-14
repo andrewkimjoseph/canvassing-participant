@@ -14,7 +14,8 @@ import {
 } from '@chakra-ui/react';
 import { Avatar } from '@/components/ui/avatar';
 import useParticipantStore from '@/stores/useParticipantStore';
-import useSurveyStore from '@/stores/useSurveyStore';
+import useMultipleSurveysStore from '@/stores/useMultipleSurveysStore';
+import useRewardStore from '@/stores/useRewardStore';
 
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -24,8 +25,17 @@ export default function Home() {
     loading: participantLoading,
     checkParticipant,
   } = useParticipantStore();
-  const { surveys, fetchSurveys, loading: surveyLoading } = useSurveyStore();
+  const { surveys, fetchSurveys, loading: surveyLoading } = useMultipleSurveysStore();
   const router = useRouter();
+
+  const { rewards, fetchRewards } = useRewardStore();
+  
+
+  useEffect(() => {
+    if (address){
+      fetchRewards(address);
+    }
+  }, [address, isConnected]);
 
   // Check participant status when wallet is connected
   const checkParticipantStatus = useCallback(async () => {
@@ -57,22 +67,18 @@ export default function Home() {
   // Show loading state while initializing or checking participant
   if (!isInitialized || participantLoading) {
     return (
-      <Flex 
+      <Flex
         position="fixed"
         top="0"
         left="0"
         right="0"
         bottom="0"
-        justify="center" 
-        align="center" 
+        justify="center"
+        align="center"
         bg="white"
         zIndex="50"
       >
-        <Spinner 
-          size="xl" 
-          color="#363062" 
-
-        />
+        <Spinner size="xl" color="#363062" />
       </Flex>
     );
   }
@@ -115,7 +121,7 @@ export default function Home() {
               </Text>
             </Flex>
             <Text fontSize={14} mb={2} color="white">
-              Surveys completed: 0
+              Surveys completed: {rewards.length}
             </Text>
           </Box>
         </Flex>
@@ -160,7 +166,7 @@ export default function Home() {
                     pt={2}
                     mt={1}
                   >
-                    <Text fontSize={'lg'} mb={2} color="#363062">
+                    <Text fontSize={'larger'} mb={2} color="#363062">
                       {survey.topic}
                     </Text>
                     <Text fontSize={'sm'} mb={2} color="black">
@@ -175,9 +181,20 @@ export default function Home() {
                   justifyContent={'space-between'}
                   alignItems={'center'}
                 >
-                  <Text fontSize={'lg'} color="green">
-                    ${survey.rewardAmountIncUSD}
-                  </Text>
+                  <Flex
+                    flexDirection="row"
+                    justifyContent={'start'}
+                    alignItems={'center'}
+                  >
+                    <Text fontSize={'lg'} color="green">
+                      ${survey.rewardAmountIncUSD}
+                    </Text>
+
+                    <Text fontSize={'lg'} color="grey" pl={1}>
+                      per survey
+                    </Text>
+                  </Flex>
+
                   <Button
                     bgColor={'#363062'}
                     borderRadius={20}

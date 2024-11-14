@@ -9,7 +9,7 @@ import { EditIconC } from '@/components/icons/edit-icon';
 
 import { Avatar } from '@/components/ui/avatar';
 import useRewardStore from '@/stores/useRewardStore';
-import useSurveyStore from '@/stores/useSurveyStore';
+import useMultipleSurveysStore from '@/stores/useMultipleSurveysStore';
 export default function RewardHistory() {
   const [userAddress, setUserAddress] = useState('');
   const [isMounted, setIsMounted] = useState(false);
