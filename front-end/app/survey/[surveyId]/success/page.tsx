@@ -64,7 +64,7 @@ export default function SuccessPage() {
               borderRadius={10}
             >
               <Image
-                src="success.png" // Replace with your image URL
+                src="/success.png" // Replace with your image URL
                 alt="Background"
                 width="100%"
                 height="35vh"

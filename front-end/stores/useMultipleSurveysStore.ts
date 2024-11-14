@@ -11,7 +11,7 @@ interface SurveyStoreState {
   fetchSurveys: () => Promise<void>;
 }
 
-const useSurveyStore = create<SurveyStoreState>((set) => ({
+const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
   surveys: [],
   loading: false,
   
@@ -31,4 +31,4 @@ const useSurveyStore = create<SurveyStoreState>((set) => ({
   },
 }));
 
-export default useSurveyStore;
+export default useMultipleSurveysStore;
