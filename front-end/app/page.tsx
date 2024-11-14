@@ -38,7 +38,7 @@ export default function Home() {
     if (address) {
       fetchRewards(address);
     }
-  }, [address, isConnected]);
+  }, [address, isConnected, fetchRewards]);
 
   // Check participant status when wallet is connected
   const checkParticipantStatus = useCallback(async () => {
