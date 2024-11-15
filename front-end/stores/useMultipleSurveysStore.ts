@@ -3,20 +3,23 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { Survey } from '@/entities/survey';
 import { db } from '@/firebase';
 import { Reward } from '@/entities/reward';
+import { Address } from 'viem';
+import { checkIfUserAddressIsWhitelisted } from '@/services/web3/checkIfUserAddressIsWhitelisted';
 
 interface SurveyStoreState {
   surveys: Survey[];
   loading: boolean;
-  fetchSurveys: (walletAddress: string) => Promise<void>;
+  fetchSurveys: (walletAddress: Address) => Promise<void>;
 }
 
 const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
   surveys: [],
   loading: false,
 
-  fetchSurveys: async (walletAddress: string) => {
+  fetchSurveys: async (walletAddress) => {
     set({ loading: true });
     try {
+      // Fetch the rewards for the user's wallet
       const rewardQuery = query(
         collection(db, 'rewards'),
         where('participantWalletAddress', '==', walletAddress)
@@ -26,6 +29,7 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
         (doc) => (doc.data() as Reward).surveyId
       );
 
+      // Query surveys excluding the ones already participated in
       let surveyQuery;
       if (participatedSurveyIds.length > 0) {
         surveyQuery = query(
@@ -36,11 +40,27 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
         surveyQuery = query(collection(db, 'surveys'));
       }
       const surveySnapshot = await getDocs(surveyQuery);
-      const data = surveySnapshot.docs.map((doc) => ({
-        ...(doc.data() as Survey), // Assert type here
+      const surveys = surveySnapshot.docs.map((doc) => ({
+        ...(doc.data() as Survey),
       }));
 
-      set({ surveys: data, loading: false });
+      // Filter surveys to check whitelist status using their contractAddress
+      const filteredSurveys = [];
+      for (const survey of surveys) {
+        if (!survey.contractAddress) continue; // Skip if no contract address in survey
+        const userIsWhitelisted = await checkIfUserAddressIsWhitelisted(
+          walletAddress,
+          {
+            _walletAddress: walletAddress,
+            _contractAddress: survey.contractAddress as Address,
+          }
+        );
+        if (userIsWhitelisted) {
+          filteredSurveys.push(survey);
+        }
+      }
+
+      set({ surveys: filteredSurveys, loading: false });
     } catch (error) {
       console.error('Error fetching surveys:', error);
       set({ loading: false });
