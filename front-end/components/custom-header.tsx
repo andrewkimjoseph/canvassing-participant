@@ -30,6 +30,7 @@ import useParticipantStore from '@/stores/useParticipantStore';
 import { useState, useEffect } from 'react';
 import { injected } from 'wagmi/connectors';
 import { useAccount, useConnect } from 'wagmi';
+import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 
 const CustomHeader = () => {
   const { participant } = useParticipantStore();
@@ -37,6 +38,7 @@ const CustomHeader = () => {
   const [mounted, setMounted] = useState(false);
   const { connect } = useConnect();
   const { address, isConnected } = useAccount();
+  const { trackAmplitudeEvent } = useAmplitudeContext();
 
   useEffect(() => {
     setMounted(true);
@@ -59,16 +61,34 @@ const CustomHeader = () => {
         <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
           <DrawerTrigger asChild>
             <IconButton size={'md'} aria-label={'Open Menu'}>
-              <HamburgerIconC />
+              <HamburgerIconC
+                onClick={() => {
+                  trackAmplitudeEvent('Hamburger Icon clicked', {
+                    participantWalletAddress: participant?.walletAddress,
+                    partipantId: participant?.id,
+                  });
+                }}
+              />
             </IconButton>
           </DrawerTrigger>
 
-          <Link href="/">
+          <Link
+            href="/"
+            onClick={() => {
+              trackAmplitudeEvent('Canvassing Logo clicked', {
+                participantWalletAddress: participant?.walletAddress,
+                partipantId: participant?.id,
+              });
+            }}
+          >
             <LogoC />
           </Link>
 
           {mounted ? (
-            <Circle size="10px" bgColor={isConnected ? 'green.500' : 'red.500'} />
+            <Circle
+              size="10px"
+              bgColor={isConnected ? 'green.500' : 'red.500'}
+            />
           ) : (
             <Box w="10px" h="10px" /> // Placeholder with same dimensions
           )}
@@ -92,13 +112,29 @@ const CustomHeader = () => {
         <DrawerBody>
           <Flex flexDirection={'column'} alignItems={'start'}>
             <DrawerActionTrigger>
-              <DrawerCardC SVGIcon={HomeIconC} text={'Home'} link={'/'} />
+              <DrawerCardC
+                SVGIcon={HomeIconC}
+                text={'Home'}
+                link={'/'}
+                onClick={() => {
+                  trackAmplitudeEvent('Home clicked', {
+                    participantWalletAddress: participant?.walletAddress,
+                    partipantId: participant?.id,
+                  });
+                }}
+              />
             </DrawerActionTrigger>
             <DrawerActionTrigger>
               <DrawerCardC
                 SVGIcon={RewardHistoryIconC}
                 text={'Reward History'}
                 link={'/reward-history'}
+                onClick={() => {
+                  trackAmplitudeEvent('Reward History clicked', {
+                    participantWalletAddress: participant?.walletAddress,
+                    partipantId: participant?.id,
+                  });
+                }}
               />
             </DrawerActionTrigger>
           </Flex>

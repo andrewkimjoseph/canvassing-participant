@@ -15,6 +15,7 @@ import useSingleSurveyStore from '@/stores/useSingleSurveyStore';
 import useParticipantStore from '@/stores/useParticipantStore';
 import { useRouter } from 'next/navigation';
 import useSingleResearcherStore from '@/stores/useResearcherStore';
+import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 
 export default function SurveyPage() {
   const [userAddress, setUserAddress] = useState('');
@@ -23,6 +24,7 @@ export default function SurveyPage() {
   const { address, isConnected } = useAccount();
   const pathname = usePathname();
   const surveyId = pathname?.split('/').pop(); // Extract surveyId from the URL
+  const { trackAmplitudeEvent } = useAmplitudeContext();
 
   const router = useRouter();
 
@@ -125,6 +127,15 @@ export default function SurveyPage() {
         <AccordionRoot
           // value={value}
           multiple
+          onClick={() => {
+            trackAmplitudeEvent('Survey instructions clicked', {
+              participantWalletAddress: participant?.walletAddress,
+              partipantId: participant?.id,
+              surveyId: survey.id,
+              researcherId: researcher?.id,
+              researcherName: researcher?.name,
+            });
+          }}
         >
           <AccordionItem value="survey-instructions" color="black" pb={1}>
             <AccordionItemTrigger fontWeight="bold">
@@ -146,7 +157,15 @@ export default function SurveyPage() {
         py={2}
       >
         <AccordionRoot
-          // value={value}
+          onClick={() => {
+            trackAmplitudeEvent('Time duration clicked', {
+              participantWalletAddress: participant?.walletAddress,
+              partipantId: participant?.id,
+              surveyId: survey.id,
+              researcherId: researcher?.id,
+              researcherName: researcher?.name,
+            });
+          }}
           multiple
         >
           <AccordionItem value="time-duration" color="black" pb={1}>
@@ -170,7 +189,18 @@ export default function SurveyPage() {
         px={2}
         py={2}
       >
-        <AccordionRoot multiple>
+        <AccordionRoot
+          onClick={() => {
+            trackAmplitudeEvent('Researcher clicked', {
+              participantWalletAddress: participant?.walletAddress,
+              partipantId: participant?.id,
+              surveyId: survey.id,
+              researcherId: researcher?.id,
+              researcherName: researcher?.name,
+            });
+          }}
+          multiple
+        >
           <AccordionItem value="researcher" color="black" pb={1}>
             <AccordionItemTrigger fontWeight="bold">
               Researcher
@@ -194,11 +224,19 @@ export default function SurveyPage() {
             `${survey.formLink}?walletAddress=${participant?.walletAddress}&surveyId=${survey.id}` ||
               '#'
           );
+
+          trackAmplitudeEvent('Start survey clicked', {
+            participantWalletAddress: participant?.walletAddress,
+            partipantId: participant?.id,
+            surveyId: survey.id,
+            researcherId: researcher?.id,
+            researcherName: researcher?.name,
+          });
         }}
-        // disabled={
-        //   window.ethereum &&
-        //   (!window.ethereum.isMiniPay || !window.ethereum.isMinipay)
-        // }
+        disabled={
+          window.ethereum &&
+          (!window.ethereum.isMiniPay || !window.ethereum.isMinipay)
+        }
       >
         <Text fontSize="16" fontWeight="bold" color="white">
           {survey.isAvailable ? 'Start Survey' : 'Survey Unavailable'}

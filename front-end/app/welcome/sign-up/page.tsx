@@ -68,8 +68,6 @@ export default function SignUpPage() {
         type: 'success',
       });
 
-      router.push('/');
-
       // Wait for 1 second to show the success message
       await new Promise((resolve) => setTimeout(resolve, 1000));
 

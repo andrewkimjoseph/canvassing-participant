@@ -1,4 +1,5 @@
 import * as admin from 'firebase-admin';
+import { Address } from 'viem';
 
 
 export interface Survey {
@@ -10,7 +11,7 @@ export interface Survey {
     durationInMinutes: number | null;
     formLink: string | null;
     rewardAmountIncUSD: number | null;
-    smartContractAddress: string | null;
+    contractAddress: Address | null;
     isAvailable: boolean | null;
     timeCreated: admin.firestore.Timestamp | null
   }

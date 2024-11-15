@@ -4,18 +4,152 @@ import { useEffect, useState } from 'react';
 
 import { useAccount } from 'wagmi';
 
-import { Box, Image, Button, Text, Flex, Spinner } from '@chakra-ui/react';
+import { Box, Image, Text, Flex, Spinner } from '@chakra-ui/react';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { processRewardClaimByParticipant } from '@/services/web3/processRewardClaimByParticipant';
+import { Address } from 'viem';
+import { Toaster, toaster } from '@/components/ui/toaster';
+import useSingleSurveyStore from '@/stores/useSingleSurveyStore';
+import { Button } from '@/components/ui/button';
+import { getContractBalance } from '@/services/web3/checkContractBalance';
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+  Timestamp,
+} from 'firebase/firestore';
+import { db } from '@/firebase';
+import useParticipantStore from '@/stores/useParticipantStore';
+import useAmplitudeContext from '@/hooks/useAmplitudeContext';
+
 export default function SuccessPage() {
   const [userAddress, setUserAddress] = useState('');
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
   const router = useRouter();
+  const { survey, fetchSurvey } = useSingleSurveyStore();
+  const [isProcessingRewardClaim, setIsProcessingRewardClaim] = useState(false);
+  const { participant } = useParticipantStore.getState();
+  const params = useParams();
+  const searchParams = useSearchParams();
+  const { trackAmplitudeEvent } = useAmplitudeContext();
+
+  const surveyId = params.surveyId;
+  const submissionId = searchParams.get('submissionId');
+  const respondentId = searchParams.get('respondentId');
+
+  const processRewardClaimByParticipantFn = async () => {
+    setIsProcessingRewardClaim(true);
+
+    if (!survey?.contractAddress || !survey?.rewardAmountIncUSD) {
+      toaster.create({
+        description: 'CE1',
+        duration: 3000,
+        type: 'error',
+      });
+      setIsProcessingRewardClaim(false);
+      return;
+    }
+
+    if (!submissionId || !respondentId || !address || !participant?.id) {
+      toaster.create({
+        description: 'CE3',
+        duration: 3000,
+        type: 'error',
+      });
+      setIsProcessingRewardClaim(false);
+      return;
+    }
+
+    const contractBalance = await getContractBalance(address, {
+      _contractAddress: survey.contractAddress as Address,
+    });
+
+    if (contractBalance < survey.rewardAmountIncUSD) {
+      toaster.create({
+        description: 'CE2',
+        duration: 3000,
+        type: 'error',
+      });
+      setIsProcessingRewardClaim(false);
+      return;
+    }
+
+    try {
+      const claimIsProcessed = await processRewardClaimByParticipant(address, {
+        _participantWalletAddress: address as Address,
+        _smartContractAddress: survey.contractAddress as Address,
+      });
+
+      if (claimIsProcessed.success) {
+        const rewardsCollection = collection(db, 'rewards');
+        const rewardsQuery = query(
+          rewardsCollection,
+          where('submissionId', '==', submissionId),
+          where('respondentId', '==', respondentId),
+          where('participantWalletAddress', '==', address),
+          where('participantId', '==', participant.id)
+        );
+
+        const querySnapshot = await getDocs(rewardsQuery);
+
+        if (!querySnapshot.empty) {
+          const rewardDoc = querySnapshot.docs[0]; // Assuming there's only one matching document
+          await updateDoc(rewardDoc.ref, {
+            isClaimed: true,
+            transactionHash: claimIsProcessed.transactionHash,
+            amountIncUSD: survey.rewardAmountIncUSD,
+            timeUpdated: Timestamp.now(),
+          });
+
+          toaster.create({
+            description: 'Reward claimed successfully!',
+            duration: 3000,
+            type: 'success',
+          });
+
+          // Wait for user feedback before navigating
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+
+          router.push(`/survey/${surveyId}/transaction-successful`);
+        } else {
+          toaster.create({
+            description: 'Reward record not found.',
+            duration: 3000,
+            type: 'error',
+          });
+        }
+      } else {
+        toaster.create({
+          description: 'Failed to claim reward. Please try again.',
+          duration: 3000,
+          type: 'error',
+        });
+      }
+    } catch (error) {
+      console.error('Error processing reward claim:', error);
+      toaster.create({
+        description: 'An unexpected error occurred. Please try again later.',
+        duration: 3000,
+        type: 'error',
+      });
+    }
+
+    setIsProcessingRewardClaim(false);
+  };
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (surveyId) {
+      fetchSurvey(surveyId as string);
+    }
+  }, [surveyId, fetchSurvey]);
 
   useEffect(() => {
     if (isConnected && address) {
@@ -32,6 +166,8 @@ export default function SuccessPage() {
 
   return (
     <Flex flexDirection={'column'} w={'100%'} bgColor={'#ECECEC'} h={'100vh'}>
+      <Toaster />
+
       <Box
         bgColor="white"
         h="25"
@@ -70,7 +206,7 @@ export default function SuccessPage() {
               alignSelf={'center'}
               mt={4}
             >
-              You earned 0.25 cUSD
+              You earned {survey?.rewardAmountIncUSD} cUSD
             </Text>
 
             <Text fontSize={'sm'} mb={2} color="black" textAlign={'center'}>
@@ -80,7 +216,6 @@ export default function SuccessPage() {
           </Flex>
         </Box>
       </Box>
-
       <Button
         bgColor={'#363062'}
         borderRadius={15}
@@ -89,7 +224,16 @@ export default function SuccessPage() {
         mt={5}
         alignSelf={'center'}
         mb={16}
-        onClick={() => router.push('/transaction-successful')}
+        onClick={() => {
+          trackAmplitudeEvent('Claim clicked', {
+            participantWalletAddress: participant?.walletAddress,
+            partipantId: participant?.id,
+            surveyId: survey?.id,
+          });
+          processRewardClaimByParticipantFn();
+        }}
+        loading={isProcessingRewardClaim}
+        loadingText="Processing claim"
       >
         <Text fontSize="16" fontWeight="bold" color="white">
           Claim
