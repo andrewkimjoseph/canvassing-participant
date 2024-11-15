@@ -59,16 +59,17 @@ const CustomHeader = () => {
       <DrawerBackdrop />
       <Box bg="#363062" px={4} position="sticky" top="0" left="0" zIndex="1000">
         <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
-          <DrawerTrigger asChild>
+          <DrawerTrigger
+            asChild
+            onClick={() => {
+              trackAmplitudeEvent('Hamburger Icon clicked', {
+                participantWalletAddress: participant?.walletAddress,
+                partipantId: participant?.id,
+              });
+            }}
+          >
             <IconButton size={'md'} aria-label={'Open Menu'}>
-              <HamburgerIconC
-                onClick={() => {
-                  trackAmplitudeEvent('Hamburger Icon clicked', {
-                    participantWalletAddress: participant?.walletAddress,
-                    partipantId: participant?.id,
-                  });
-                }}
-              />
+              <HamburgerIconC />
             </IconButton>
           </DrawerTrigger>
 
