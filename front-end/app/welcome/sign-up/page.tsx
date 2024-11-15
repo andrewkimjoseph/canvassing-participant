@@ -1,5 +1,6 @@
 'use client';
 
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
@@ -26,6 +27,7 @@ import {
 
 import { SignUpPageIconC } from '@/components/icons/signup-page-icon';
 import useParticipantStore from '@/stores/useParticipantStore';
+import { Timestamp } from 'firebase/firestore';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -57,6 +59,7 @@ export default function SignUpPage() {
         country,
         walletAddress: address,
         username: `user_${address.slice(2, 7)}`,
+        timeCreated: Timestamp.now()
       });
 
       toaster.create({

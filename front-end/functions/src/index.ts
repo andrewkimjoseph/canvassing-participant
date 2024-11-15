@@ -78,6 +78,7 @@ export const createUnclaimedRewardUponFormSubmission =
         participantWalletAddress: walletAddress,
         responseId: data.responseId,
         timeCreated: admin.firestore.FieldValue.serverTimestamp(),
+        timeUpdated: null,
         transactionHash: null,
         amountIncUSD: null,
       });

@@ -1,11 +1,10 @@
 
 import * as admin from 'firebase-admin';
 
-export interface Participant {
+export interface Researcher {
     country: string;
     id: string;
-    gender: string;
-    username: string;
+    name: string;
     walletAddress: string;
     timeCreated: admin.firestore.Timestamp;
   }

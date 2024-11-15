@@ -14,6 +14,7 @@ import useSingleSurveyStore from '@/stores/useSingleSurveyStore';
 
 import useParticipantStore from '@/stores/useParticipantStore';
 import { useRouter } from 'next/navigation';
+import useSingleResearcherStore from '@/stores/useResearcherStore';
 
 export default function SurveyPage() {
   const [userAddress, setUserAddress] = useState('');
@@ -26,7 +27,7 @@ export default function SurveyPage() {
   const router = useRouter();
 
   const { survey, loading, fetchSurvey } = useSingleSurveyStore();
-
+  const { researcher, fetchResearcher } = useSingleResearcherStore();
   const { participant } = useParticipantStore();
 
   useEffect(() => {
@@ -44,6 +45,12 @@ export default function SurveyPage() {
       fetchSurvey(surveyId);
     }
   }, [isMounted, surveyId, fetchSurvey]);
+
+  useEffect(() => {
+    if (survey?.researcherId) {
+      fetchResearcher(survey.researcherId);
+    }
+  }, [survey?.researcherId, fetchResearcher]);
 
   if (!isMounted)
     return (
@@ -163,16 +170,13 @@ export default function SurveyPage() {
         px={2}
         py={2}
       >
-        <AccordionRoot
-          // value={value}
-          multiple
-        >
+        <AccordionRoot multiple>
           <AccordionItem value="researcher" color="black" pb={1}>
             <AccordionItemTrigger fontWeight="bold">
               Researcher
             </AccordionItemTrigger>
             <AccordionItemContent>
-              Researcher ID: {survey.researcherId}
+              <Text>Researcher: {researcher?.name || 'Loading...'}</Text>
             </AccordionItemContent>
           </AccordionItem>
         </AccordionRoot>
@@ -186,7 +190,6 @@ export default function SurveyPage() {
         mt={16}
         alignSelf="center"
         onClick={() => {
-
           router.push(
             `${survey.formLink}?walletAddress=${participant?.walletAddress}&surveyId=${survey.id}` ||
               '#'
