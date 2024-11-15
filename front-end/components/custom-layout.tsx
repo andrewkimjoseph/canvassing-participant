@@ -9,7 +9,7 @@ interface Props {
 
 const CustomLayout: FC<Props> = ({ children }) => {
   const pathname = usePathname();
-  const noHeaderRoutes = ['/welcome', '/sign-up'];
+  const noHeaderRoutes = ['/welcome', 'welcome/sign-up'];
   const showHeader = !noHeaderRoutes.includes(pathname);
 
   return (
