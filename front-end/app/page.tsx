@@ -16,6 +16,7 @@ import { Avatar } from '@/components/ui/avatar';
 import useParticipantStore from '@/stores/useParticipantStore';
 import useMultipleSurveysStore from '@/stores/useMultipleSurveysStore';
 import useRewardStore from '@/stores/useRewardStore';
+import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -33,6 +34,7 @@ export default function Home() {
   const router = useRouter();
 
   const { rewards, fetchRewards } = useRewardStore();
+  const { trackAmplitudeEvent } = useAmplitudeContext();
 
   useEffect(() => {
     if (address) {
@@ -161,6 +163,13 @@ export default function Home() {
                 mb={4}
                 mt={0}
                 pt={1}
+                onClick={() => {
+                  trackAmplitudeEvent('Survey clicked', {
+                    walletAddress: address,
+                    surveyId: survey.id,
+                  });
+                  console.log("Logged survey clicked");
+                }}
               >
                 <Box bgColor="#CFCED8" h="30" borderRadius={10} mx={2}>
                   <Flex
