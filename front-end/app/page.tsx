@@ -168,7 +168,6 @@ export default function Home() {
                     walletAddress: address,
                     surveyId: survey.id,
                   });
-                  console.log("Logged survey clicked");
                 }}
               >
                 <Box bgColor="#CFCED8" h="30" borderRadius={10} mx={2}>

@@ -13,6 +13,7 @@ import {
   ClipboardInput,
   ClipboardRoot,
 } from '@/components/ui/clipboard';
+import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 
 export default function RewardHistory() {
   const [isMounted, setIsMounted] = useState(false);
@@ -20,6 +21,7 @@ export default function RewardHistory() {
   const { rewards } = useRewardStore();
   const router = useRouter();
   const { participant, checkParticipant } = useParticipantStore();
+  const { trackAmplitudeEvent } = useAmplitudeContext();
 
   const checkParticipantStatus = useCallback(() => {
     if (isConnected && address) {
@@ -98,7 +100,16 @@ export default function RewardHistory() {
                   {reward.id}
                 </Text>
                 <ClipboardRoot value={reward.id} color={'black'}>
-                  <ClipboardIconButton />
+                  <ClipboardIconButton
+                    onClick={() => {
+                      trackAmplitudeEvent('Copy reward id clicked', {
+                        participantWalletAddress: participant?.walletAddress,
+                        partipantId: participant?.id,
+                        rewardId: reward.id,
+                        surveyId: reward.surveyId,
+                      });
+                    }}
+                  />
                 </ClipboardRoot>
               </Flex>
               <Flex justify="start" align="center" mt={4}>
@@ -111,10 +122,24 @@ export default function RewardHistory() {
                       router.push(
                         `https://celo-alfajores.blockscout.com/tx/${reward.transactionHash}`
                       );
+
+                      trackAmplitudeEvent('View on block explorer clicked', {
+                        participantWalletAddress: participant?.walletAddress,
+                        partipantId: participant?.id,
+                        rewardId: reward.id,
+                        surveyId: reward.surveyId,
+                      });
                     } else {
                       router.push(
                         `/survey/${reward.surveyId}/success?submissionId=${reward.submissionId}&respondentId=${reward.respondentId}`
                       );
+
+                      trackAmplitudeEvent('Claim clicked', {
+                        participantWalletAddress: participant?.walletAddress,
+                        partipantId: participant?.id,
+                        rewardId: reward.id,
+                        surveyId: reward.surveyId,
+                      });
                     }
                   }}
                 >

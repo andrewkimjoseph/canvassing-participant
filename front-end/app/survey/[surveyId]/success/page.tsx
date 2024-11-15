@@ -11,7 +11,6 @@ import { processRewardClaimByParticipant } from '@/services/web3/processRewardCl
 import { Address } from 'viem';
 import { Toaster, toaster } from '@/components/ui/toaster';
 import useSingleSurveyStore from '@/stores/useSingleSurveyStore';
-import { StringDecoder } from 'string_decoder';
 import { Button } from '@/components/ui/button';
 import { getContractBalance } from '@/services/web3/checkContractBalance';
 import {
@@ -24,6 +23,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/firebase';
 import useParticipantStore from '@/stores/useParticipantStore';
+import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 
 export default function SuccessPage() {
   const [userAddress, setUserAddress] = useState('');
@@ -35,6 +35,7 @@ export default function SuccessPage() {
   const { participant } = useParticipantStore.getState();
   const params = useParams();
   const searchParams = useSearchParams();
+  const { trackAmplitudeEvent } = useAmplitudeContext();
 
   const surveyId = params.surveyId;
   const submissionId = searchParams.get('submissionId');
@@ -101,7 +102,7 @@ export default function SuccessPage() {
             isClaimed: true,
             transactionHash: claimIsProcessed.transactionHash,
             amountIncUSD: survey.rewardAmountIncUSD,
-            timeUpdated: Timestamp.now()
+            timeUpdated: Timestamp.now(),
           });
 
           toaster.create({
@@ -223,7 +224,14 @@ export default function SuccessPage() {
         mt={5}
         alignSelf={'center'}
         mb={16}
-        onClick={processRewardClaimByParticipantFn}
+        onClick={() => {
+          trackAmplitudeEvent('Claim clicked', {
+            participantWalletAddress: participant?.walletAddress,
+            partipantId: participant?.id,
+            surveyId: survey?.id,
+          });
+          processRewardClaimByParticipantFn();
+        }}
         loading={isProcessingRewardClaim}
         loadingText="Processing claim"
       >

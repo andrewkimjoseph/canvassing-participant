@@ -11,23 +11,25 @@ import {
   Text,
   Flex,
 } from '@chakra-ui/react';
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
+import useParticipantStore from '@/stores/useParticipantStore';
+import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 
 
 export default function TransactionSuccessfulPage() {
-  const [userAddress, setUserAddress] = useState('');
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
   const router = useRouter();
+
+  const params = useParams();
+  const surveyId = params.surveyId;
+
+  const { participant } = useParticipantStore();
+  const { trackAmplitudeEvent } = useAmplitudeContext();
+  
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
-  useEffect(() => {
-    if (isConnected && address) {
-      setUserAddress(address);
-    }
-  }, [address, isConnected]);
 
   if (!isMounted) {
     return null;
@@ -63,7 +65,13 @@ export default function TransactionSuccessfulPage() {
         mt={5}
         alignSelf={'center'}
         mb={16}
-        onClick={()=>router.push("/")}
+        onClick={()=>{
+          trackAmplitudeEvent('Go home clicked', {
+            participantWalletAddress: participant?.walletAddress,
+            partipantId: participant?.id,
+            surveyId: surveyId,
+          });
+          router.push("/")}}
       >
         <Text fontSize="16" fontWeight="bold" color="white">
           Back to Homepage
