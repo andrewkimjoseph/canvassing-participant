@@ -17,6 +17,8 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
     uint256 public rewardAmountPerParticipantInWei;
     uint256 public targetNumberOfParticipants;
     uint256 public numberOfRewardedParticipants;
+    uint256 public numberOfWhitelistedUserAddresses;
+    uint256 public numberOfBlacklistedUserAddresses;
 
     event OneUserAddressWhitelisted(address participantWalletAddress);
     event MultipleUserAddressesWhitelisted(address[] walletAddresses);
@@ -120,6 +122,9 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
             revert ZeroAddress();
         }
         usersWhitelistedForSurvey[walletAddress] = true;
+        unchecked {
+            ++numberOfWhitelistedUserAddresses;
+        }
         emit OneUserAddressWhitelisted(walletAddress);
     }
 
@@ -132,10 +137,13 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
             revert ZeroAddress();
         }
         usersWhitelistedForSurvey[walletAddress] = false;
+        unchecked {
+            ++numberOfBlacklistedUserAddresses;
+        }
         emit OneWhitelistedUserAddressBlacklisted(walletAddress);
     }
 
-    function whitelistMultipleAddresses(address[] calldata walletAddresses)
+    function whitelistMultipleUserAddresses(address[] calldata walletAddresses)
         external
         onlyOwner
     {
@@ -159,6 +167,9 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
         for (uint256 i = 0; i < length; ) {
             usersWhitelistedForSurvey[walletAddresses[i]] = true;
             unchecked {
+                ++numberOfWhitelistedUserAddresses;
+            }
+            unchecked {
                 ++i;
             }
         }
@@ -166,7 +177,7 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
         emit MultipleUserAddressesWhitelisted(walletAddresses);
     }
 
-    function blacklistMultipleWhitelistedAddresses(
+    function blacklistMultipleWhitelistedUserAddresses(
         address[] calldata walletAddresses
     ) external onlyOwner {
         uint256 length = walletAddresses.length;
@@ -188,6 +199,9 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
 
         for (uint256 i = 0; i < length; ) {
             usersWhitelistedForSurvey[walletAddresses[i]] = false;
+            unchecked {
+                ++numberOfBlacklistedUserAddresses;
+            }
             unchecked {
                 ++i;
             }
@@ -363,6 +377,14 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
 
     function getNumberOfRewardedParticipants() external view returns (uint256) {
         return numberOfRewardedParticipants;
+    }
+
+    function getNumberOfWhitelistedUserAddresses() external view returns (uint256) {
+        return numberOfWhitelistedUserAddresses;
+    }
+
+    function getNumberOfBlacklistedUserAddresses() external view returns (uint256) {
+        return numberOfBlacklistedUserAddresses;
     }
 }
 
