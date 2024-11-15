@@ -7,15 +7,19 @@ import useRewardStore from '@/stores/useRewardStore';
 import { useRouter } from 'next/navigation';
 import useParticipantStore from '@/stores/useParticipantStore';
 
+import {
+  ClipboardButton,
+  ClipboardIconButton,
+  ClipboardInput,
+  ClipboardRoot,
+} from '@/components/ui/clipboard';
+
 export default function RewardHistory() {
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
   const { rewards } = useRewardStore();
   const router = useRouter();
-  const {
-    participant,
-    checkParticipant,
-  } = useParticipantStore();
+  const { participant, checkParticipant } = useParticipantStore();
 
   const checkParticipantStatus = useCallback(() => {
     if (isConnected && address) {
@@ -68,6 +72,8 @@ export default function RewardHistory() {
               borderLeft="solid"
               borderColor="black"
               borderLeftWidth={4}
+              borderTopRightRadius={10}
+              borderBottomRightRadius={10}
               p={4}
               mb={4}
             >
@@ -77,8 +83,8 @@ export default function RewardHistory() {
                   : null}
               </Text>
 
-              <Flex justify="space-between" align="center">
-                <Text fontSize="sm" color={reward.isClaimed ? 'green' : 'red'}>
+              <Flex justify="space-between" align="center" mt={2}>
+                <Text fontSize="lg" color={reward.isClaimed ? 'green' : 'red'}>
                   {reward.isClaimed ? 'Claim Completed' : 'Pending Claim'}
                 </Text>
                 <Text fontSize="sm" color="black">
@@ -87,10 +93,34 @@ export default function RewardHistory() {
                     : 'N/A'}
                 </Text>
               </Flex>
-
-              <Text fontSize="lg" color="black">
-                {reward.id}
-              </Text>
+              <Flex justify="start" align="center" mt={2}>
+                <Text fontSize="lg" color="#94B9FF">
+                  {reward.id}
+                </Text>
+                <ClipboardRoot value={reward.id} color={'black'}>
+                  <ClipboardIconButton />
+                </ClipboardRoot>
+              </Flex>
+              <Flex justify="start" align="center" mt={4}>
+                <Text
+                  fontSize="sm"
+                  color="black"
+                  textDecoration={'underline'}
+                  onClick={() => {
+                    if (reward.isClaimed) {
+                      router.push(
+                        `https://celo-alfajores.blockscout.com/tx/${reward.transactionHash}`
+                      );
+                    } else {
+                      router.push(
+                        `/survey/${reward.surveyId}/success?submissionId=${reward.submissionId}&respondentId=${reward.respondentId}`
+                      );
+                    }
+                  }}
+                >
+                  {reward.isClaimed ? 'View on block explorer' : 'Claim'}
+                </Text>
+              </Flex>
             </Box>
           ))
         ) : (
