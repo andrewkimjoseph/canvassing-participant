@@ -43,7 +43,7 @@ export default function TransactionSuccessfulPage() {
         mt={16}
       >
         <Image
-          src="transaction-successful.png" // Replace with your image URL
+          src="/transaction-successful.png" // Replace with your image URL
           alt="Background"
           width="100%"
           height="35vh"
