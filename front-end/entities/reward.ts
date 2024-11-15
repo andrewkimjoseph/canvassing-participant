@@ -11,6 +11,7 @@ export interface Reward {
   participantWalletAddress: string | null;
   responseId: string | null;
   timeCreated: admin.firestore.Timestamp | null;
+  timeUpdated: admin.firestore.Timestamp | null;
   transactionHash: string | null;
   amountIncUSD: number | null;
 }
