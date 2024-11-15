@@ -40,7 +40,7 @@ export default function WelcomePage() {
   }, []);
 
   const handleGetStarted = () => {
-    router.push('/sign-up');
+    router.push('/welcome/sign-up');
   };
 
 
