@@ -18,7 +18,6 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
     uint256 public targetNumberOfParticipants;
     uint256 public numberOfRewardedParticipants;
     uint256 public numberOfWhitelistedUserAddresses;
-    uint256 public numberOfBlacklistedUserAddresses;
 
     event OneUserAddressWhitelisted(address participantWalletAddress);
     event MultipleUserAddressesWhitelisted(address[] walletAddresses);
@@ -113,7 +112,7 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
         targetNumberOfParticipants = _targetNumberOfParticipants;
     }
 
-    function whitelistOneAddress(address walletAddress)
+    function whitelistOneUserAddress(address walletAddress)
         external
         onlyOwner
         mustBeBlacklisted(walletAddress)
@@ -128,7 +127,7 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
         emit OneUserAddressWhitelisted(walletAddress);
     }
 
-    function blacklistOneWhitelistedAddress(address walletAddress)
+    function blacklistOneWhitelistedUserAddress(address walletAddress)
         external
         onlyOwner
         mustBeWhitelisted(walletAddress)
@@ -138,7 +137,7 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
         }
         usersWhitelistedForSurvey[walletAddress] = false;
         unchecked {
-            ++numberOfBlacklistedUserAddresses;
+            --numberOfWhitelistedUserAddresses;
         }
         emit OneWhitelistedUserAddressBlacklisted(walletAddress);
     }
@@ -200,7 +199,7 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
         for (uint256 i = 0; i < length; ) {
             usersWhitelistedForSurvey[walletAddresses[i]] = false;
             unchecked {
-                ++numberOfBlacklistedUserAddresses;
+                --numberOfWhitelistedUserAddresses;
             }
             unchecked {
                 ++i;
@@ -379,12 +378,12 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
         return numberOfRewardedParticipants;
     }
 
-    function getNumberOfWhitelistedUserAddresses() external view returns (uint256) {
+    function getNumberOfWhitelistedUserAddresses()
+        external
+        view
+        returns (uint256)
+    {
         return numberOfWhitelistedUserAddresses;
-    }
-
-    function getNumberOfBlacklistedUserAddresses() external view returns (uint256) {
-        return numberOfBlacklistedUserAddresses;
     }
 }
 

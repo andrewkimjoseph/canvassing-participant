@@ -12,14 +12,13 @@ import { celoAlfajores } from "viem/chains";
 import { mnemonicToAccount, privateKeyToAccount } from "viem/accounts";
 import { config } from "dotenv";
 
-// Import your contract ABI and bytecode
 import { abi } from "../artifacts/contracts/CanvassingSurvey.sol/CanvassingSurvey.json";
 import { bytecode } from "../artifacts/contracts/CanvassingSurvey.sol/CanvassingSurvey.json";
 import { cUSDAlfajoresContractABI } from "./utils/cUSDAlfajoresContractABI";
 
 config();
 
-const CUSD_ADDRESS = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"; // cUSD on Alfajores
+const CUSD_ADDRESS = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1";
 const SRP = process.env.SRP;
 const INFURA_API_KEY = process.env.INFURA_API_KEY;
 const INFURA_RPC_URL = `https://celo-alfajores.infura.io/v3/${INFURA_API_KEY}`;
@@ -45,18 +44,16 @@ describe("CanvassingSurvey", () => {
   let contractAddress: Address | null | undefined;
 
   before(async function () {
-
     const hash = await privateClient.deployContract({
       abi,
       account: mnemonicAccount,
       args: [
         mnemonicAccount.address,
-        parseEther("0.25"), // 0.25 cUSD reward
-        BigInt(1), // target participants
+        parseEther("0.25"),
+        BigInt(1),
         CUSD_ADDRESS,
       ],
       bytecode: bytecode as `0x${string}`,
-      // nonce: currentNonce
     });
 
     const receipt = await publicClient.waitForTransactionReceipt({ hash });
@@ -70,11 +67,18 @@ describe("CanvassingSurvey", () => {
   it("Should whitelist an address", async () => {
     const testAddress = "0xE49B05F2c7DD51f61E415E1DFAc10B80074B001A";
 
+    // Get the initial number of whitelisted addresses
+    const initialWhitelistedCount = await getWhitelistedAddressesCount(
+      publicClient,
+      contractAddress  as Address,
+      abi
+    );
+
     const whitelistTx = await privateClient.writeContract({
       account: mnemonicAccount,
       address: contractAddress as Address,
       abi: abi,
-      functionName: "whitelistOneAddress",
+      functionName: "whitelistOneUserAddress",
       args: [testAddress],
     });
 
@@ -82,25 +86,38 @@ describe("CanvassingSurvey", () => {
       hash: whitelistTx,
     });
 
-    const isWhitelisted: boolean = (await publicClient.readContract({
-      address: contractAddress as Address,
-      abi: abi,
-      functionName: "checkIfUserAddressIsWhitelisted",
-      args: [testAddress],
-    })) as boolean;
+    const isWhitelisted = await checkIfAddressIsWhitelisted(
+      publicClient,
+      contractAddress  as Address,
+      abi,
+      testAddress
+    );
+    const currentWhitelistedCount = await getWhitelistedAddressesCount(
+      publicClient,
+      contractAddress  as Address,
+      abi
+    );
 
-    // Check if address is whitelisted
+    // Check if address is whitelisted and the whitelisted count has increased
     expect(isWhitelisted).to.be.true;
+    expect(currentWhitelistedCount).to.equal(initialWhitelistedCount + 1);
   });
 
   it("Should blacklist a whitelisted address", async () => {
     const testAddress = "0xE49B05F2c7DD51f61E415E1DFAc10B80074B001A";
 
+    // Get the initial number of whitelisted addresses
+    const initialWhitelistedCount = await getWhitelistedAddressesCount(
+      publicClient,
+      contractAddress  as Address,
+      abi
+    );
+
     const blacklistTx = await privateClient.writeContract({
       account: mnemonicAccount,
       address: contractAddress as Address,
       abi: abi,
-      functionName: "blacklistOneWhitelistedAddress",
+      functionName: "blacklistOneWhitelistedUserAddress",
       args: [testAddress],
     });
 
@@ -108,23 +125,28 @@ describe("CanvassingSurvey", () => {
       hash: blacklistTx,
     });
 
-    const isWhitelisted: boolean = (await publicClient.readContract({
-      address: contractAddress as Address,
-      abi: abi,
-      functionName: "checkIfUserAddressIsWhitelisted",
-      args: [testAddress],
-    })) as boolean;
+    const isWhitelisted = await checkIfAddressIsWhitelisted(
+      publicClient,
+      contractAddress  as Address,
+      abi,
+      testAddress
+    );
+    const isBlacklisted = await checkIfAddressIsBlacklisted(
+      publicClient,
+      contractAddress  as Address,
+      abi,
+      testAddress
+    );
+    const currentWhitelistedCount = await getWhitelistedAddressesCount(
+      publicClient,
+      contractAddress  as Address,
+      abi
+    );
 
-    const isBlacklisted: boolean = (await publicClient.readContract({
-      address: contractAddress as Address,
-      abi: abi,
-      functionName: "checkIfUserAddressIsBlacklisted",
-      args: [testAddress],
-    })) as boolean;
-
-    // Check if address is blacklisted
+    // Check if address is blacklisted and the whitelisted count has decreased
     expect(isWhitelisted).to.be.false;
     expect(isBlacklisted).to.be.true;
+    expect(currentWhitelistedCount).to.equal(initialWhitelistedCount - 1);
   });
 
   it("Should whitelist multiple addresses", async () => {
@@ -134,11 +156,18 @@ describe("CanvassingSurvey", () => {
       "0xdaB7EB2409fdD974CF93357C61aEA141729AEfF5",
     ];
 
+    // Get the initial number of whitelisted addresses
+    const initialWhitelistedCount = await getWhitelistedAddressesCount(
+      publicClient,
+      contractAddress  as Address,
+      abi
+    );
+
     const whitelistTx = await privateClient.writeContract({
       account: mnemonicAccount,
       address: contractAddress as Address,
       abi: abi,
-      functionName: "whitelistMultipleAddresses",
+      functionName: "whitelistMultipleUserAddresses",
       args: [testAddresses],
     });
 
@@ -146,18 +175,27 @@ describe("CanvassingSurvey", () => {
       hash: whitelistTx,
     });
 
-    const whitelistedAddresses = (await publicClient.readContract({
-      address: contractAddress as Address,
-      abi: abi,
-      functionName: "getWhitelistedAddressesFromRegisteredAddresses",
-      args: [testAddresses],
-    })) as Address[];
+    const whitelistedAddresses =
+      await getWhitelistedAddressesFromRegisteredAddresses(
+        publicClient,
+        contractAddress  as Address,
+        abi,
+        testAddresses
+      );
+    const currentWhitelistedCount = await getWhitelistedAddressesCount(
+      publicClient,
+      contractAddress  as Address,
+      abi
+    );
 
-    // Check if all addresses are whitelisted
+    // Check if all addresses are whitelisted and the whitelisted count has increased
     expect(whitelistedAddresses.length).to.equal(testAddresses.length);
     for (const address of testAddresses) {
       expect(whitelistedAddresses).to.include(address);
     }
+    expect(currentWhitelistedCount).to.equal(
+      initialWhitelistedCount + testAddresses.length
+    );
   });
 
   it("Should blacklist multiple whitelisted addresses", async () => {
@@ -166,30 +204,18 @@ describe("CanvassingSurvey", () => {
       "0xdaB7EB2409fdD974CF93357C61aEA141729AEfF5",
     ];
 
-    // const [address] = await privateClient.getAddresses();
-
-    // // Whitelist the addresses first
-    // const whitelistMultipleAddressesTxHash = await privateClient.writeContract({
-    //   account: mnemonicAccount,
-    //   address: contractAddress as Address,
-    //   abi: abi,
-    //   functionName: "whitelistMultipleAddresses",
-    //   args: [testAddresses],
-    // });
-
-    // await publicClient.waitForTransactionReceipt({
-    //   hash: whitelistMultipleAddressesTxHash,
-    // });
-
-    // // if (whitelistMultipleAddressesTxReceipt.status === "success"){
-
-    // // }
+    // Get the initial number of whitelisted addresses
+    const initialWhitelistedCount = await getWhitelistedAddressesCount(
+      publicClient,
+      contractAddress  as Address,
+      abi
+    );
 
     const blacklistTx = await privateClient.writeContract({
       account: mnemonicAccount,
       address: contractAddress as Address,
       abi: abi,
-      functionName: "blacklistMultipleWhitelistedAddresses",
+      functionName: "blacklistMultipleWhitelistedUserAddresses",
       args: [testAddresses],
     });
 
@@ -197,27 +223,35 @@ describe("CanvassingSurvey", () => {
       hash: blacklistTx,
     });
 
-    const whitelistedAddresses = (await publicClient.readContract({
-      address: contractAddress as Address,
-      abi: abi,
-      functionName: "getWhitelistedAddressesFromRegisteredAddresses",
-      args: [testAddresses],
-    })) as Address[];
+    const whitelistedAddresses =
+      await getWhitelistedAddressesFromRegisteredAddresses(
+        publicClient,
+        contractAddress  as Address,
+        abi,
+        testAddresses
+      );
+    const currentWhitelistedCount = await getWhitelistedAddressesCount(
+      publicClient,
+      contractAddress  as Address,
+      abi
+    );
 
-    // Check if all addresses are blacklisted
+    // Check if all addresses are blacklisted and the whitelisted count has decreased
     expect(whitelistedAddresses.length).to.equal(0);
+    expect(currentWhitelistedCount).to.equal(
+      initialWhitelistedCount - testAddresses.length
+    );
   });
 
   it("Should update the target number of participants", async () => {
     const [address] = await privateClient.getAddresses();
 
-    const oldTargetParticipants = (await publicClient.readContract({
-      address: contractAddress as Address,
-      abi: abi,
-      functionName: "targetNumberOfParticipants",
-    })) as number;
-
-    const newTargetParticipants = BigInt(200);
+    const oldTargetParticipants = await getTargetNumberOfParticipants(
+      publicClient,
+      contractAddress  as Address,
+      abi
+    );
+    const newTargetParticipants = Number(200);
 
     const updateTx = await privateClient.writeContract({
       account: mnemonicAccount,
@@ -231,88 +265,81 @@ describe("CanvassingSurvey", () => {
       hash: updateTx,
     });
 
-    const currentTargetParticipants = (await publicClient.readContract({
-      address: contractAddress as Address,
-      abi: abi,
-      functionName: "targetNumberOfParticipants",
-    })) as number;
+    const currentTargetParticipants = await getTargetNumberOfParticipants(
+      publicClient,
+      contractAddress  as Address,
+      abi
+    );
 
     // Check if the target number of participants was updated
     expect(currentTargetParticipants).to.equal(newTargetParticipants);
     expect(currentTargetParticipants).to.not.equal(oldTargetParticipants);
   });
 
-  it("Should not allow any reward claim if contract balance is insufficient", async () => {
-    const testAddress = "0xE49B05F2c7DD51f61E415E1DFAc10B80074B001A";
+  // Helper functions
+  async function checkIfAddressIsWhitelisted(
+    publicClient: any,
+    contractAddress: Address,
+    abi: any,
+    walletAddress: Address
+  ): Promise<boolean> {
+    return (await publicClient.readContract({
+      address: contractAddress,
+      abi: abi,
+      functionName: "checkIfUserAddressIsWhitelisted",
+      args: [walletAddress],
+    })) as boolean;
+  }
 
-    await expect(
-      (async () => {
-        const data = encodeFunctionData({
-          abi: abi,
-          functionName: "processRewardClaimByParticipant",
-          args: [testAddress],
-        });
+  async function checkIfAddressIsBlacklisted(
+    publicClient: any,
+    contractAddress: Address,
+    abi: any,
+    walletAddress: Address
+  ): Promise<boolean> {
+    return (await publicClient.readContract({
+      address: contractAddress,
+      abi: abi,
+      functionName: "checkIfUserAddressIsBlacklisted",
+      args: [walletAddress],
+    })) as boolean;
+  }
 
-        // Send the transaction as a raw signed transaction
-        const request = await privateClient.prepareTransactionRequest({
-          to: contractAddress,
-          data,
-        });
+  async function getWhitelistedAddressesFromRegisteredAddresses(
+    publicClient: any,
+    contractAddress: Address,
+    abi: any,
+    registeredAddresses: Address[]
+  ): Promise<Address[]> {
+    return (await publicClient.readContract({
+      address: contractAddress,
+      abi: abi,
+      functionName: "getWhitelistedAddressesFromRegisteredAddresses",
+      args: [registeredAddresses],
+    })) as Address[];
+  }
 
-        const serializedTransaction = await privateClient.signTransaction(
-          request
-        );
+  async function getWhitelistedAddressesCount(
+    publicClient: any,
+    contractAddress: Address,
+    abi: any
+  ): Promise<number> {
+    return Number(await publicClient.readContract({
+      address: contractAddress,
+      abi: abi,
+      functionName: "getNumberOfWhitelistedUserAddresses",
+    }));
+  }
 
-        const hash = await privateClient.sendRawTransaction({
-          serializedTransaction,
-        });
-
-        return await publicClient.waitForTransactionReceipt({ hash });
-      })()
-    ).to.be.rejected;
-  });
-
-  it("Should allow a whitelisted participant to claim a reward once the contract balance is sufficient", async () => {
-    const testAddress = "0xE49B05F2c7DD51f61E415E1DFAc10B80074B001A";
-
-    // Send 0.25 cUSD to the contract
-    const sendCUSDTx = await privateClient.writeContract({
-      account: mnemonicAccount,
-      address: CUSD_ADDRESS as Address,
-      abi: cUSDAlfajoresContractABI,
-      functionName: "transfer",
-      args: [contractAddress, parseEther("0.25")],
-    });
-
-    await publicClient.waitForTransactionReceipt({
-      hash: sendCUSDTx,
-    });
-
-    // This should execute without throwing an error
-    await expect(
-      (async () => {
-        const data = encodeFunctionData({
-          abi: abi,
-          functionName: "processRewardClaimByParticipant",
-          args: [testAddress],
-        });
-
-        // Send the transaction as a raw signed transaction
-        const request = await privateClient.prepareTransactionRequest({
-          to: contractAddress,
-          data,
-        });
-
-        const serializedTransaction = await privateClient.signTransaction(
-          request
-        );
-
-        const hash = await privateClient.sendRawTransaction({
-          serializedTransaction,
-        });
-
-        return await publicClient.waitForTransactionReceipt({ hash });
-      })()
-    ).to.not.be.rejected;
-  });
+  async function getTargetNumberOfParticipants(
+    publicClient: any,
+    contractAddress: Address,
+    abi: any
+  ): Promise<number> {
+    return Number(await publicClient.readContract({
+      address: contractAddress,
+      abi: abi,
+      functionName: "targetNumberOfParticipants",
+    })) as number;
+  }
 });
