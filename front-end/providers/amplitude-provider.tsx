@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, createContext } from 'react';
-import { init, track } from '@amplitude/analytics-browser';
+import { init, track,add } from '@amplitude/analytics-browser';
+import { sessionReplayPlugin } from '@amplitude/plugin-session-replay-browser';
+const sessionReplayTracking = sessionReplayPlugin();
 
 const NEXT_PUBLIC_AMPLITUDE_API_KEY = process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY;
 
@@ -20,6 +22,7 @@ const AmplitudeContextProvider = ({
 }) => {
   useEffect(() => {
     init(NEXT_PUBLIC_AMPLITUDE_API_KEY as string, { autocapture: true });
+    add(sessionReplayTracking);
   }, []);
 
   const trackAmplitudeEvent = (eventName: string, eventProperties: {}) => {
