@@ -97,7 +97,7 @@ export default function SignUpPage() {
 
       <Box position="relative" width="100%" height="50%" overflow="hidden">
         <Image
-          src="signup-page.jpg"
+          src="/signup-page.jpg"
           alt="Background"
           width="100vw"
           objectFit="cover"
