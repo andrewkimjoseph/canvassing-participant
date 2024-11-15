@@ -61,7 +61,7 @@ export default function RewardHistory() {
               mb={4}
             >
               <Text fontSize="lg" color="#363062">
-                {reward.timeCreated?.toDate().toLocaleString()}
+                {reward.timeCreated ? new Date(reward.timeCreated.seconds * 1000).toLocaleString() : null}
               </Text>
 
               <Flex
