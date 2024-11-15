@@ -6,14 +6,24 @@ import { useAccount } from 'wagmi';
 
 import { Box, Image, Text, Flex, Spinner } from '@chakra-ui/react';
 
-import { useRouter, useParams } from 'next/navigation';
-import { processRewardClaimByParticipant } from '@/services/processRewardClaimByParticipant';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { processRewardClaimByParticipant } from '@/services/web3/processRewardClaimByParticipant';
 import { Address } from 'viem';
 import { Toaster, toaster } from '@/components/ui/toaster';
 import useSingleSurveyStore from '@/stores/useSingleSurveyStore';
 import { StringDecoder } from 'string_decoder';
 import { Button } from '@/components/ui/button';
-import { getContractBalance } from '@/services/checkContractBalance';
+import { getContractBalance } from '@/services/web3/checkContractBalance';
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+  Timestamp,
+} from 'firebase/firestore';
+import { db } from '@/firebase';
+import useParticipantStore from '@/stores/useParticipantStore';
 
 export default function SuccessPage() {
   const [userAddress, setUserAddress] = useState('');
@@ -22,15 +32,30 @@ export default function SuccessPage() {
   const router = useRouter();
   const { survey, fetchSurvey } = useSingleSurveyStore();
   const [isProcessingRewardClaim, setIsProcessingRewardClaim] = useState(false);
-
+  const { participant } = useParticipantStore.getState();
   const params = useParams();
+  const searchParams = useSearchParams();
+
   const surveyId = params.surveyId;
+  const submissionId = searchParams.get('submissionId');
+  const respondentId = searchParams.get('respondentId');
 
   const processRewardClaimByParticipantFn = async () => {
     setIsProcessingRewardClaim(true);
+
     if (!survey?.contractAddress || !survey?.rewardAmountIncUSD) {
       toaster.create({
         description: 'CE1',
+        duration: 3000,
+        type: 'error',
+      });
+      setIsProcessingRewardClaim(false);
+      return;
+    }
+
+    if (!submissionId || !respondentId || !address || !participant?.id) {
+      toaster.create({
+        description: 'CE3',
         duration: 3000,
         type: 'error',
       });
@@ -52,24 +77,61 @@ export default function SuccessPage() {
       return;
     }
 
-    const claimIsProcessed = await processRewardClaimByParticipant(address, {
-      _participantWalletAddress: address as Address,
-      _smartContractAddress: survey.contractAddress as Address,
-    });
-
-    if (claimIsProcessed) {
-      toaster.create({
-        description: 'Reward claimed successfully!',
-        duration: 3000,
-        type: 'success',
+    try {
+      const claimIsProcessed = await processRewardClaimByParticipant(address, {
+        _participantWalletAddress: address as Address,
+        _smartContractAddress: survey.contractAddress as Address,
       });
 
-      // Wait for user feedback before navigating
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      router.push(`/survey/${surveyId}/transaction-successful`);
-    } else {
+      if (claimIsProcessed.success) {
+        const rewardsCollection = collection(db, 'rewards');
+        const rewardsQuery = query(
+          rewardsCollection,
+          where('submissionId', '==', submissionId),
+          where('respondentId', '==', respondentId),
+          where('participantWalletAddress', '==', address),
+          where('participantId', '==', participant.id)
+        );
+
+        const querySnapshot = await getDocs(rewardsQuery);
+
+        if (!querySnapshot.empty) {
+          const rewardDoc = querySnapshot.docs[0]; // Assuming there's only one matching document
+          await updateDoc(rewardDoc.ref, {
+            isClaimed: true,
+            transactionHash: claimIsProcessed.transactionHash,
+            amountIncUSD: survey.rewardAmountIncUSD,
+            timeUpdated: Timestamp.now()
+          });
+
+          toaster.create({
+            description: 'Reward claimed successfully!',
+            duration: 3000,
+            type: 'success',
+          });
+
+          // Wait for user feedback before navigating
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+
+          router.push(`/survey/${surveyId}/transaction-successful`);
+        } else {
+          toaster.create({
+            description: 'Reward record not found.',
+            duration: 3000,
+            type: 'error',
+          });
+        }
+      } else {
+        toaster.create({
+          description: 'Failed to claim reward. Please try again.',
+          duration: 3000,
+          type: 'error',
+        });
+      }
+    } catch (error) {
+      console.error('Error processing reward claim:', error);
       toaster.create({
-        description: 'Failed to claim reward. Please try again.',
+        description: 'An unexpected error occurred. Please try again later.',
         duration: 3000,
         type: 'error',
       });
@@ -77,6 +139,7 @@ export default function SuccessPage() {
 
     setIsProcessingRewardClaim(false);
   };
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
