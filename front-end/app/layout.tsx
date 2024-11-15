@@ -19,11 +19,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={font.dmSans.className} suppressHydrationWarning>
       <body>
+      <AmplitudeContextProvider>
         <Provider>
           <AppProvider>
-            <AmplitudeContextProvider>{children}</AmplitudeContextProvider>
+            {children}
           </AppProvider>
         </Provider>
+        </AmplitudeContextProvider>
       </body>
     </html>
   );
