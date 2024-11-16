@@ -7,7 +7,8 @@ import {
   where, 
   addDoc, 
   doc, 
-  updateDoc 
+  updateDoc, 
+  Timestamp
 } from 'firebase/firestore';
 import { Participant } from '@/entities/participant';
 import { db } from '@/firebase';
@@ -71,7 +72,6 @@ const useParticipantStore = create<ParticipantStoreState>()(
 
           await updateDoc(doc(db, 'participants', docRef.id), {
             id: docRef.id,
-            updatedAt: new Date().toISOString()
           });
 
           set({ participant: newParticipant, loading: false });
