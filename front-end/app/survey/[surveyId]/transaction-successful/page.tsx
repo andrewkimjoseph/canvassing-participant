@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from 'react';
 
-import { useAccount } from 'wagmi';
-
 import {
   Box,
   Image,
@@ -18,7 +16,6 @@ import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 
 export default function TransactionSuccessfulPage() {
   const [isMounted, setIsMounted] = useState(false);
-  const { address, isConnected } = useAccount();
   const router = useRouter();
 
   const params = useParams();

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { usePathname } from 'next/navigation';
-import { Box, Image, Button, Text, Flex, Spinner } from '@chakra-ui/react';
+import { Box, Image, Button, Text, Flex } from '@chakra-ui/react';
 import {
   AccordionItem,
   AccordionItemContent,
@@ -16,6 +16,7 @@ import useParticipantStore from '@/stores/useParticipantStore';
 import { useRouter } from 'next/navigation';
 import useSingleResearcherStore from '@/stores/useResearcherStore';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
+import { SpinnerIconC } from '@/components/icons/spinner-icon';
 
 export default function SurveyPage() {
   const [userAddress, setUserAddress] = useState('');
@@ -57,14 +58,14 @@ export default function SurveyPage() {
   if (!isMounted)
     return (
       <Flex justify="center" align="center" minH="100vh">
-        <Spinner size="xl" color="#363062" />
+        <SpinnerIconC />
       </Flex>
     );
   if (loading)
     return (
       <Flex justify="center" align="center" minH="100vh">
-        <Spinner size="xl" color="#363062" />
-      </Flex>
+        <SpinnerIconC />
+     </Flex>
     );
   if (!survey)
     return (
