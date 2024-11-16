@@ -1,6 +1,5 @@
 'use client';
 
-
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
@@ -28,6 +27,7 @@ import {
 import { SignUpPageIconC } from '@/components/icons/signup-page-icon';
 import useParticipantStore from '@/stores/useParticipantStore';
 import { Timestamp } from 'firebase/firestore';
+import { SpinnerIconC } from '@/components/icons/spinner-icon';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -44,12 +44,17 @@ export default function SignUpPage() {
   }, []);
 
   const handleSubmit = async () => {
+    setIsCreatingParticipant(true);
+
     if (!gender || !country || !address) {
       toaster.create({
         description: 'Please select all required fields',
         duration: 3000,
         type: 'info',
       });
+
+      setIsCreatingParticipant(false);
+
       return;
     }
 
@@ -59,7 +64,7 @@ export default function SignUpPage() {
         country,
         walletAddress: address,
         username: `user_${address.slice(2, 7)}`,
-        timeCreated: Timestamp.now()
+        timeCreated: Timestamp.now(),
       });
 
       toaster.create({
@@ -78,12 +83,12 @@ export default function SignUpPage() {
 
       router.push('/');
     } catch (error) {
-      setIsCreatingParticipant(false);
       toaster.create({
         description: 'Failed to create account. Please try again.',
         duration: 3000,
         type: 'error',
       });
+      setIsCreatingParticipant(false);
     }
   };
 
@@ -126,6 +131,7 @@ export default function SignUpPage() {
         <Text fontSize="3xl" fontWeight="bold" color="#363062" py={5}>
           Get Started
         </Text>
+
         <Box w={'4/6'}>
           <SelectRoot
             collection={genders}
@@ -192,7 +198,7 @@ export default function SignUpPage() {
           onClick={handleSubmit}
           disabled={!gender || !country}
           loading={isCreatingParticipant}
-          loadingText="Creating account ..."
+          loadingText={<SpinnerIconC />}
         >
           <Text fontSize="16" fontWeight="bold" color="white">
             Create account

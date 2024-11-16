@@ -2,18 +2,17 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import { Box, Text, Flex, Spinner } from '@chakra-ui/react';
+import { Box, Text, Flex } from '@chakra-ui/react';
 import useRewardStore from '@/stores/useRewardStore';
 import { useRouter } from 'next/navigation';
 import useParticipantStore from '@/stores/useParticipantStore';
 
 import {
-  ClipboardButton,
   ClipboardIconButton,
-  ClipboardInput,
   ClipboardRoot,
 } from '@/components/ui/clipboard';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
+import { SpinnerIconC } from '@/components/icons/spinner-icon';
 
 export default function RewardHistory() {
   const [isMounted, setIsMounted] = useState(false);
@@ -46,7 +45,7 @@ export default function RewardHistory() {
   if (!isMounted) {
     return (
       <Flex justify="center" align="center" h="100vh">
-        <Spinner />
+         <SpinnerIconC />
       </Flex>
     );
   }

@@ -24,6 +24,7 @@ import {
 import { db } from '@/firebase';
 import useParticipantStore from '@/stores/useParticipantStore';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
+import { SpinnerIconC } from '@/components/icons/spinner-icon';
 
 export default function SuccessPage() {
   const [userAddress, setUserAddress] = useState('');
@@ -114,7 +115,7 @@ export default function SuccessPage() {
           // Wait for user feedback before navigating
           await new Promise((resolve) => setTimeout(resolve, 1500));
 
-          router.push(`/survey/${surveyId}/transaction-successful`);
+          router.replace(`/survey/${surveyId}/transaction-successful`);
         } else {
           toaster.create({
             description: 'Reward record not found.',
@@ -233,7 +234,7 @@ export default function SuccessPage() {
           processRewardClaimByParticipantFn();
         }}
         loading={isProcessingRewardClaim}
-        loadingText="Processing claim"
+        loadingText={<SpinnerIconC />}
       >
         <Text fontSize="16" fontWeight="bold" color="white">
           Claim

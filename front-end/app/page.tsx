@@ -9,14 +9,14 @@ import {
   VStack,
   Text,
   Flex,
-  Link,
-  Spinner,
+  Link
 } from '@chakra-ui/react';
 import { Avatar } from '@/components/ui/avatar';
 import useParticipantStore from '@/stores/useParticipantStore';
 import useMultipleSurveysStore from '@/stores/useMultipleSurveysStore';
 import useRewardStore from '@/stores/useRewardStore';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
+import { SpinnerIconC } from '@/components/icons/spinner-icon';
 
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -84,7 +84,7 @@ export default function Home() {
         bg="white"
         zIndex="50"
       >
-        <Spinner size="xl" color="#363062" />
+          <SpinnerIconC />
       </Flex>
     );
   }
@@ -148,7 +148,7 @@ export default function Home() {
       <Box w="full" h="100vh">
         {surveyLoading ? (
           <Flex justify="center" align="center" h="100%">
-            <Spinner size="lg" color="#363062" />
+              <SpinnerIconC />
           </Flex>
         ) : surveys.length > 0 ? (
           surveys.map((survey) => (

@@ -62,8 +62,6 @@ const useParticipantStore = create<ParticipantStoreState>()(
           const participantsRef = collection(db, 'participants');
           const docRef = await addDoc(participantsRef, {
             ...participantData,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
           });
 
           const newParticipant: Participant = {
