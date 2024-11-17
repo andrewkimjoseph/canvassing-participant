@@ -112,11 +112,9 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
         targetNumberOfParticipants = _targetNumberOfParticipants;
     }
 
-    function whitelistOneUserAddress(address walletAddress)
-        external
-        onlyOwner
-        mustBeBlacklisted(walletAddress)
-    {
+    function whitelistOneUserAddress(
+        address walletAddress
+    ) external onlyOwner mustBeBlacklisted(walletAddress) {
         if (walletAddress == address(0)) {
             revert ZeroAddress();
         }
@@ -127,11 +125,9 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
         emit OneUserAddressWhitelisted(walletAddress);
     }
 
-    function blacklistOneWhitelistedUserAddress(address walletAddress)
-        external
-        onlyOwner
-        mustBeWhitelisted(walletAddress)
-    {
+    function blacklistOneWhitelistedUserAddress(
+        address walletAddress
+    ) external onlyOwner mustBeWhitelisted(walletAddress) {
         if (walletAddress == address(0)) {
             revert ZeroAddress();
         }
@@ -142,10 +138,9 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
         emit OneWhitelistedUserAddressBlacklisted(walletAddress);
     }
 
-    function whitelistMultipleUserAddresses(address[] calldata walletAddresses)
-        external
-        onlyOwner
-    {
+    function whitelistMultipleUserAddresses(
+        address[] calldata walletAddresses
+    ) external onlyOwner {
         uint256 length = walletAddresses.length;
         if (length == 0) {
             revert InvalidArrayLength();
@@ -208,7 +203,9 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
         emit MultipleWhitelistedUserAddressesBlacklisted(walletAddresses);
     }
 
-    function processRewardClaimByParticipant(address walletAddress)
+    function processRewardClaimByParticipant(
+        address walletAddress
+    )
         external
         whenNotPaused
         nonReentrant
@@ -218,7 +215,9 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
         if (cUSD.balanceOf(address(this)) < rewardAmountPerParticipantInWei) {
             revert InsufficientContractBalance();
         }
-
+        if (numberOfRewardedParticipants == targetNumberOfParticipants) {
+            revert AllParticipantsRewarded();
+        }
         markParticipantAsHavingClaimedReward(walletAddress);
         rewardParticipant(walletAddress);
     }
@@ -231,9 +230,6 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
     }
 
     function rewardParticipant(address participantWalletAddress) private {
-        if (numberOfRewardedParticipants == targetNumberOfParticipants) {
-            revert AllParticipantsRewarded();
-        }
         bool success = cUSD.transfer(
             participantWalletAddress,
             rewardAmountPerParticipantInWei
@@ -342,27 +338,21 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
         return whitelistedAddresses;
     }
 
-    function checkIfParticipantHasAlreadyClaimedReward(address walletAddress)
-        external
-        view
-        returns (bool)
-    {
+    function checkIfParticipantHasAlreadyClaimedReward(
+        address walletAddress
+    ) external view returns (bool) {
         return participantsWhoHaveClaimedRewards[walletAddress];
     }
 
-    function checkIfUserAddressIsWhitelisted(address walletAddress)
-        external
-        view
-        returns (bool)
-    {
+    function checkIfUserAddressIsWhitelisted(
+        address walletAddress
+    ) external view returns (bool) {
         return usersWhitelistedForSurvey[walletAddress];
     }
 
-    function checkIfUserAddressIsBlacklisted(address walletAddress)
-        external
-        view
-        returns (bool)
-    {
+    function checkIfUserAddressIsBlacklisted(
+        address walletAddress
+    ) external view returns (bool) {
         return !usersWhitelistedForSurvey[walletAddress];
     }
 
