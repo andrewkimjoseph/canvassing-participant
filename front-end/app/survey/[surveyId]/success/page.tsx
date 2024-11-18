@@ -95,9 +95,6 @@ export default function SuccessPage() {
         const rewardsCollection = collection(db, 'rewards');
         const rewardsQuery = query(
           rewardsCollection,
-          where('submissionId', '==', submissionId),
-          where('respondentId', '==', respondentId),
-          where('participantWalletAddress', '==', address),
           where('participantId', '==', participant.id),
           where('surveyId', '==', surveyId)
         );
