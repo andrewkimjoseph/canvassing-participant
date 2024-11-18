@@ -86,6 +86,7 @@ export default function SuccessPage() {
       });
 
       if (claimIsProcessed.success) {
+        await new Promise((resolve) => setTimeout(resolve, 7500));
         const rewardsCollection = collection(db, 'rewards');
         const rewardsQuery = query(
           rewardsCollection,
