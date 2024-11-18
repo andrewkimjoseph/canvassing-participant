@@ -234,10 +234,6 @@ export default function SurveyPage() {
             researcherName: researcher?.name,
           });
         }}
-        disabled={
-          window.ethereum &&
-          (!window.ethereum.isMiniPay || !window.ethereum.isMinipay)
-        }
       >
         <Text fontSize="16" fontWeight="bold" color="white">
           {survey.isAvailable ? 'Start Survey' : 'Survey Unavailable'}
