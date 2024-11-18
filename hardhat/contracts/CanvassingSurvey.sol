@@ -368,6 +368,10 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
         return numberOfRewardedParticipants;
     }
 
+    function getTargetNumberOfParticipants() external view returns (uint256) {
+        return targetNumberOfParticipants;
+    }
+
     function getNumberOfWhitelistedUserAddresses()
         external
         view
@@ -378,6 +382,7 @@ contract CanvassingSurvey is Ownable, ReentrancyGuard, Pausable {
 }
 
 // researcherWalletAddress:             0xE49B05F2c7DD51f61E415E1DFAc10B80074B001A
-// _rewardAmountPerParticipantInWei:    250000000000000000
-// _targetNumberOfParticipants:         1
+// _rewardAmountPerParticipantInWei:    100000000000000000
+// _targetNumberOfParticipants:         3
 // cUSDTokenAddress:                    0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1
+// ["0x70eEEda66D4f23a9E7bFF93b7d152286eA63f52C","0x2FC0047E148888836DB5257D79A7ca8327dd9Bcc","0xA3872860EE9FeAB369c1a5E911CeCc2F4c40f702"]
