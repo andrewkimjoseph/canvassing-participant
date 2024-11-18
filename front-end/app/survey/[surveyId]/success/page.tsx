@@ -86,6 +86,12 @@ export default function SuccessPage() {
       });
 
       if (claimIsProcessed.success) {
+        toaster.create({
+          description: 'Waiting for your reward record to be updated',
+          duration: 3000,
+          type: 'info',
+        });
+
         const rewardsCollection = collection(db, 'rewards');
         const rewardsQuery = query(
           rewardsCollection,
@@ -95,34 +101,41 @@ export default function SuccessPage() {
           where('participantId', '==', participant.id)
         );
 
-        const querySnapshot = await getDocs(rewardsQuery);
+        for (let attempt = 0; attempt < 5; attempt++) {
+          const querySnapshot = await getDocs(rewardsQuery);
 
-        if (!querySnapshot.empty) {
-          const rewardDoc = querySnapshot.docs[0]; // Assuming there's only one matching document
-          await updateDoc(rewardDoc.ref, {
-            isClaimed: true,
-            transactionHash: claimIsProcessed.transactionHash,
-            amountIncUSD: survey.rewardAmountIncUSD,
-            timeUpdated: Timestamp.now(),
-          });
+          if (!querySnapshot.empty) {
+            const rewardDoc = querySnapshot.docs[0];
+            await updateDoc(rewardDoc.ref, {
+              isClaimed: true,
+              transactionHash: claimIsProcessed.transactionHash,
+              amountIncUSD: survey.rewardAmountIncUSD,
+              timeUpdated: Timestamp.now(),
+            });
 
-          toaster.create({
-            description: 'Reward claimed successfully!',
-            duration: 3000,
-            type: 'success',
-          });
+            toaster.create({
+              description: 'Reward claimed successfully!',
+              duration: 3000,
+              type: 'success',
+            });
 
-          // Wait for user feedback before navigating
-          await new Promise((resolve) => setTimeout(resolve, 1500));
+            // Wait for user feedback before navigating
+            await new Promise((resolve) => setTimeout(resolve, 1500));
 
-          router.replace(`/survey/${surveyId}/transaction-successful`);
-        } else {
-          toaster.create({
-            description: 'Reward record not found.',
-            duration: 3000,
-            type: 'error',
-          });
+            router.replace(`/survey/${surveyId}/transaction-successful`);
+            return;
+          }
+
+          // Exponential backoff
+          await new Promise((resolve) =>
+            setTimeout(resolve, Math.pow(2, attempt) * 1000)
+          );
         }
+        toaster.create({
+          description: 'Reward record not found. Please contact support.',
+          duration: 3000,
+          type: 'error',
+        });
       } else {
         toaster.create({
           description: 'Reward claim was unsuccessful. Please try again.',
