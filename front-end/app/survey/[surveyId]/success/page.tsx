@@ -86,7 +86,6 @@ export default function SuccessPage() {
       });
 
       if (claimIsProcessed.success) {
-        await new Promise((resolve) => setTimeout(resolve, 7500));
         const rewardsCollection = collection(db, 'rewards');
         const rewardsQuery = query(
           rewardsCollection,
@@ -126,7 +125,7 @@ export default function SuccessPage() {
         }
       } else {
         toaster.create({
-          description: 'Failed to claim reward. Please try again.',
+          description: 'Reward claim was unsuccessful. Please try again.',
           duration: 3000,
           type: 'error',
         });
