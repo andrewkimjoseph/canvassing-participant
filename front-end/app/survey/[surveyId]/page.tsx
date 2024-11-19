@@ -65,7 +65,7 @@ export default function SurveyPage() {
     return (
       <Flex justify="center" align="center" minH="100vh">
         <SpinnerIconC />
-     </Flex>
+      </Flex>
     );
   if (!survey)
     return (
@@ -106,11 +106,14 @@ export default function SurveyPage() {
           flexDirection="row"
           pl={2}
           pt={2}
-          justifyContent="space-between"
+          justifyContent="start"
           alignItems="center"
         >
           <Text fontSize="lg" color="green">
             ${survey.rewardAmountIncUSD}
+          </Text>
+          <Text fontSize={'lg'} color="grey" pl={1}>
+            per survey
           </Text>
         </Flex>
       </Box>

@@ -119,6 +119,12 @@ export default function SuccessPage() {
           // Wait for user feedback before navigating
           await new Promise((resolve) => setTimeout(resolve, 1500));
 
+          trackAmplitudeEvent('Reward claimed', {
+            participantWalletAddress: participant?.walletAddress,
+            partipantId: participant?.id,
+            surveyId: survey?.id,
+          });
+
           router.replace(`/survey/${surveyId}/transaction-successful`);
         } else {
           toaster.create({
