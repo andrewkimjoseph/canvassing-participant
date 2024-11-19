@@ -14,7 +14,6 @@ import { celo, celoAlfajores } from 'wagmi/chains';
 import { injectedWallet } from '@rainbow-me/rainbowkit/wallets';
 import { useEffect } from 'react';
 
-import useParticipantStore from '@/stores/useParticipantStore';
 import CustomLayout from '@/components/custom-layout';
 
 const connectors = connectorsForWallets(

@@ -1,6 +1,7 @@
 import { canvassingSurveyContractABI } from '@/utils/abis/canvassingSurveyContractABI';
 import { Address, createPublicClient, createWalletClient, custom } from 'viem';
-import { celoAlfajores } from 'viem/chains';
+// import { celoAlfajores } from 'viem/chains';
+import { celo } from 'viem/chains';
 
 export type ProcessRewardClaimResult = {
   success: boolean;
@@ -24,12 +25,12 @@ export const processRewardClaimByParticipant = async (
   }
 
   const privateClient = createWalletClient({
-    chain: celoAlfajores,
+    chain: celo,
     transport: custom(window.ethereum),
   });
 
   const publicClient = createPublicClient({
-    chain: celoAlfajores,
+    chain: celo,
     transport: custom(window.ethereum),
   });
 

@@ -1,8 +1,10 @@
 
 import { cUSDContractABI } from "@/utils/abis/cUSDContractABI";
-import { cUSDAlfajoresContractAddress } from "@/utils/addresses/cUSDAlfajoresContractAddress";
+// import { cUSDAlfajoresContractAddress } from "@/utils/addresses/cUSDAlfajoresContractAddress";
+import { cUSDMainnetContractAddress } from "@/utils/addresses/cUSDMainnetContractAddress";
 import { Address, createPublicClient, custom } from "viem";
-import { celoAlfajores } from "viem/chains";
+// import { celoAlfajores } from "viem/chains";
+import { celo } from "viem/chains";
 
 export const getContractBalance = async (
   _signerAddress: `0x${string}` | undefined,
@@ -12,12 +14,12 @@ export const getContractBalance = async (
   if (window.ethereum) {
     try {
       const publicClient = createPublicClient({
-        chain: celoAlfajores,
+        chain: celo,
         transport: custom(window.ethereum),
       });
       contractBalance = Number(
         (await publicClient.readContract({
-          address: cUSDAlfajoresContractAddress,
+          address: cUSDMainnetContractAddress,
           abi: cUSDContractABI,
           functionName: "balanceOf",
           args: [contractAddress],
