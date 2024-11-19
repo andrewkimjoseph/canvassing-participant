@@ -118,9 +118,14 @@ export default function RewardHistory() {
                   textDecoration={'underline'}
                   onClick={() => {
                     if (reward.isClaimed) {
+                      // router.push(
+                      //   `https://celo-alfajores.blockscout.com/tx/${reward.transactionHash}`
+                      // );
+
                       router.push(
-                        `https://celo-alfajores.blockscout.com/tx/${reward.transactionHash}`
+                        `https://celoscan.io/tx/${reward.transactionHash}`
                       );
+
 
                       trackAmplitudeEvent('View on block explorer clicked', {
                         participantWalletAddress: participant?.walletAddress,

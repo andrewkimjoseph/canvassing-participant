@@ -1,6 +1,7 @@
 import { canvassingSurveyContractABI } from "@/utils/abis/canvassingSurveyContractABI";
 import { Address, createPublicClient, custom } from "viem";
-import { celoAlfajores } from "viem/chains";
+// import { celoAlfajores } from "viem/chains";
+import { celo } from "viem/chains";
 
 export const checkIfUserAddressIsWhitelisted = async (
   _signerAddress: `0x${string}` | undefined,
@@ -12,7 +13,7 @@ export const checkIfUserAddressIsWhitelisted = async (
   if (window.ethereum) {
     try {
       const publicClient = createPublicClient({
-        chain: celoAlfajores,
+        chain: celo,
         transport: custom(window.ethereum),
       });
       try {
