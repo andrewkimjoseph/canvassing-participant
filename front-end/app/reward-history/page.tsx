@@ -133,7 +133,7 @@ export default function RewardHistory() {
                         `/survey/${reward.surveyId}/success?submissionId=${reward.submissionId}&respondentId=${reward.respondentId}`
                       );
 
-                      trackAmplitudeEvent('Claim clicked', {
+                      trackAmplitudeEvent('Unclaimed claim clicked', {
                         participantWalletAddress: participant?.walletAddress,
                         partipantId: participant?.id,
                         rewardId: reward.id,
