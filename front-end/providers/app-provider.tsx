@@ -12,9 +12,10 @@ import { WagmiProvider, createConfig, http } from 'wagmi';
 import { celo, celoAlfajores } from 'wagmi/chains';
 
 import { injectedWallet } from '@rainbow-me/rainbowkit/wallets';
-import { useEffect } from 'react';
 
 import CustomLayout from '@/components/custom-layout';
+import MobileOnlyProvider from '@/providers/mobile-only-provider';
+import NigeriaKenyaProvider from '@/providers/nigeria-kenya-provider';
 
 const connectors = connectorsForWallets(
   [
@@ -40,21 +41,24 @@ const config = createConfig({
 
 const queryClient = new QueryClient();
 
-export function AppProvider({ children }: { children: React.ReactNode }) {
-
+export function Web3Provider({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider
           theme={lightTheme({
-            accentColor: "#9D99B4",
-            accentColorForeground: "white",
-            borderRadius: "large",
-            fontStack: "rounded",
-            overlayBlur: "small",
+            accentColor: '#9D99B4',
+            accentColorForeground: 'white',
+            borderRadius: 'large',
+            fontStack: 'rounded',
+            overlayBlur: 'small',
           })}
         >
-          <CustomLayout>{children}</CustomLayout>
+          <MobileOnlyProvider>
+            <NigeriaKenyaProvider>
+              <CustomLayout>{children}</CustomLayout>
+            </NigeriaKenyaProvider>
+          </MobileOnlyProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
