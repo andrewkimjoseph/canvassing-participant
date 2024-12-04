@@ -47,8 +47,6 @@ export const NigeriaKenyaProvider: React.FC<{
       align="center"
       minH="100vh"
       >
-        <p>This dApp is not available in your country.</p>
-
         <Text fontSize={'md'} color="#363062" textAlign={"center"}>
           This dApp is not available in your country.
         </Text>
