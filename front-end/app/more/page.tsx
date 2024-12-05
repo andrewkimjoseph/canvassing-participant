@@ -63,7 +63,7 @@ export default function More() {
         SVGIcon={SupportIconC}
         primaryText={'Support'}
         secondaryText={'Get help with your queries'}
-        link={'https://tally.so/r/wbNq90'}
+        link={`https://tally.so/r/wbNq90?miniPayWalletAddress=${participant?.walletAddress}`}
       />
 
       <MoreOptionsCard
