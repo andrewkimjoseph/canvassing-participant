@@ -31,6 +31,7 @@ import { useState, useEffect } from 'react';
 import { injected } from 'wagmi/connectors';
 import { useAccount, useConnect } from 'wagmi';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
+import { MoreIconC } from './icons/more-icon';
 
 const CustomHeader = () => {
   const { participant } = useParticipantStore();
@@ -132,6 +133,19 @@ const CustomHeader = () => {
                 link={'/reward-history'}
                 onClick={() => {
                   trackAmplitudeEvent('Reward History clicked', {
+                    participantWalletAddress: participant?.walletAddress,
+                    partipantId: participant?.id,
+                  });
+                }}
+              />
+            </DrawerActionTrigger>
+            <DrawerActionTrigger>
+              <DrawerCardC
+                SVGIcon={MoreIconC}
+                text={'More'}
+                link={'/more'}
+                onClick={() => {
+                  trackAmplitudeEvent('More clicked', {
                     participantWalletAddress: participant?.walletAddress,
                     partipantId: participant?.id,
                   });
