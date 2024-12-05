@@ -18,12 +18,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={font.dmSans.className} suppressHydrationWarning>
       <body>
-      <AmplitudeContextProvider>
-        <Provider>
-          <Web3Provider>
-            {children}
-          </Web3Provider>
-        </Provider>
+        <AmplitudeContextProvider>
+          <Provider>
+            <Web3Provider>{children}</Web3Provider>
+          </Provider>
         </AmplitudeContextProvider>
       </body>
     </html>
