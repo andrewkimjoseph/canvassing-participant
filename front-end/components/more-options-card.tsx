@@ -7,9 +7,7 @@ interface Props {
   SVGIcon: React.FC<IconSvgProps>;
   primaryText: string;
   secondaryText: string;
-
   link: string;
-  onClick?: () => void; // Optional onClick callback
 }
 
 export const MoreOptionsCard: React.FC<Props> = ({
@@ -17,13 +15,11 @@ export const MoreOptionsCard: React.FC<Props> = ({
   primaryText,
   secondaryText,
   link,
-  onClick,
 }) => {
   return (
     <Link
       href={link}
       py={1}
-      onClick={onClick} // Attach the onClick callback here
     >
       <Box
         className="flex flex-row items-center"
