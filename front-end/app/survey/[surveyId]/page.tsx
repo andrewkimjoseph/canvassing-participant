@@ -76,7 +76,7 @@ export default function SurveyPage() {
 
   return (
     <Flex flexDirection="column" w="100%" h="100vh" bgColor="#ECECEC">
-      <Box
+      {/* <Box
         width="100%"
         height={300}
         bgColor="#CEDDF9"
@@ -91,7 +91,7 @@ export default function SurveyPage() {
           objectFit="contain"
           blur="md"
         />
-      </Box>
+      </Box> */}
 
       <Box bgColor="white" borderRadius={10} pb={2} mb={4} mt={2} pt={1} mx={2}>
         <Flex flexDirection="column" alignItems="top" pl={2} pt={2} mt={1}>
