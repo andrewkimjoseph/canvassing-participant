@@ -80,7 +80,7 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         _;
     }
 
-    modifier onlyWhenTheContractHadEnoughcUSD() {
+    modifier onlyIfContractHasEnoughcUSD() {
         require(
             cUSD.balanceOf(address(this)) >= rewardAmountPerParticipantInWei,
             "Contract does not have enough cUSD"
@@ -88,7 +88,7 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         _;
     }
 
-    modifier onlyIfTheContractHasAnycUSD() {
+    modifier onlyIfContractHasAnycUSD() {
         require(
             cUSD.balanceOf(address(this)) > 0,
             "Contract does not have any cUSD"
@@ -237,7 +237,7 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         external
         whenNotPaused
         nonReentrant
-        onlyWhenTheContractHadEnoughcUSD
+        onlyIfContractHasEnoughcUSD
         onlyWhenAllParticipantHaveNotBeenRewarded
         onlyValidSender(walletAddress)
         onlyWhitelistedAddress(walletAddress)
@@ -272,7 +272,7 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         external
         onlyOwner
         whenNotPaused
-        onlyIfTheContractHasAnycUSD
+        onlyIfContractHasAnycUSD
     {
         uint256 balance = cUSD.balanceOf(address(this));
         cUSD.transfer(owner(), balance);

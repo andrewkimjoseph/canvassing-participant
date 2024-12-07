@@ -48,7 +48,7 @@ contract OpenSurvey is Ownable, ReentrancyGuard, Pausable {
         _;
     }
 
-    modifier onlyWhenTheContractHasEnoughcUSD() {
+    modifier onlyIfContractHasEnoughcUSD() {
         require(
             cUSD.balanceOf(address(this)) >= rewardAmountPerParticipantInWei,
             "Contract does not have enough cUSD"
@@ -64,7 +64,7 @@ contract OpenSurvey is Ownable, ReentrancyGuard, Pausable {
         _;
     }
 
-    modifier onlyWhenAllParticipantHaveNotBeenRewarded() {
+    modifier onlyIfAllParticipantHaveNotBeenRewarded() {
         require(
             numberOfRewardedParticipants < targetNumberOfParticipants,
             "All participants have been rewarded"
@@ -105,8 +105,8 @@ contract OpenSurvey is Ownable, ReentrancyGuard, Pausable {
         external
         whenNotPaused
         nonReentrant
-        onlyWhenTheContractHasEnoughcUSD
-        onlyWhenAllParticipantHaveNotBeenRewarded
+        onlyIfContractHasEnoughcUSD
+        onlyIfAllParticipantHaveNotBeenRewarded
         onlyValidSender(walletAddress)
         onlyUnrewardedParticipant(walletAddress)
     {
