@@ -1,6 +1,6 @@
 import '@/styles/globals.css';
 import { Web3Provider } from '@/providers/app-provider';
-import { Provider } from '@/components/ui/provider';
+import { UIProvider } from '@/components/ui/provider';
 import { Metadata } from 'next';
 import { font } from '@/utils/font';
 import AmplitudeContextProvider from '@/providers/amplitude-provider';
@@ -19,9 +19,9 @@ export default function RootLayout({
     <html lang="en" className={font.dmSans.className} suppressHydrationWarning>
       <body>
         <AmplitudeContextProvider>
-          <Provider>
+          <UIProvider>
             <Web3Provider>{children}</Web3Provider>
-          </Provider>
+          </UIProvider>
         </AmplitudeContextProvider>
       </body>
     </html>

@@ -7,7 +7,7 @@ interface ProviderProps extends ColorModeProviderProps {
   children: React.ReactNode;
 }
 
-export function Provider({ children, ...props }: ProviderProps) {
+export function UIProvider({ children, ...props }: ProviderProps) {
   return (
     <ChakraProvider value={defaultSystem}>
       <ColorModeProvider forcedTheme="light">

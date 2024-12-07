@@ -8,6 +8,7 @@ interface Props {
   primaryText: string;
   secondaryText: string;
   link: string;
+  onClick?: () => void; // Optional onClick callback
 }
 
 export const MoreOptionsCard: React.FC<Props> = ({
@@ -15,11 +16,13 @@ export const MoreOptionsCard: React.FC<Props> = ({
   primaryText,
   secondaryText,
   link,
+  onClick
 }) => {
   return (
     <Link
       href={link}
       py={1}
+      onClick={onClick}
     >
       <Box
         className="flex flex-row items-center"
