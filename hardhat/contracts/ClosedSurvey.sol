@@ -88,7 +88,7 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         _;
     }
 
-    modifier onlyWhenTheContractHadAnycUSD() {
+    modifier onlyIfTheContractHasAnycUSD() {
         require(
             cUSD.balanceOf(address(this)) > 0,
             "Contract does not have any cUSD"
@@ -110,11 +110,14 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         uint256 _targetNumberOfParticipants,
         address cUSDTokenAddress
     ) Ownable(researcherWalletAddress) {
-        // Fixed validation logic
         require(
-            researcherWalletAddress != address(0) &&
-                cUSDTokenAddress != address(0),
-            "Invalid zero address"
+            cUSDTokenAddress != address(0),
+            "Zero address given for cUSDTokenAddress"
+        );
+
+        require(
+            researcherWalletAddress != address(0),
+            "Zero address given for researcherWalletAddress"
         );
 
         require(_rewardAmountPerParticipantInWei > 0, "Invalid reward amount");
@@ -269,7 +272,7 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         external
         onlyOwner
         whenNotPaused
-        onlyWhenTheContractHadAnycUSD
+        onlyIfTheContractHasAnycUSD
     {
         uint256 balance = cUSD.balanceOf(address(this));
         cUSD.transfer(owner(), balance);
