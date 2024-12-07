@@ -13,12 +13,14 @@ import { SupportIconC } from '@/components/icons/more-options-icons/support-icon
 import { AboutIconC } from '@/components/icons/more-options-icons/about-icon';
 import { TermsIconC } from '@/components/icons/more-options-icons/terms-icon';
 import { PrivacyIconC } from '@/components/icons/more-options-icons/privacy-icon';
+import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 
 export default function More() {
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
   const router = useRouter();
   const { participant, checkParticipant } = useParticipantStore();
+  const { trackAmplitudeEvent } = useAmplitudeContext();
 
   const checkParticipantStatus = useCallback(() => {
     if (isConnected && address) {
@@ -56,6 +58,12 @@ export default function More() {
           primaryText={'View Profile'}
           secondaryText={'Manage your account details'}
           link={'#'}
+          onClick={() =>
+            trackAmplitudeEvent('View profile clicked', {
+              participantWalletAddress: participant?.walletAddress,
+              partipantId: participant?.id,
+            })
+          }
         />
       </VisuallyHidden>
 
@@ -64,6 +72,12 @@ export default function More() {
         primaryText={'Support'}
         secondaryText={'Get help with your queries'}
         link={`https://tally.so/r/wbNq90?miniPayWalletAddress=${participant?.walletAddress}`}
+        onClick={() =>
+          trackAmplitudeEvent('Support clicked', {
+            participantWalletAddress: participant?.walletAddress,
+            partipantId: participant?.id,
+          })
+        }
       />
 
       <MoreOptionsCard
@@ -71,6 +85,12 @@ export default function More() {
         primaryText={'About'}
         secondaryText={'Learn more about us'}
         link={'https://thecanvassing.xyz'}
+        onClick={() =>
+          trackAmplitudeEvent('About clicked', {
+            participantWalletAddress: participant?.walletAddress,
+            partipantId: participant?.id,
+          })
+        }
       />
 
       <MoreOptionsCard
@@ -80,6 +100,12 @@ export default function More() {
         link={
           'https://canvassing.notion.site/Terms-of-Service-1285e1ccc593808f8d1df0b444c36b85?pvs=4'
         }
+        onClick={() =>
+          trackAmplitudeEvent('Terms clicked', {
+            participantWalletAddress: participant?.walletAddress,
+            partipantId: participant?.id,
+          })
+        }
       />
 
       <MoreOptionsCard
@@ -88,6 +114,12 @@ export default function More() {
         secondaryText={'Read through our privacy policies'}
         link={
           'https://canvassing.notion.site/Privacy-Policy-9446d085f6f3473087868007d931247c'
+        }
+        onClick={() =>
+          trackAmplitudeEvent('Privacy clicked', {
+            participantWalletAddress: participant?.walletAddress,
+            partipantId: participant?.id,
+          })
         }
       />
     </Flex>
