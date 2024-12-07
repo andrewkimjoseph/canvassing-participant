@@ -56,7 +56,7 @@ contract OpenSurvey is Ownable, ReentrancyGuard, Pausable {
         _;
     }
 
-    modifier onlyIfTheContractHasAnycUSD() {
+    modifier onlyIfContractHasAnycUSD() {
         require(
             cUSD.balanceOf(address(this)) > 0,
             "Contract does not have any cUSD"
@@ -139,7 +139,7 @@ contract OpenSurvey is Ownable, ReentrancyGuard, Pausable {
         external
         onlyOwner
         whenNotPaused
-        onlyIfTheContractHasAnycUSD
+        onlyIfContractHasAnycUSD
     {
         uint256 balance = cUSD.balanceOf(address(this));
         cUSD.transfer(owner(), balance);

@@ -543,11 +543,11 @@
 			]
 		},
 		"hardhat/contracts/OpenSurvey.sol": {
-			"keccak256": "0x986e12c92348cdaf9bce7332ea5d64fc8e9ea51bf7899aadde18098c546f4495",
+			"keccak256": "0xf7f4ab4e92d0d34f24ac5240422161677ec8fde52d9a7e7745bcd56ba151a186",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://da427b01d66c281e7ec6881b4d4bd45b8ab8be3a5f58d1df076fac008df30991",
-				"dweb:/ipfs/QmYktkqrAiP1rpRL67kHZH3YESjrt27b11SB2e599vQxw6"
+				"bzz-raw://f32b0cd99b82fe4461fdac323a9666f20ecbc80a3f32fbbcb5b215babcc4569b",
+				"dweb:/ipfs/Qmb3QAAfyjt5peTS9CBEtSuA8hKGuYV485mgk669iZMCGR"
 			]
 		}
 	},
