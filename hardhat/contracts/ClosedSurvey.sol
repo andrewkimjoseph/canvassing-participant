@@ -19,7 +19,6 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
     uint256 public numberOfRewardedParticipants;
     uint256 public numberOfWhitelistedUserAddresses;
 
-    // (Events remain the same as in the original contract)
     event OneUserAddressWhitelisted(address participantWalletAddress);
     event MultipleUserAddressesWhitelisted(address[] walletAddresses);
     event OneWhitelistedUserAddressBlacklisted(
@@ -64,7 +63,7 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
     modifier mustBeBlacklisted(address walletAddress) {
         require(
             !usersWhitelistedForSurvey[walletAddress],
-            "User already whitelisted"
+            "Must be blacklisted"
         );
         _;
     }
@@ -231,7 +230,6 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         emit MultipleWhitelistedUserAddressesBlacklisted(walletAddresses);
     }
 
-    // Remaining functions stay the same as in the original contract
     function processRewardClaimByParticipant(address walletAddress)
         external
         whenNotPaused
@@ -246,7 +244,6 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         rewardParticipant(walletAddress);
     }
 
-    // All remaining functions from the original contract are kept unchanged
     function markParticipantAsHavingClaimedReward(
         address participantWalletAddress
     ) private {
