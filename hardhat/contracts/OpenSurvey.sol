@@ -15,7 +15,7 @@ contract OpenSurvey is Ownable, ReentrancyGuard, Pausable {
 
     uint256 public rewardAmountPerParticipantInWei;
     uint256 public targetNumberOfParticipants;
-    uint256 public numberOfRewardedParticipants;
+    uint256 private numberOfRewardedParticipants;
 
     event ParticipantRewarded(
         address participantWalletAddress,

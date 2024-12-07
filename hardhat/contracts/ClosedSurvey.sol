@@ -16,7 +16,7 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
 
     uint256 public rewardAmountPerParticipantInWei;
     uint256 public targetNumberOfParticipants;
-    uint256 public numberOfRewardedParticipants;
+    uint256 private numberOfRewardedParticipants;
     uint256 public numberOfWhitelistedUserAddresses;
 
     event OneUserAddressWhitelisted(address participantWalletAddress);
