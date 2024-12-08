@@ -243,8 +243,11 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         onlyWhitelistedAddress(walletAddress)
         onlyUnrewardedParticipant(walletAddress)
     {
-        markParticipantAsHavingClaimedReward(walletAddress);
-        rewardParticipant(walletAddress);
+        bool rewardTransferIsSuccesful = rewardParticipant(walletAddress);
+
+        if (rewardTransferIsSuccesful) {
+            markParticipantAsHavingClaimedReward(walletAddress);
+        }
     }
 
     function markParticipantAsHavingClaimedReward(
@@ -254,18 +257,26 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         emit ParticipantMarkedAsRewarded(participantWalletAddress);
     }
 
-    function rewardParticipant(address participantWalletAddress) private {
-        cUSD.transfer(
+    function rewardParticipant(address participantWalletAddress)
+        private
+        returns (bool)
+    {
+        bool rewardTransferIsSuccesful = cUSD.transfer(
             participantWalletAddress,
             rewardAmountPerParticipantInWei
         );
-        unchecked {
-            ++numberOfRewardedParticipants;
+
+        if (rewardTransferIsSuccesful) {
+            unchecked {
+                ++numberOfRewardedParticipants;
+            }
+            emit ParticipantRewarded(
+                participantWalletAddress,
+                rewardAmountPerParticipantInWei
+            );
         }
-        emit ParticipantRewarded(
-            participantWalletAddress,
-            rewardAmountPerParticipantInWei
-        );
+
+        return rewardTransferIsSuccesful;
     }
 
     function withdrawAllRewardFundsToResearcher()

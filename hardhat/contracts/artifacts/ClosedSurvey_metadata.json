@@ -423,19 +423,6 @@
 			},
 			{
 				"inputs": [],
-				"name": "numberOfRewardedParticipants",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
 				"name": "numberOfWhitelistedUserAddresses",
 				"outputs": [
 					{
@@ -730,11 +717,11 @@
 			]
 		},
 		"hardhat/contracts/ClosedSurvey.sol": {
-			"keccak256": "0x86a92ba8230b59cb8d5d36fdd244f2ff14966c4d5672cb68deaa2e594ca73d79",
+			"keccak256": "0x6ad0d6329d18970b5f817bfeb52eee418d6783fcc89c3b96e0be1bcf3cbabadd",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://b642c44ab7c19798937633ada46b93163f2823730b72bca154c23aff20794965",
-				"dweb:/ipfs/QmPHZRd5AtmXR9V4WsBshD3AW87gp6SjxvTfpMAfyCDhDy"
+				"bzz-raw://1cf22ef603802d846fa7a5107bd894d6ccf927d038282064dab4c470bcb1ef27",
+				"dweb:/ipfs/QmZHXotbiDFwPPLHrCZ1d1QxzCkTybNpJuXFKeczJYNXqu"
 			]
 		}
 	},
