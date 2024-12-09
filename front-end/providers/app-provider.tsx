@@ -16,6 +16,7 @@ import { injectedWallet } from '@rainbow-me/rainbowkit/wallets';
 import CustomLayout from '@/components/custom-layout';
 import MobileOnlyProvider from '@/providers/mobile-only-provider';
 import NigeriaKenyaProvider from '@/providers/nigeria-kenya-provider';
+import MiniPayProvider from './minipay-provider';
 
 const connectors = connectorsForWallets(
   [
@@ -54,11 +55,13 @@ export function Web3Provider({ children }: { children: React.ReactNode }) {
             overlayBlur: 'small',
           })}
         >
-          <MobileOnlyProvider>
-            {/* <NigeriaKenyaProvider> */}
+          <MiniPayProvider>
+            <MobileOnlyProvider>
+              {/* <NigeriaKenyaProvider> */}
               <CustomLayout>{children}</CustomLayout>
-            {/* </NigeriaKenyaProvider> */}
-          </MobileOnlyProvider>
+              {/* </NigeriaKenyaProvider> */}
+            </MobileOnlyProvider>
+          </MiniPayProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

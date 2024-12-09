@@ -52,7 +52,7 @@ export default function Home() {
         identifyEvent.set('Username', participant.username);
         identifyEvent.set(
           'Time created',
-          participant.timeCreated.toDate().toDateString()
+          new Date(participant.timeCreated.seconds * 1000).toLocaleString()
         );
         identifyEvent.set('Id', participant.id);
 
