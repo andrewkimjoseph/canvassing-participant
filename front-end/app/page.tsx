@@ -55,8 +55,6 @@ export default function Home() {
   useEffect(() => {
     const initialize = async () => {
       await checkParticipantStatus();
-      if (!surveys.length) {
-      }
       setIsInitialized(true);
     };
 
