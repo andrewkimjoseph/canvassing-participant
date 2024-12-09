@@ -19,14 +19,14 @@ export default function RewardHistory() {
   const { address, isConnected } = useAccount();
   const { rewards } = useRewardStore();
   const router = useRouter();
-  const { participant, checkParticipant } = useParticipantStore();
+  const { participant, getParticipant } = useParticipantStore();
   const { trackAmplitudeEvent } = useAmplitudeContext();
 
   const checkParticipantStatus = useCallback(() => {
     if (isConnected && address) {
-      checkParticipant(address);
+      getParticipant(address);
     }
-  }, [isConnected, address, checkParticipant]);
+  }, [isConnected, address, getParticipant]);
 
   useEffect(() => {
     checkParticipantStatus();

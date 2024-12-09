@@ -24,7 +24,7 @@ export default function Home() {
   const {
     participant,
     loading: participantLoading,
-    checkParticipant,
+    getParticipant,
   } = useParticipantStore();
   const {
     surveys,
@@ -45,11 +45,11 @@ export default function Home() {
   // Check participant status when wallet is connected
   const checkParticipantStatus = useCallback(async () => {
     if (isConnected && address) {
-      await checkParticipant(address);
+      await getParticipant(address);
 
       await fetchSurveys(address);
     }
-  }, [isConnected, address, checkParticipant]);
+  }, [isConnected, address, getParticipant]);
 
   // Initial setup effect
   useEffect(() => {

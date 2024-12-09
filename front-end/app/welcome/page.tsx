@@ -10,7 +10,7 @@ import { WelcomePageIconC } from '@/components/icons/welcome-page-icon';
 export default function WelcomePage() {
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
-  const { participant, checkParticipant, loading } = useParticipantStore();
+  const { participant, getParticipant, loading } = useParticipantStore();
   const router = useRouter();
 
   // Handle mounting
@@ -20,9 +20,9 @@ export default function WelcomePage() {
   // Check for participant when wallet is connected
   const checkParticipantStatus = useCallback(() => {
     if (isConnected && address) {
-      checkParticipant(address);
+      getParticipant(address);
     }
-  }, [isConnected, address, checkParticipant]);
+  }, [isConnected, address, getParticipant]);
 
   useEffect(() => {
     checkParticipantStatus();
