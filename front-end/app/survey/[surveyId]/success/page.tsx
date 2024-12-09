@@ -121,7 +121,7 @@ export default function SuccessPage() {
 
           trackAmplitudeEvent('Reward claimed', {
             participantWalletAddress: participant?.walletAddress,
-            partipantId: participant?.id,
+            participantId: participant?.id,
             surveyId: survey?.id,
           });
 
@@ -238,7 +238,7 @@ export default function SuccessPage() {
         onClick={() => {
           trackAmplitudeEvent('Claim clicked', {
             participantWalletAddress: participant?.walletAddress,
-            partipantId: participant?.id,
+            participantId: participant?.id,
             surveyId: survey?.id,
           });
           processRewardClaimByParticipantFn();

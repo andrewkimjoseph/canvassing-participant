@@ -65,7 +65,7 @@ const CustomHeader = () => {
             onClick={() => {
               trackAmplitudeEvent('Hamburger Icon clicked', {
                 participantWalletAddress: participant?.walletAddress,
-                partipantId: participant?.id,
+                participantId: participant?.id,
               });
             }}
           >
@@ -79,7 +79,7 @@ const CustomHeader = () => {
             onClick={() => {
               trackAmplitudeEvent('Canvassing Logo clicked', {
                 participantWalletAddress: participant?.walletAddress,
-                partipantId: participant?.id,
+                participantId: participant?.id,
               });
             }}
           >
@@ -121,7 +121,7 @@ const CustomHeader = () => {
                 onClick={() => {
                   trackAmplitudeEvent('Home clicked', {
                     participantWalletAddress: participant?.walletAddress,
-                    partipantId: participant?.id,
+                    participantId: participant?.id,
                   });
                 }}
               />
@@ -134,7 +134,7 @@ const CustomHeader = () => {
                 onClick={() => {
                   trackAmplitudeEvent('Reward History clicked', {
                     participantWalletAddress: participant?.walletAddress,
-                    partipantId: participant?.id,
+                    participantId: participant?.id,
                   });
                 }}
               />
@@ -147,7 +147,7 @@ const CustomHeader = () => {
                 onClick={() => {
                   trackAmplitudeEvent('More clicked', {
                     participantWalletAddress: participant?.walletAddress,
-                    partipantId: participant?.id,
+                    participantId: participant?.id,
                   });
                 }}
               />

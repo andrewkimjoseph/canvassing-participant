@@ -61,7 +61,7 @@ export default function More() {
           onClick={() =>
             trackAmplitudeEvent('View profile clicked', {
               participantWalletAddress: participant?.walletAddress,
-              partipantId: participant?.id,
+              participantId: participant?.id,
             })
           }
         />
@@ -75,7 +75,7 @@ export default function More() {
         onClick={() =>
           trackAmplitudeEvent('Support clicked', {
             participantWalletAddress: participant?.walletAddress,
-            partipantId: participant?.id,
+            participantId: participant?.id,
           })
         }
       />
@@ -88,7 +88,7 @@ export default function More() {
         onClick={() =>
           trackAmplitudeEvent('About clicked', {
             participantWalletAddress: participant?.walletAddress,
-            partipantId: participant?.id,
+            participantId: participant?.id,
           })
         }
       />
@@ -103,7 +103,7 @@ export default function More() {
         onClick={() =>
           trackAmplitudeEvent('Terms clicked', {
             participantWalletAddress: participant?.walletAddress,
-            partipantId: participant?.id,
+            participantId: participant?.id,
           })
         }
       />
@@ -118,7 +118,7 @@ export default function More() {
         onClick={() =>
           trackAmplitudeEvent('Privacy clicked', {
             participantWalletAddress: participant?.walletAddress,
-            partipantId: participant?.id,
+            participantId: participant?.id,
           })
         }
       />

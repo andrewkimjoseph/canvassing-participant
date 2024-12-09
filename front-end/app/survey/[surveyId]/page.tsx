@@ -134,7 +134,7 @@ export default function SurveyPage() {
           onClick={() => {
             trackAmplitudeEvent('Survey instructions clicked', {
               participantWalletAddress: participant?.walletAddress,
-              partipantId: participant?.id,
+              participantId: participant?.id,
               surveyId: survey.id,
               researcherId: researcher?.id,
               researcherName: researcher?.name,
@@ -164,7 +164,7 @@ export default function SurveyPage() {
           onClick={() => {
             trackAmplitudeEvent('Time duration clicked', {
               participantWalletAddress: participant?.walletAddress,
-              partipantId: participant?.id,
+              participantId: participant?.id,
               surveyId: survey.id,
               researcherId: researcher?.id,
               researcherName: researcher?.name,
@@ -197,7 +197,7 @@ export default function SurveyPage() {
           onClick={() => {
             trackAmplitudeEvent('Researcher clicked', {
               participantWalletAddress: participant?.walletAddress,
-              partipantId: participant?.id,
+              participantId: participant?.id,
               surveyId: survey.id,
               researcherId: researcher?.id,
               researcherName: researcher?.name,
@@ -231,7 +231,7 @@ export default function SurveyPage() {
 
           trackAmplitudeEvent('Start survey clicked', {
             participantWalletAddress: participant?.walletAddress,
-            partipantId: participant?.id,
+            participantId: participant?.id,
             surveyId: survey.id,
             researcherId: researcher?.id,
             researcherName: researcher?.name,
