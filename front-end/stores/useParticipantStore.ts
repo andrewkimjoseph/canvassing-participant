@@ -16,7 +16,7 @@ import { db } from '@/firebase';
 interface ParticipantStoreState {
   participant: Participant | null;
   loading: boolean;
-  checkParticipant: (walletAddress: string) => Promise<Participant | null>;
+  getParticipant: (walletAddress: string) => Promise<Participant | null>;
   setParticipant: (participantData: Omit<Participant, 'id'>) => Promise<void>;
 }
 
@@ -26,7 +26,7 @@ const useParticipantStore = create<ParticipantStoreState>()(
       participant: null,
       loading: false,
 
-      checkParticipant: async (walletAddress) => {
+      getParticipant: async (walletAddress) => {
         set({ loading: true });
         try {
           const q = query(
@@ -53,7 +53,7 @@ const useParticipantStore = create<ParticipantStoreState>()(
       setParticipant: async (participantData) => {
         set({ loading: true });
         try {
-          const existingParticipant = await get().checkParticipant(participantData.walletAddress);
+          const existingParticipant = await get().getParticipant(participantData.walletAddress);
 
           if (existingParticipant) {
             set({ participant: existingParticipant, loading: false });
