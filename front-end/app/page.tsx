@@ -46,15 +46,15 @@ export default function Home() {
       if (surveys && participant) {
         const identifyEvent = new Identify();
         identifyEvent.set('Surveys Taken', surveys.length);
-        identifyEvent.set('Wallet Address', participant.walletAddress);
-        identifyEvent.set('Gender', participant.gender);
-        identifyEvent.set('Country', participant.country);
-        identifyEvent.set('Username', participant.username);
-        identifyEvent.set(
+        identifyEvent.setOnce('Wallet Address', participant.walletAddress);
+        identifyEvent.setOnce('Gender', participant.gender);
+        identifyEvent.setOnce('Country', participant.country);
+        identifyEvent.setOnce('Username', participant.username);
+        identifyEvent.setOnce(
           'Time created',
           new Date(participant.timeCreated.seconds * 1000).toLocaleString()
         );
-        identifyEvent.set('Id', participant.id);
+        identifyEvent.setOnce('Id', participant.id);
 
         identifyUser(identifyEvent);
       }
