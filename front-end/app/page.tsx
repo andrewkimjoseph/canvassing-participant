@@ -3,20 +3,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
-import {
-  Box,
-  Button,
-  VStack,
-  Text,
-  Flex,
-  Link
-} from '@chakra-ui/react';
+import { Box, Button, VStack, Text, Flex, Link } from '@chakra-ui/react';
 import { Avatar } from '@/components/ui/avatar';
 import useParticipantStore from '@/stores/useParticipantStore';
 import useMultipleSurveysStore from '@/stores/useMultipleSurveysStore';
 import useRewardStore from '@/stores/useRewardStore';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 import { SpinnerIconC } from '@/components/icons/spinner-icon';
+import { Identify } from '@amplitude/analytics-browser';
 
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -34,7 +28,7 @@ export default function Home() {
   const router = useRouter();
 
   const { rewards, fetchRewards } = useRewardStore();
-  const { trackAmplitudeEvent } = useAmplitudeContext();
+  const { trackAmplitudeEvent, identifyUser } = useAmplitudeContext();
 
   useEffect(() => {
     if (address) {
@@ -48,6 +42,22 @@ export default function Home() {
       await getParticipant(address);
 
       await fetchSurveys(address);
+
+      if (surveys && participant) {
+        const identifyEvent = new Identify();
+        identifyEvent.set('Surveys Taken', surveys.length);
+        identifyEvent.set('Wallet Address', participant.walletAddress);
+        identifyEvent.set('Gender', participant.gender);
+        identifyEvent.set('Country', participant.country);
+        identifyEvent.set('Username', participant.username);
+        identifyEvent.set(
+          'Time created',
+          participant.timeCreated.toDate().toDateString()
+        );
+        identifyEvent.set('Id', participant.id);
+
+        identifyUser(identifyEvent);
+      }
     }
   }, [isConnected, address, getParticipant]);
 
@@ -82,7 +92,7 @@ export default function Home() {
         bg="white"
         zIndex="50"
       >
-          <SpinnerIconC />
+        <SpinnerIconC />
       </Flex>
     );
   }
@@ -146,7 +156,7 @@ export default function Home() {
       <Box w="full" h="100vh">
         {surveyLoading ? (
           <Flex justify="center" align="center" h="100%">
-              <SpinnerIconC />
+            <SpinnerIconC />
           </Flex>
         ) : surveys.length > 0 ? (
           surveys.map((survey) => (
