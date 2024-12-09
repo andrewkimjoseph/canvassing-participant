@@ -21,8 +21,8 @@ const AmplitudeContextProvider = ({
   children: React.ReactNode;
 }) => {
   useEffect(() => {
-    init(NEXT_PUBLIC_AMPLITUDE_API_KEY as string, { autocapture: true });
     add(sessionReplayTracking);
+    init(NEXT_PUBLIC_AMPLITUDE_API_KEY as string, { autocapture: true });
   }, []);
 
   const trackAmplitudeEvent = (eventName: string, eventProperties: {}) => {
