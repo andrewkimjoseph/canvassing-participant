@@ -65,7 +65,7 @@ export default function TransactionSuccessfulPage() {
         onClick={()=>{
           trackAmplitudeEvent('Go home clicked', {
             participantWalletAddress: participant?.walletAddress,
-            partipantId: participant?.id,
+            participantId: participant?.id,
             surveyId: surveyId,
           });
           router.push("/")}}

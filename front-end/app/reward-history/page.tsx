@@ -103,7 +103,7 @@ export default function RewardHistory() {
                     onClick={() => {
                       trackAmplitudeEvent('Copy reward id clicked', {
                         participantWalletAddress: participant?.walletAddress,
-                        partipantId: participant?.id,
+                        participantId: participant?.id,
                         rewardId: reward.id,
                         surveyId: reward.surveyId,
                       });
@@ -129,7 +129,7 @@ export default function RewardHistory() {
 
                       trackAmplitudeEvent('View on block explorer clicked', {
                         participantWalletAddress: participant?.walletAddress,
-                        partipantId: participant?.id,
+                        participantId: participant?.id,
                         rewardId: reward.id,
                         surveyId: reward.surveyId,
                       });
@@ -140,7 +140,7 @@ export default function RewardHistory() {
 
                       trackAmplitudeEvent('Unclaimed claim clicked', {
                         participantWalletAddress: participant?.walletAddress,
-                        partipantId: participant?.id,
+                        participantId: participant?.id,
                         rewardId: reward.id,
                         surveyId: reward.surveyId,
                       });
