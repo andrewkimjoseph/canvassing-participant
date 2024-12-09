@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, createContext } from 'react';
-import { init, track,add } from '@amplitude/analytics-browser';
+import { init, track,add, identify, Identify} from '@amplitude/analytics-browser';
 import { sessionReplayPlugin } from '@amplitude/plugin-session-replay-browser';
 const sessionReplayTracking = sessionReplayPlugin();
 
@@ -9,6 +9,7 @@ const NEXT_PUBLIC_AMPLITUDE_API_KEY = process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY;
 // Define the shape of the context value
 interface AmplitudeContextType {
   trackAmplitudeEvent: (eventName: string, eventProperties: {}) => void;
+  identifyUser: (identifyObj: Identify) => void;
 }
 
 export const AmplitudeContext = createContext<AmplitudeContextType | undefined>(
@@ -29,7 +30,11 @@ const AmplitudeContextProvider = ({
     track(eventName, eventProperties);
   };
 
-  const value: AmplitudeContextType = { trackAmplitudeEvent };
+  const identifyUser = (identifyObj: Identify) => {
+    identify(identifyObj);
+  };
+
+  const value: AmplitudeContextType = { trackAmplitudeEvent, identifyUser };
 
   return (
     <AmplitudeContext.Provider value={value}>
