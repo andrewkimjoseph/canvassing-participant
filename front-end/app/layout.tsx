@@ -1,5 +1,5 @@
 import '@/styles/globals.css';
-import { Web3Provider } from '@/providers/app-provider';
+import { Web3Provider } from '@/providers/web-3-provider';
 import { UIProvider } from '@/components/ui/provider';
 import { Metadata } from 'next';
 import { font } from '@/utils/font';
