@@ -9,15 +9,12 @@ export const MiniPayProvider: React.FC<{
 
   useEffect(() => {
     const checkMiniPay = () => {
-      // Check for MiniPay in window.ethereum
-      console.log(window);
       const miniPayExists =
         window.ethereum &&
         (window.ethereum.isMiniPay || window.ethereum.isMinipay)
           ? true
           : false;
 
-      console.log(miniPayExists);
       setIsMiniPay(miniPayExists);
     };
 
