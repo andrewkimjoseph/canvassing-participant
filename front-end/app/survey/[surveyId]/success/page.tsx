@@ -47,7 +47,8 @@ export default function SuccessPage() {
 
     if (!survey?.contractAddress || !survey?.rewardAmountIncUSD) {
       toaster.create({
-        description: 'CE1',
+        description:
+          'Invalid survey claim request. Kindly reach out to support via the "More" tab.',
         duration: 3000,
         type: 'error',
       });
@@ -57,7 +58,8 @@ export default function SuccessPage() {
 
     if (!submissionId || !respondentId || !address || !participant?.id) {
       toaster.create({
-        description: 'CE3',
+        description:
+          'Invalid form submission/participant. Kindly reach out to support via the "More" tab.',
         duration: 3000,
         type: 'error',
       });
@@ -71,7 +73,8 @@ export default function SuccessPage() {
 
     if (contractBalance < survey.rewardAmountIncUSD) {
       toaster.create({
-        description: 'CE2',
+        description:
+          'Not enough balance to pay you out. Kindly reach out to support via the "More" tab.',
         duration: 3000,
         type: 'error',
       });
@@ -87,7 +90,7 @@ export default function SuccessPage() {
 
       if (claimIsProcessed.success) {
         toaster.create({
-          description: 'Waiting for your reward record to be updated',
+          description: 'Waiting for your reward record to be updated ...',
           duration: 3000,
           type: 'info',
         });
@@ -128,14 +131,16 @@ export default function SuccessPage() {
           router.replace(`/survey/${surveyId}/transaction-successful`);
         } else {
           toaster.create({
-            description: 'Reward record not found.',
+            description:
+              'Reward record not found. Kindly reach out to support via the "More" tab.',
             duration: 3000,
             type: 'error',
           });
         }
       } else {
         toaster.create({
-          description: 'Reward claim was unsuccessful. Please try again.',
+          description:
+            'Reward claim was unsuccessful. Kindly reach out to support via the "More" tab.',
           duration: 3000,
           type: 'error',
         });
@@ -143,7 +148,8 @@ export default function SuccessPage() {
     } catch (error) {
       console.error('Error processing reward claim:', error);
       toaster.create({
-        description: 'An unexpected error occurred. Please try again later.',
+        description:
+          'An unexpected error occurred. Kindly reach out to support via the "More" tab.',
         duration: 3000,
         type: 'error',
       });
