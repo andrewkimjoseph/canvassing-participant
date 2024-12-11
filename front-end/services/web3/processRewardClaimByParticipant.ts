@@ -36,22 +36,27 @@ export const processRewardClaimByParticipant = async (
 
   try {
     const [address] = await privateClient.getAddresses();
-    
-    const createDonationAccountTxnHash = await privateClient.writeContract({
-      account: address,
-      address: smartContractAddress,
-      abi: canvassingSurveyContractABI,
-      functionName: 'processRewardClaimByParticipant',
-      args: [participantWalletAddress],
-    });
 
-    const createDonationTxnReceipt = await publicClient.waitForTransactionReceipt({
-      hash: createDonationAccountTxnHash,
-    });
+    const { request: processRewardClaimByParticipantRqst } =
+      await publicClient.simulateContract({
+        account: address,
+        address: smartContractAddress,
+        abi: canvassingSurveyContractABI,
+        functionName: 'processRewardClaimByParticipant',
+        args: [participantWalletAddress],
+      });
+
+    const processRewardClaimByParticipantTxnHash =
+      await privateClient.writeContract(processRewardClaimByParticipantRqst);
+
+    const processRewardClaimByParticipantTxnReceipt =
+      await publicClient.waitForTransactionReceipt({
+        hash: processRewardClaimByParticipantTxnHash,
+      });
 
     return {
-      success: createDonationTxnReceipt.status === 'success',
-      transactionHash: createDonationAccountTxnHash
+      success: processRewardClaimByParticipantTxnReceipt.status === 'success',
+      transactionHash: processRewardClaimByParticipantTxnHash,
     };
   } catch (err) {
     console.error(err);
