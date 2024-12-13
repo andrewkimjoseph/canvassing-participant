@@ -47,6 +47,7 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
       // Filter surveys to check whitelist status using their contractAddress
       const filteredSurveys = [];
       for (const survey of surveys) {
+        if (!survey.isAvailable) continue; // Skip if the survey is marked as unavailable
         if (!survey.contractAddress) continue; // Skip if no contract address in survey
         const userIsWhitelisted = await checkIfUserAddressIsWhitelisted(
           walletAddress,
