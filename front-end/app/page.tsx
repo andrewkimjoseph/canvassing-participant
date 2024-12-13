@@ -45,16 +45,16 @@ export default function Home() {
 
       if (surveys && participant) {
         const identifyEvent = new Identify();
-        identifyEvent.set('Surveys Taken', surveys.length);
-        identifyEvent.setOnce('Wallet Address', participant.walletAddress);
-        identifyEvent.setOnce('Gender', participant.gender);
-        identifyEvent.setOnce('Country', participant.country);
-        identifyEvent.setOnce('Username', participant.username);
+        identifyEvent.set('[Canvassing] Surveys Taken', surveys.length);
+        identifyEvent.setOnce('[Canvassing] Wallet Address', participant.walletAddress);
+        identifyEvent.setOnce('[Canvassing] Gender', participant.gender);
+        identifyEvent.setOnce('[Canvassing] Country', participant.country);
+        identifyEvent.setOnce('[Canvassing] Username', participant.username);
         identifyEvent.setOnce(
-          'Time created',
+          '[Canvassing] Time Created',
           new Date(participant.timeCreated.seconds * 1000).toLocaleString()
         );
-        identifyEvent.setOnce('Id', participant.id);
+        identifyEvent.setOnce('[Canvassing] Id', participant.id);
 
         identifyUser(identifyEvent);
       }
