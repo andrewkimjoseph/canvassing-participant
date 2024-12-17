@@ -9,11 +9,12 @@ export const MiniPayProvider: React.FC<{
 
   useEffect(() => {
     const checkMiniPay = () => {
+      const isDevelopment = process.env.NODE_ENV === 'development';
+      
       const miniPayExists =
-        window.ethereum &&
-        (window.ethereum.isMiniPay || window.ethereum.isMinipay)
-          ? true
-          : false;
+        isDevelopment || 
+        (window.ethereum &&
+          (window.ethereum.isMiniPay || window.ethereum.isMinipay));
 
       setIsMiniPay(miniPayExists);
     };
