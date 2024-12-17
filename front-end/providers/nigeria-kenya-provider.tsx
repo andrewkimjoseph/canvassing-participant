@@ -12,25 +12,19 @@ export const NigeriaKenyaProvider: React.FC<{
   useEffect(() => {
     const checkCountry = async () => {
       try {
-        // Use geolocation API to get user's country
         const response = await fetch('https://ipapi.co/json/');
         const data = await response.json();
 
-        // Check if the country is Nigeria or Kenya
         const allowedCountries = ['NG', 'KE'];
         setIsAllowedCountry(allowedCountries.includes(data.country_code));
       } catch (error) {
         console.error('Error detecting country:', error);
-        // Default to false if detection fails
         setIsAllowedCountry(false);
       }
     };
 
-    // Check on initial mount
     checkCountry();
   }, []);
-
-  // If not from Nigeria or Kenya, render centered message
 
   if (isAllowedCountry === null) {
     return (
@@ -42,12 +36,8 @@ export const NigeriaKenyaProvider: React.FC<{
 
   if (isAllowedCountry === false) {
     return (
-      <Flex
-      justify="center"
-      align="center"
-      minH="100vh"
-      >
-        <Text fontSize={'md'} color="#363062" textAlign={"center"}>
+      <Flex justify="center" align="center" minH="100vh">
+        <Text fontSize={'md'} color="#363062" textAlign={'center'}>
           This dApp is not available in your country.
         </Text>
       </Flex>
