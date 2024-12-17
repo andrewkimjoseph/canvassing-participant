@@ -72,58 +72,6 @@
 				"anonymous": false,
 				"inputs": [
 					{
-						"indexed": false,
-						"internalType": "address[]",
-						"name": "walletAddresses",
-						"type": "address[]"
-					}
-				],
-				"name": "MultipleUserAddressesWhitelisted",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "address[]",
-						"name": "walletAddresses",
-						"type": "address[]"
-					}
-				],
-				"name": "MultipleWhitelistedUserAddressesBlacklisted",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "address",
-						"name": "participantWalletAddress",
-						"type": "address"
-					}
-				],
-				"name": "OneUserAddressWhitelisted",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "address",
-						"name": "participantWalletAddress",
-						"type": "address"
-					}
-				],
-				"name": "OneWhitelistedUserAddressBlacklisted",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
 						"indexed": true,
 						"internalType": "address",
 						"name": "previousOwner",
@@ -255,32 +203,6 @@
 				"type": "event"
 			},
 			{
-				"inputs": [
-					{
-						"internalType": "address[]",
-						"name": "walletAddresses",
-						"type": "address[]"
-					}
-				],
-				"name": "blacklistMultipleWhitelistedUserAddresses",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "walletAddress",
-						"type": "address"
-					}
-				],
-				"name": "blacklistOneWhitelistedUserAddress",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
 				"inputs": [],
 				"name": "cUSD",
 				"outputs": [
@@ -313,59 +235,8 @@
 				"type": "function"
 			},
 			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "walletAddress",
-						"type": "address"
-					}
-				],
-				"name": "checkIfUserAddressIsBlacklisted",
-				"outputs": [
-					{
-						"internalType": "bool",
-						"name": "",
-						"type": "bool"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "walletAddress",
-						"type": "address"
-					}
-				],
-				"name": "checkIfUserAddressIsWhitelisted",
-				"outputs": [
-					{
-						"internalType": "bool",
-						"name": "",
-						"type": "bool"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
 				"inputs": [],
 				"name": "getNumberOfRewardedParticipants",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "getNumberOfWhitelistedUserAddresses",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -392,38 +263,6 @@
 			{
 				"inputs": [],
 				"name": "getTargetNumberOfParticipants",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address[]",
-						"name": "registeredAddresses",
-						"type": "address[]"
-					}
-				],
-				"name": "getWhitelistedAddressesFromRegisteredAddresses",
-				"outputs": [
-					{
-						"internalType": "address[]",
-						"name": "",
-						"type": "address[]"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "numberOfWhitelistedUserAddresses",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -560,32 +399,6 @@
 				"type": "function"
 			},
 			{
-				"inputs": [
-					{
-						"internalType": "address[]",
-						"name": "walletAddresses",
-						"type": "address[]"
-					}
-				],
-				"name": "whitelistMultipleUserAddresses",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "walletAddress",
-						"type": "address"
-					}
-				],
-				"name": "whitelistOneUserAddress",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
 				"inputs": [],
 				"name": "withdrawAllRewardFundsToResearcher",
 				"outputs": [],
@@ -654,7 +467,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"hardhat/contracts/ClosedSurveyV2.sol": "ClosedSurvey"
+			"hardhat/contracts/OpenSurvey.sol": "OpenSurvey"
 		},
 		"evmVersion": "paris",
 		"libraries": {},
@@ -716,12 +529,12 @@
 				"dweb:/ipfs/QmZiKwtKU1SBX4RGfQtY7PZfiapbbu6SZ9vizGQD9UHjRA"
 			]
 		},
-		"hardhat/contracts/ClosedSurveyV2.sol": {
-			"keccak256": "0x157a4f17c77b28c36027c2896358155fcea185bf778a0fc381b5219f935cc60a",
+		"hardhat/contracts/OpenSurvey.sol": {
+			"keccak256": "0x60699868a16485d9c4950e2ead317f6be74bd24dcdbd17bacbc170c6f87a7ac4",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://4b10f0fadcc76a15e570e92df7cd090bfa193b673d131f1c9c5acaeb317e4ea5",
-				"dweb:/ipfs/QmfQJ6KNPVGFTvM6J8j1FEB676sHTkdzzt3z87gmvWjfiL"
+				"bzz-raw://e92b18676b2c48220ec1fa15e75fe4797fe33eabfb4befa1334626341f63cf3b",
+				"dweb:/ipfs/Qmd5Jc3a82pU6AHiqekXMHDwGE8HxZz6yYy5mZfLJvREap"
 			]
 		}
 	},
