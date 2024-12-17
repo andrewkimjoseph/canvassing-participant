@@ -155,7 +155,7 @@ export default function Home() {
 
       <Box w="full" h="100vh">
         {surveyLoading ? (
-          <Flex justify="center" align="center" h="100%">
+          <Flex justify="center" >
             <SpinnerIconC />
           </Flex>
         ) : surveys.length > 0 ? (
