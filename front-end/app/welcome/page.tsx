@@ -13,11 +13,10 @@ export default function WelcomePage() {
   const { participant, getParticipant, loading } = useParticipantStore();
   const router = useRouter();
 
-  // Handle mounting
   useEffect(() => {
     setIsMounted(true);
   }, []);
-  // Check for participant when wallet is connected
+
   const checkParticipantStatus = useCallback(() => {
     if (isConnected && address) {
       getParticipant(address);
@@ -28,7 +27,6 @@ export default function WelcomePage() {
     checkParticipantStatus();
   }, [checkParticipantStatus]);
 
-  // Handle redirect
   useEffect(() => {
     if (isMounted && participant) {
       router.replace('/');
@@ -46,7 +44,6 @@ export default function WelcomePage() {
 
   return (
     <VStack width="100vw" h="100vh">
-      {/* Background Image */}
       <Box
         position="relative"
         width="100%"

@@ -17,6 +17,7 @@ import CustomLayout from '@/components/custom-layout';
 import MobileOnlyProvider from '@/providers/mobile-only-provider';
 import NigeriaKenyaProvider from '@/providers/nigeria-kenya-provider';
 import MiniPayProvider from './minipay-provider';
+import { RPCUrls } from '@/utils/rpcURLs/rpcUrls';
 
 const connectors = connectorsForWallets(
   [
@@ -35,8 +36,8 @@ const config = createConfig({
   connectors,
   chains: [celo, celoAlfajores],
   transports: {
-    [celo.id]: http(),
-    [celoAlfajores.id]: http(),
+    [celo.id]: http(RPCUrls.celoMainnet()),
+    [celoAlfajores.id]: http(RPCUrls.celoAlfajores()),
   },
 });
 
