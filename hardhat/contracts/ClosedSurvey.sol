@@ -67,9 +67,10 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         _;
     }
     modifier mustBeWhitelisted(address walletAddress) {
-        if (!usersWhitelistedForSurvey[walletAddress]) {
-            revert UserAddressNotWhitelisted(walletAddress);
-        }
+        require(
+            !usersWhitelistedForSurvey[walletAddress],
+            "Must be whitelisted"
+        );
         _;
     }
 
