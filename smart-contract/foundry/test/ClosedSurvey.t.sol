@@ -47,7 +47,7 @@ contract ClosedSurveyTest is Test {
         );
 
         // Fund the researcher with some cUSD for testing
-        vm.prank(0x874069Fa1EB16D44d622F2e0Ca25eeA172369bC1); // cUSD contract owner
+        vm.prank(0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1); // cUSD contract owner
         cUSD.transfer(researcher, REWARD_AMOUNT * TARGET_PARTICIPANTS);
 
         // Transfer funds to the contract
