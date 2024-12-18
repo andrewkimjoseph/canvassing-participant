@@ -654,7 +654,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"hardhat/contracts/ClosedSurveyV2.sol": "ClosedSurvey"
+			"hardhat/contracts/ClosedSurveyV2.sol": "ClosedSurveyV2"
 		},
 		"evmVersion": "paris",
 		"libraries": {},
@@ -717,11 +717,11 @@
 			]
 		},
 		"hardhat/contracts/ClosedSurveyV2.sol": {
-			"keccak256": "0x157a4f17c77b28c36027c2896358155fcea185bf778a0fc381b5219f935cc60a",
+			"keccak256": "0xb9c201ee17f9ad2454eae31a2a29f91df4b4e55f7a4a5aa483c9b735fee42e1c",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://4b10f0fadcc76a15e570e92df7cd090bfa193b673d131f1c9c5acaeb317e4ea5",
-				"dweb:/ipfs/QmfQJ6KNPVGFTvM6J8j1FEB676sHTkdzzt3z87gmvWjfiL"
+				"bzz-raw://09948295c8946b3e85e499a848ba5c2257d96d5a8b35a46e431e70e0f4bccc5c",
+				"dweb:/ipfs/QmbnToppfkHBgy4BjjxiXqqmb5iSjPsfy9S6sYzt8Vr9LE"
 			]
 		}
 	},

@@ -16,7 +16,7 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
 
     uint256 public rewardAmountPerParticipantInWei;
     uint256 public targetNumberOfParticipants;
-    uint256 private numberOfRewardedParticipants;
+    uint256 public numberOfRewardedParticipants;
     uint256 public numberOfWhitelistedUserAddresses;
 
     event OneUserAddressWhitelisted(address participantWalletAddress);
@@ -40,69 +40,60 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         uint256 oldcUSDRewardAmountPerParticipantInWei,
         uint256 newcUSDRewardAmountPerParticipantInWei
     );
+
     event TargetNumberOfParticipantsUpdates(
         uint256 oldTargetNumberOfParticipants,
         uint256 newTargetNumberOfParticipants
     );
 
+    error ZeroAddress();
+    error InvalidRewardAmountGiven();
+    error InvalidNumberOfTargetParticipants();
+    error UserAddressNotWhitelisted(address walletAddress);
+    error UserAddressAlreadyWhitelisted(address walletAddress);
+    error ParticipantAlreadyRewarded(address walletAddress);
+    error NoRewardFunds();
+    error RewardTransferFailed();
+    error AllParticipantsRewarded();
+    error UnauthorizedMessageSender(address unauthorizedMessageSender);
+    error WithdrawalFailed();
+    error InvalidArrayLength();
+    error InsufficientContractBalance();
+
     modifier onlyWhitelistedAddress(address walletAddress) {
-        require(
-            usersWhitelistedForSurvey[walletAddress],
-            "Only whitelisted address"
-        );
+        if (!usersWhitelistedForSurvey[walletAddress]) {
+            revert UserAddressNotWhitelisted(walletAddress);
+        }
         _;
     }
     modifier mustBeWhitelisted(address walletAddress) {
         require(
-            usersWhitelistedForSurvey[walletAddress],
+            !usersWhitelistedForSurvey[walletAddress],
             "Must be whitelisted"
         );
         _;
     }
 
     modifier mustBeBlacklisted(address walletAddress) {
-        require(
-            !usersWhitelistedForSurvey[walletAddress],
-            "Must be blacklisted"
-        );
+        if (usersWhitelistedForSurvey[walletAddress]) {
+            revert UserAddressAlreadyWhitelisted(walletAddress);
+        }
         _;
     }
     modifier onlyUnrewardedParticipant(address participantWalletAddress) {
-        require(
-            !participantsWhoHaveClaimedRewards[participantWalletAddress],
-            "Participant already rewarded"
-        );
+        if (participantsWhoHaveClaimedRewards[participantWalletAddress]) {
+            revert ParticipantAlreadyRewarded(participantWalletAddress);
+        }
         _;
     }
 
     modifier onlyValidSender(address messageSender) {
-        require(msg.sender == messageSender, "Only valid sender");
+        if (msg.sender != messageSender) {
+            revert UnauthorizedMessageSender(messageSender);
+        }
         _;
     }
-
-    modifier onlyIfContractHasEnoughcUSD() {
-        require(
-            cUSD.balanceOf(address(this)) >= rewardAmountPerParticipantInWei,
-            "Contract does not have enough cUSD"
-        );
-        _;
-    }
-
-    modifier onlyIfContractHasAnycUSD() {
-        require(
-            cUSD.balanceOf(address(this)) > 0,
-            "Contract does not have any cUSD"
-        );
-        _;
-    }
-
-    modifier onlyWhenAllParticipantHaveNotBeenRewarded() {
-        require(
-            numberOfRewardedParticipants < targetNumberOfParticipants,
-            "All participants have been rewarded"
-        );
-        _;
-    }
+   
 
     constructor(
         address researcherWalletAddress,
@@ -110,22 +101,19 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         uint256 _targetNumberOfParticipants,
         address cUSDTokenAddress
     ) Ownable(researcherWalletAddress) {
-        require(
-            cUSDTokenAddress != address(0),
-            "Zero address given for cUSDTokenAddress"
-        );
+        if (
+            researcherWalletAddress == address(0) ||
+            cUSDTokenAddress == address(0)
+        ) {
+            revert ZeroAddress();
+        }
+        if (_rewardAmountPerParticipantInWei == 0) {
+            revert InvalidRewardAmountGiven();
+        }
 
-        require(
-            researcherWalletAddress != address(0),
-            "Zero address given for researcherWalletAddress"
-        );
-
-        require(_rewardAmountPerParticipantInWei > 0, "Invalid reward amount");
-
-        require(
-            _targetNumberOfParticipants > 0,
-            "Invalid number of target participants"
-        );
+        if (_targetNumberOfParticipants == 0) {
+            revert InvalidNumberOfTargetParticipants();
+        }
 
         cUSD = IERC20Metadata(cUSDTokenAddress);
 
@@ -133,13 +121,12 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         targetNumberOfParticipants = _targetNumberOfParticipants;
     }
 
-    function whitelistOneUserAddress(address walletAddress)
-        external
-        onlyOwner
-        mustBeBlacklisted(walletAddress)
-    {
-        require(walletAddress != address(0), "Zero address passed");
-
+    function whitelistOneUserAddress(
+        address walletAddress
+    ) external onlyOwner mustBeBlacklisted(walletAddress) {
+        if (walletAddress == address(0)) {
+            revert ZeroAddress();
+        }
         usersWhitelistedForSurvey[walletAddress] = true;
         unchecked {
             ++numberOfWhitelistedUserAddresses;
@@ -147,13 +134,12 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         emit OneUserAddressWhitelisted(walletAddress);
     }
 
-    function blacklistOneWhitelistedUserAddress(address walletAddress)
-        external
-        onlyOwner
-        mustBeWhitelisted(walletAddress)
-    {
-        require(walletAddress != address(0), "Zero address passed");
-
+    function blacklistOneWhitelistedUserAddress(
+        address walletAddress
+    ) external onlyOwner mustBeWhitelisted(walletAddress) {
+        if (walletAddress == address(0)) {
+            revert ZeroAddress();
+        }
         usersWhitelistedForSurvey[walletAddress] = false;
         unchecked {
             --numberOfWhitelistedUserAddresses;
@@ -161,25 +147,21 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         emit OneWhitelistedUserAddressBlacklisted(walletAddress);
     }
 
-    function whitelistMultipleUserAddresses(address[] calldata walletAddresses)
-        external
-        onlyOwner
-    {
+    function whitelistMultipleUserAddresses(
+        address[] calldata walletAddresses
+    ) external onlyOwner {
         uint256 length = walletAddresses.length;
-
-        require(length > 0, "No addresses passed");
+        if (length == 0) {
+            revert InvalidArrayLength();
+        }
 
         for (uint256 i = 0; i < length; ) {
-            require(
-                walletAddresses[i] != address(0),
-                "One/more zero addresses given"
-            );
-
-            require(
-                !usersWhitelistedForSurvey[walletAddresses[i]],
-                "One/more given addresses already whitelisted"
-            );
-
+            if (walletAddresses[i] == address(0)) {
+                revert ZeroAddress();
+            }
+            if (usersWhitelistedForSurvey[walletAddresses[i]]) {
+                revert UserAddressAlreadyWhitelisted(walletAddresses[i]);
+            }
             unchecked {
                 ++i;
             }
@@ -202,20 +184,17 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         address[] calldata walletAddresses
     ) external onlyOwner {
         uint256 length = walletAddresses.length;
-
-        require(length > 0, "No addresses passed");
+        if (length == 0) {
+            revert InvalidArrayLength();
+        }
 
         for (uint256 i = 0; i < length; ) {
-            require(
-                walletAddresses[i] != address(0),
-                "One/more zero addresses given"
-            );
-
-            require(
-                usersWhitelistedForSurvey[walletAddresses[i]],
-                "One/more given addresses already blacklisted"
-            );
-
+            if (walletAddresses[i] == address(0)) {
+                revert ZeroAddress();
+            }
+            if (!usersWhitelistedForSurvey[walletAddresses[i]]) {
+                revert UserAddressNotWhitelisted(walletAddresses[i]);
+            }
             unchecked {
                 ++i;
             }
@@ -233,21 +212,24 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         emit MultipleWhitelistedUserAddressesBlacklisted(walletAddresses);
     }
 
-    function processRewardClaimByParticipant(address walletAddress)
+    function processRewardClaimByParticipant(
+        address walletAddress
+    )
         external
         whenNotPaused
         nonReentrant
-        onlyIfContractHasEnoughcUSD
-        onlyWhenAllParticipantHaveNotBeenRewarded
         onlyValidSender(walletAddress)
         onlyWhitelistedAddress(walletAddress)
         onlyUnrewardedParticipant(walletAddress)
     {
-        bool rewardTransferIsSuccesful = rewardParticipant(walletAddress);
-
-        if (rewardTransferIsSuccesful) {
-            markParticipantAsHavingClaimedReward(walletAddress);
+        if (cUSD.balanceOf(address(this)) < rewardAmountPerParticipantInWei) {
+            revert InsufficientContractBalance();
         }
+        if (numberOfRewardedParticipants == targetNumberOfParticipants) {
+            revert AllParticipantsRewarded();
+        }
+        markParticipantAsHavingClaimedReward(walletAddress);
+        rewardParticipant(walletAddress);
     }
 
     function markParticipantAsHavingClaimedReward(
@@ -257,47 +239,46 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         emit ParticipantMarkedAsRewarded(participantWalletAddress);
     }
 
-    function rewardParticipant(address participantWalletAddress)
-        private
-        returns (bool)
-    {
-        bool rewardTransferIsSuccesful = cUSD.transfer(
+    function rewardParticipant(address participantWalletAddress) private {
+        bool success = cUSD.transfer(
             participantWalletAddress,
             rewardAmountPerParticipantInWei
         );
-
-        if (rewardTransferIsSuccesful) {
-            unchecked {
-                ++numberOfRewardedParticipants;
-            }
-            emit ParticipantRewarded(
-                participantWalletAddress,
-                rewardAmountPerParticipantInWei
-            );
+        if (!success) {
+            revert RewardTransferFailed();
         }
-
-        return rewardTransferIsSuccesful;
+        unchecked {
+            ++numberOfRewardedParticipants;
+        }
+        emit ParticipantRewarded(
+            participantWalletAddress,
+            rewardAmountPerParticipantInWei
+        );
     }
 
     function withdrawAllRewardFundsToResearcher()
         external
         onlyOwner
         whenNotPaused
-        onlyIfContractHasAnycUSD
+        nonReentrant
     {
         uint256 balance = cUSD.balanceOf(address(this));
-        cUSD.transfer(owner(), balance);
+        if (balance == 0) {
+            revert NoRewardFunds();
+        }
+        bool success = cUSD.transfer(owner(), balance);
+        if (!success) {
+            revert WithdrawalFailed();
+        }
         emit RewardFundsWithdrawn(owner(), balance);
     }
 
     function updateRewardAmountPerParticipant(
         uint256 _newRewardAmountPerParticipantInWei
     ) external onlyOwner {
-        require(
-            _newRewardAmountPerParticipantInWei != 0,
-            "Zero reward amount given"
-        );
-
+        if (_newRewardAmountPerParticipantInWei == 0) {
+            revert InvalidRewardAmountGiven();
+        }
         uint256 oldRewardAmountPerParticipantInWei = rewardAmountPerParticipantInWei;
 
         uint256 newRewardAmountPerParticipantInWei = _newRewardAmountPerParticipantInWei;
@@ -312,10 +293,9 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
     function updateTargetNumberOfParticipants(
         uint256 _newTargetNumberOfParticipants
     ) external onlyOwner {
-        require(
-            _newTargetNumberOfParticipants != 0,
-            "Zero number of target participants given"
-        );
+        if (_newTargetNumberOfParticipants == 0) {
+            revert InvalidNumberOfTargetParticipants();
+        }
 
         uint256 oldTargetNumberOfParticipants = targetNumberOfParticipants;
 
@@ -341,8 +321,10 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         address[] calldata registeredAddresses
     ) external view returns (address[] memory) {
         uint256 length = registeredAddresses.length;
+        if (length == 0) {
+            revert InvalidArrayLength();
+        }
 
-        require(length != 0, "No addresses passed");
         uint256 whitelistedCount = 0;
         for (uint256 i = 0; i < length; ) {
             if (usersWhitelistedForSurvey[registeredAddresses[i]]) {
@@ -366,27 +348,21 @@ contract ClosedSurvey is Ownable, ReentrancyGuard, Pausable {
         return whitelistedAddresses;
     }
 
-    function checkIfParticipantHasAlreadyClaimedReward(address walletAddress)
-        external
-        view
-        returns (bool)
-    {
+    function checkIfParticipantHasAlreadyClaimedReward(
+        address walletAddress
+    ) external view returns (bool) {
         return participantsWhoHaveClaimedRewards[walletAddress];
     }
 
-    function checkIfUserAddressIsWhitelisted(address walletAddress)
-        external
-        view
-        returns (bool)
-    {
+    function checkIfUserAddressIsWhitelisted(
+        address walletAddress
+    ) external view returns (bool) {
         return usersWhitelistedForSurvey[walletAddress];
     }
 
-    function checkIfUserAddressIsBlacklisted(address walletAddress)
-        external
-        view
-        returns (bool)
-    {
+    function checkIfUserAddressIsBlacklisted(
+        address walletAddress
+    ) external view returns (bool) {
         return !usersWhitelistedForSurvey[walletAddress];
     }
 
