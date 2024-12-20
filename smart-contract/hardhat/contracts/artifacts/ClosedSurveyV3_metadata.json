@@ -33,42 +33,12 @@
 			},
 			{
 				"inputs": [],
-				"name": "AllParticipantsRewarded",
-				"type": "error"
-			},
-			{
-				"inputs": [],
 				"name": "EnforcedPause",
 				"type": "error"
 			},
 			{
 				"inputs": [],
 				"name": "ExpectedPause",
-				"type": "error"
-			},
-			{
-				"inputs": [],
-				"name": "InsufficientContractBalance",
-				"type": "error"
-			},
-			{
-				"inputs": [],
-				"name": "InvalidArrayLength",
-				"type": "error"
-			},
-			{
-				"inputs": [],
-				"name": "InvalidNumberOfTargetParticipants",
-				"type": "error"
-			},
-			{
-				"inputs": [],
-				"name": "InvalidRewardAmountGiven",
-				"type": "error"
-			},
-			{
-				"inputs": [],
-				"name": "NoRewardFunds",
 				"type": "error"
 			},
 			{
@@ -94,67 +64,8 @@
 				"type": "error"
 			},
 			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "walletAddress",
-						"type": "address"
-					}
-				],
-				"name": "ParticipantAlreadyRewarded",
-				"type": "error"
-			},
-			{
 				"inputs": [],
 				"name": "ReentrancyGuardReentrantCall",
-				"type": "error"
-			},
-			{
-				"inputs": [],
-				"name": "RewardTransferFailed",
-				"type": "error"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "unauthorizedMessageSender",
-						"type": "address"
-					}
-				],
-				"name": "UnauthorizedMessageSender",
-				"type": "error"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "walletAddress",
-						"type": "address"
-					}
-				],
-				"name": "UserAddressAlreadyWhitelisted",
-				"type": "error"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "walletAddress",
-						"type": "address"
-					}
-				],
-				"name": "UserAddressNotWhitelisted",
-				"type": "error"
-			},
-			{
-				"inputs": [],
-				"name": "WithdrawalFailed",
-				"type": "error"
-			},
-			{
-				"inputs": [],
-				"name": "ZeroAddress",
 				"type": "error"
 			},
 			{
@@ -163,7 +74,33 @@
 					{
 						"indexed": false,
 						"internalType": "address[]",
-						"name": "walletAddresses",
+						"name": "participantWalletAddresses",
+						"type": "address[]"
+					}
+				],
+				"name": "MultipleUnscreenedUserAddressesScreened",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address[]",
+						"name": "participantWalletAddresses",
+						"type": "address[]"
+					}
+				],
+				"name": "MultipleUserAddressesScreened",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address[]",
+						"name": "participantWalletAddresses",
 						"type": "address[]"
 					}
 				],
@@ -181,6 +118,32 @@
 					}
 				],
 				"name": "MultipleWhitelistedUserAddressesBlacklisted",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "participantWalletAddress",
+						"type": "address"
+					}
+				],
+				"name": "OneUnscreenedUserAddressScreened",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "participantWalletAddress",
+						"type": "address"
+					}
+				],
+				"name": "OneUserAddressScreened",
 				"type": "event"
 			},
 			{
@@ -512,19 +475,6 @@
 			},
 			{
 				"inputs": [],
-				"name": "numberOfRewardedParticipants",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
 				"name": "numberOfWhitelistedUserAddresses",
 				"outputs": [
 					{
@@ -756,7 +706,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"smart-contract/hardhat/contracts/ClosedSurvey.sol": "ClosedSurvey"
+			"smart-contract/hardhat/contracts/ClosedSurveyV3.sol": "ClosedSurveyV3"
 		},
 		"evmVersion": "paris",
 		"libraries": {},
@@ -818,12 +768,12 @@
 				"dweb:/ipfs/QmZiKwtKU1SBX4RGfQtY7PZfiapbbu6SZ9vizGQD9UHjRA"
 			]
 		},
-		"smart-contract/hardhat/contracts/ClosedSurvey.sol": {
-			"keccak256": "0xb561a913e0988dc4e30469c9c31a88b22a80d99373c309d7d8cb500cfddb8256",
+		"smart-contract/hardhat/contracts/ClosedSurveyV3.sol": {
+			"keccak256": "0xc8879f8b3cb3ca5a8fd993111f813a8928ccb9aab53fca62d2a6c2fc406a990a",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://34b2ff1ae4a17da90f7f4538d96f3c9f2bcf1fd4c9fcc188ff20058dd7160c85",
-				"dweb:/ipfs/QmanJYZmouu1MmqTSgSe1JERSD29dFbo5RpobyX77GbJg1"
+				"bzz-raw://bfd01ea1661593bc75feb96a2e6be9980c779e385f40566c778f64e1e5d2768a",
+				"dweb:/ipfs/QmUV84sG4kqXFBHqaZ6boxw6Eknk21fEtXaZ7fPitZoe4R"
 			]
 		}
 	},
