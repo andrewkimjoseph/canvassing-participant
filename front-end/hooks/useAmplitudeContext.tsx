@@ -10,7 +10,7 @@ const useAmplitudeContext = () => {
     );
   }
 
-  return context; // Now this will correctly return the trackAmplitudeEvent function
+  return context;
 };
 
 export default useAmplitudeContext;

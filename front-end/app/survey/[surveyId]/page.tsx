@@ -24,7 +24,7 @@ export default function SurveyPage() {
 
   const { address, isConnected } = useAccount();
   const pathname = usePathname();
-  const surveyId = pathname?.split('/').pop(); // Extract surveyId from the URL
+  const surveyId = pathname?.split('/').pop();
   const { trackAmplitudeEvent } = useAmplitudeContext();
 
   const router = useRouter();
@@ -76,23 +76,6 @@ export default function SurveyPage() {
 
   return (
     <Flex flexDirection="column" w="100%" h="100vh" bgColor="#ECECEC">
-      {/* <Box
-        width="100%"
-        height={300}
-        bgColor="#CEDDF9"
-        borderBottomLeftRadius={15}
-        borderBottomRightRadius={15}
-      >
-        <Image
-          src="/instructional-manual.png"
-          alt="Background"
-          width="100%"
-          height={300}
-          objectFit="contain"
-          blur="md"
-        />
-      </Box> */}
-
       <Box bgColor="white" borderRadius={10} pb={2} mb={4} mt={2} pt={1} mx={2}>
         <Flex flexDirection="column" alignItems="top" pl={2} pt={2} mt={1}>
           <Text fontSize="lg" mb={2} color="#363062">

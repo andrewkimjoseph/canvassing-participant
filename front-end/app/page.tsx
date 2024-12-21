@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
-import { Box, Button, VStack, Text, Flex, Link } from '@chakra-ui/react';
+import { Box, Button, Text, Flex, Link } from '@chakra-ui/react';
 import { Avatar } from '@/components/ui/avatar';
 import useParticipantStore from '@/stores/useParticipantStore';
 import useMultipleSurveysStore from '@/stores/useMultipleSurveysStore';

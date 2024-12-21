@@ -32,7 +32,7 @@ import { SpinnerIconC } from '@/components/icons/spinner-icon';
 export default function SignUpPage() {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
-  const { address, isConnected } = useAccount();
+  const { address } = useAccount();
   const { setParticipant } = useParticipantStore();
   const [country, setCountry] = useState<string | null>(null);
   const [gender, setGender] = useState<string | null>(null);
