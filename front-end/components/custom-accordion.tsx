@@ -1,49 +1,49 @@
-// 'use client';
+'use client';
 
-// import { Box } from '@chakra-ui/react';
-// import { AccordionItem, AccordionItemContent, AccordionItemTrigger, AccordionRoot } from '@/components/ui/accordion';
-// import { useState } from 'react';
+import {
+  AccordionItem,
+  AccordionItemContent,
+  AccordionItemTrigger,
+  AccordionRoot,
+} from '@/components/ui/accordion';
+import { Box } from '@chakra-ui/react';
 
+interface AccordionComponentProps {
+  title: string;
+  content: React.ReactNode;
+  value?: string;
+}
 
-// interface AccordionItemData {
-//   value: string;
-//   title: string;
-//   text: string;
-// }
+const CustomAccordion: React.FC<AccordionComponentProps> = ({
+  title,
+  content,
+  value = 'accordion-item',
+}) => {
+  return (
+    <Box
+      bgColor="white"
+      h="25"
+      borderRadius={10}
+      flexDirection="column"
+      pb={2}
+      mb={2}
+      pt={1}
+      mx={2}
+      px={2}
+      py={2}
+      justifyContent="center"
+    >
+      <AccordionRoot
+        // value={value}
+        multiple
+      >
+        <AccordionItem value="survey-instructions" color="black" pb={1}>
+          <AccordionItemTrigger fontWeight="bold">{title}</AccordionItemTrigger>
+          <AccordionItemContent>{content}</AccordionItemContent>
+        </AccordionItem>
+      </AccordionRoot>
+    </Box>
+  );
+};
 
-// interface AccordionBoxProps {
-//   items: AccordionItemData[];
-//   value: string[];
-//  onValueChange?: (value: string[]) => void;
-// }
-
-// const AccordionBox: React.FC<AccordionBoxProps> = ({ items, value, onValueChange}) => {
-
-//     const [theValue, setTheValue] = useState(["survey-instructions"])
-//   return (
-//     <Box
-//       bgColor="white"
-//       h="25"
-//       borderRadius={10}
-//       flexDirection="column"
-//       pb={2}
-//       mb={2}
-//       pt={1}
-//       mx={2}
-//       px={2}
-//       py={2}
-//       justifyContent="center"
-//     >
-//       <AccordionRoot value={value}   onValueChange={(e) => setTheValue(items.indexOf())}>
-//         {items.map((item, index) => (
-//           <AccordionItem key={index} value={item.value} color="black" pb={1}>
-//             <AccordionItemTrigger fontWeight="bold">{item.title}</AccordionItemTrigger>
-//             <AccordionItemContent>{item.text}</AccordionItemContent>
-//           </AccordionItem>
-//         ))}
-//       </AccordionRoot>
-//     </Box>
-//   );
-// };
-
-// export default AccordionBox;
+export default CustomAccordion;
