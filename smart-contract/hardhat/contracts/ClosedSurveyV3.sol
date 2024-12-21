@@ -180,50 +180,50 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         emit ParticipantScreened(participantWalletAddress);
     }
 
-    function whitelistOneUserAddress(address walletAddress)
+    function whitelistOneParticipant(address participantWalletAddress)
         external
         onlyOwner
-        mustBeBlacklisted(walletAddress)
+        mustBeBlacklisted(participantWalletAddress)
     {
-        require(walletAddress != address(0), "Zero address passed");
+        require(participantWalletAddress != address(0), "Zero address passed");
 
-        participantsWhitelistedForSurvey[walletAddress] = true;
+        participantsWhitelistedForSurvey[participantWalletAddress] = true;
         unchecked {
             ++numberOfWhitelistedParticipants;
         }
-        emit OneParticipantWhitelisted(walletAddress);
+        emit OneParticipantWhitelisted(participantWalletAddress);
     }
 
-    function blacklistOneWhitelistedUserAddress(address walletAddress)
+    function blacklistOneParticipant(address participantWalletAddress)
         external
         onlyOwner
-        mustBeWhitelisted(walletAddress)
+        mustBeWhitelisted(participantWalletAddress)
     {
-        require(walletAddress != address(0), "Zero address passed");
+        require(participantWalletAddress != address(0), "Zero address passed");
 
-        participantsWhitelistedForSurvey[walletAddress] = false;
+        participantsWhitelistedForSurvey[participantWalletAddress] = false;
         unchecked {
             --numberOfWhitelistedParticipants;
         }
-        emit OneWhitelistedParticipantBlacklisted(walletAddress);
+        emit OneWhitelistedParticipantBlacklisted(participantWalletAddress);
     }
 
-    function whitelistMultipleUserAddresses(address[] calldata walletAddresses)
+    function whitelistMultipleParticipants(address[] calldata participantWalletAddresses)
         external
         onlyOwner
     {
-        uint256 length = walletAddresses.length;
+        uint256 length = participantWalletAddresses.length;
 
         require(length > 0, "No addresses passed");
 
         for (uint256 i = 0; i < length; ) {
             require(
-                walletAddresses[i] != address(0),
+                participantWalletAddresses[i] != address(0),
                 "One/more zero addresses given"
             );
 
             require(
-                !participantsWhitelistedForSurvey[walletAddresses[i]],
+                !participantsWhitelistedForSurvey[participantWalletAddresses[i]],
                 "One/more given addresses already whitelisted"
             );
 
@@ -233,7 +233,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         }
 
         for (uint256 i = 0; i < length; ) {
-            participantsWhitelistedForSurvey[walletAddresses[i]] = true;
+            participantsWhitelistedForSurvey[participantWalletAddresses[i]] = true;
             unchecked {
                 ++numberOfWhitelistedParticipants;
             }
@@ -242,24 +242,24 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
             }
         }
 
-        emit MultipleParticipantsWhitelisted(walletAddresses);
+        emit MultipleParticipantsWhitelisted(participantWalletAddresses);
     }
 
-    function blacklistMultipleWhitelistedUserAddresses(
-        address[] calldata walletAddresses
+    function blacklistMultipleParticipants(
+        address[] calldata participantWalletAddresses
     ) external onlyOwner {
-        uint256 length = walletAddresses.length;
+        uint256 length = participantWalletAddresses.length;
 
         require(length > 0, "No addresses passed");
 
         for (uint256 i = 0; i < length; ) {
             require(
-                walletAddresses[i] != address(0),
+                participantWalletAddresses[i] != address(0),
                 "One/more zero addresses given"
             );
 
             require(
-                participantsWhitelistedForSurvey[walletAddresses[i]],
+                participantsWhitelistedForSurvey[participantWalletAddresses[i]],
                 "One/more given addresses already blacklisted"
             );
 
@@ -269,7 +269,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         }
 
         for (uint256 i = 0; i < length; ) {
-            participantsWhitelistedForSurvey[walletAddresses[i]] = false;
+            participantsWhitelistedForSurvey[participantWalletAddresses[i]] = false;
             unchecked {
                 --numberOfWhitelistedParticipants;
             }
@@ -277,7 +277,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
                 ++i;
             }
         }
-        emit MultipleWhitelistedParticipantsBlacklisted(walletAddresses);
+        emit MultipleWhitelistedParticipantsBlacklisted(participantWalletAddresses);
     }
 
     function processRewardClaimByParticipant(address walletAddress)

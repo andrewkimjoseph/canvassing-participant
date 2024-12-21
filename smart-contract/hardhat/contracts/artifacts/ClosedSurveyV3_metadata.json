@@ -271,11 +271,11 @@
 				"inputs": [
 					{
 						"internalType": "address[]",
-						"name": "walletAddresses",
+						"name": "participantWalletAddresses",
 						"type": "address[]"
 					}
 				],
-				"name": "blacklistMultipleWhitelistedUserAddresses",
+				"name": "blacklistMultipleParticipants",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -284,11 +284,11 @@
 				"inputs": [
 					{
 						"internalType": "address",
-						"name": "walletAddress",
+						"name": "participantWalletAddress",
 						"type": "address"
 					}
 				],
-				"name": "blacklistOneWhitelistedUserAddress",
+				"name": "blacklistOneParticipant",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -602,11 +602,11 @@
 				"inputs": [
 					{
 						"internalType": "address[]",
-						"name": "walletAddresses",
+						"name": "participantWalletAddresses",
 						"type": "address[]"
 					}
 				],
-				"name": "whitelistMultipleUserAddresses",
+				"name": "whitelistMultipleParticipants",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -615,11 +615,11 @@
 				"inputs": [
 					{
 						"internalType": "address",
-						"name": "walletAddress",
+						"name": "participantWalletAddress",
 						"type": "address"
 					}
 				],
-				"name": "whitelistOneUserAddress",
+				"name": "whitelistOneParticipant",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -756,11 +756,11 @@
 			]
 		},
 		"smart-contract/hardhat/contracts/ClosedSurveyV3.sol": {
-			"keccak256": "0x465c00857cdec5a59d299d478a0113370cd22e8b9c599f8af8c5cf4e2ca0240e",
+			"keccak256": "0x70349d928b8b89d53aff7b9fad4a959b72c38578b258ce41ebf644016e2a77d2",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://6d609f5cbc9cfd7b451efa49c3b73dc3b2843c01734379733dc6f9a7dc2d6247",
-				"dweb:/ipfs/QmNwZMaZWNw2RphDyfpRapqL1aQLMtYZRVcaWtLcCKrazk"
+				"bzz-raw://bd2189f0f59a44a12dee1d00eed61e882c92b85746d8e19c7f2c1bace55439de",
+				"dweb:/ipfs/QmPqXn3yoSLToiiuGn7HdHdobGXa8nJnwQwfT5UT6maxtQ"
 			]
 		}
 	},
