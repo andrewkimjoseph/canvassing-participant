@@ -14,6 +14,7 @@ import { AboutIconC } from '@/components/icons/more-options-icons/about-icon';
 import { TermsIconC } from '@/components/icons/more-options-icons/terms-icon';
 import { PrivacyIconC } from '@/components/icons/more-options-icons/privacy-icon';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
+import { FAQsIconC } from '@/components/icons/more-options-icons/faqs-icons';
 
 export default function More() {
   const [isMounted, setIsMounted] = useState(false);
@@ -117,6 +118,19 @@ export default function More() {
         }
         onClick={() =>
           trackAmplitudeEvent('Privacy clicked', {
+            participantWalletAddress: participant?.walletAddress,
+            participantId: participant?.id,
+          })
+        }
+      />
+
+      <MoreOptionsCard
+        SVGIcon={FAQsIconC}
+        primaryText={'FAQs'}
+        secondaryText={'Check out our Frequently Asked Questions'}
+        link={'/more/faqs'}
+        onClick={() =>
+          trackAmplitudeEvent('FAQs clicked', {
             participantWalletAddress: participant?.walletAddress,
             participantId: participant?.id,
           })
