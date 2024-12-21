@@ -7,14 +7,7 @@ import { useRouter } from 'next/navigation';
 import useParticipantStore from '@/stores/useParticipantStore';
 
 import { SpinnerIconC } from '@/components/icons/spinner-icon';
-import { MoreOptionsCard } from '@/components/more-options-card';
-import { MoreOptionsProfileIconC } from '@/components/icons/more-options-icons/more-options-profile-icon';
-import { SupportIconC } from '@/components/icons/more-options-icons/support-icon';
-import { AboutIconC } from '@/components/icons/more-options-icons/about-icon';
-import { TermsIconC } from '@/components/icons/more-options-icons/terms-icon';
-import { PrivacyIconC } from '@/components/icons/more-options-icons/privacy-icon';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
-import { FAQsIconC } from '@/components/icons/more-options-icons/faqs-icons';
 import CustomAccordion from '@/components/custom-accordion';
 import { faqs } from '@/utils/faqs/faqs';
 
@@ -23,7 +16,6 @@ export default function FAQs() {
   const { address, isConnected } = useAccount();
   const router = useRouter();
   const { participant, getParticipant } = useParticipantStore();
-  const { trackAmplitudeEvent } = useAmplitudeContext();
 
   const checkParticipantStatus = useCallback(() => {
     if (isConnected && address) {

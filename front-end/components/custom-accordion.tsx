@@ -17,7 +17,6 @@ interface AccordionComponentProps {
 const CustomAccordion: React.FC<AccordionComponentProps> = ({
   title,
   content,
-  value = 'accordion-item',
 }) => {
   return (
     <Box
@@ -34,7 +33,6 @@ const CustomAccordion: React.FC<AccordionComponentProps> = ({
       justifyContent="center"
     >
       <AccordionRoot
-        // value={value}
         multiple
       >
         <AccordionItem value="survey-instructions" color="black" pb={1}>
