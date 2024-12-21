@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import useParticipantStore from '@/stores/useParticipantStore';
 
 import { SpinnerIconC } from '@/components/icons/spinner-icon';
-import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 import CustomAccordion from '@/components/custom-accordion';
 import { faqs } from '@/utils/faqs/faqs';
 
