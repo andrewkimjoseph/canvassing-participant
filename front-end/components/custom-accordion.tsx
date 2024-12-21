@@ -6,6 +6,7 @@ import {
   AccordionItemTrigger,
   AccordionRoot,
 } from '@/components/ui/accordion';
+import { primaryColor } from '@/utils/colors/colors';
 import { Box } from '@chakra-ui/react';
 
 interface AccordionComponentProps {
@@ -32,12 +33,20 @@ const CustomAccordion: React.FC<AccordionComponentProps> = ({
       py={2}
       justifyContent="center"
     >
-      <AccordionRoot
-        multiple
-      >
-        <AccordionItem value="survey-instructions" color="black" pb={1}>
+      <AccordionRoot multiple>
+        <AccordionItem value="faq-questions" color="black" pb={1}>
           <AccordionItemTrigger fontWeight="bold">{title}</AccordionItemTrigger>
-          <AccordionItemContent>{content}</AccordionItemContent>
+          <AccordionItemContent>
+            <hr
+              style={{
+                backgroundColor: primaryColor,
+                height: 3,
+                borderRadius: 4,
+              }}
+            />
+
+            {content}
+          </AccordionItemContent>
         </AccordionItem>
       </AccordionRoot>
     </Box>
