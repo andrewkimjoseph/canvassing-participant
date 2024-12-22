@@ -63,13 +63,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         );
         _;
     }
-    modifier mustBeWhitelisted(address participantWalletAddress) {
-        require(
-            participantsWhitelistedForSurvey[participantWalletAddress],
-            "Must be whitelisted"
-        );
-        _;
-    }
+
     modifier mustBeBlacklisted(address participantWalletAddress) {
         require(
             !participantsWhitelistedForSurvey[participantWalletAddress],
@@ -197,7 +191,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
     function blacklistOneParticipant(address participantWalletAddress)
         external
         onlyOwner
-        mustBeWhitelisted(participantWalletAddress)
+        onlyWhitelistedParticipant(participantWalletAddress)
     {
         require(participantWalletAddress != address(0), "Zero address passed");
 
