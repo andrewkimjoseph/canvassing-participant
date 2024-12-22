@@ -206,11 +206,11 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         external
         onlyOwner
     {
-        uint256 length = participantWalletAddresses.length;
+        uint256 numberOfAddressesGiven = participantWalletAddresses.length;
 
-        require(length > 0, "No addresses passed");
+        require(numberOfAddressesGiven > 0, "No addresses passed");
 
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i = 0; i < numberOfAddressesGiven; ) {
             require(
                 participantWalletAddresses[i] != address(0),
                 "One/more zero addresses given"
@@ -226,7 +226,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
             }
         }
 
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i = 0; i < numberOfAddressesGiven; ) {
             participantsWhitelistedForSurvey[participantWalletAddresses[i]] = true;
             unchecked {
                 ++numberOfWhitelistedParticipants;
@@ -242,11 +242,11 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
     function blacklistMultipleParticipants(
         address[] calldata participantWalletAddresses
     ) external onlyOwner {
-        uint256 length = participantWalletAddresses.length;
+        uint256 numberOfAddressesGiven = participantWalletAddresses.length;
 
-        require(length > 0, "No addresses passed");
+        require(numberOfAddressesGiven > 0, "No addresses passed");
 
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i = 0; i < numberOfAddressesGiven; ) {
             require(
                 participantWalletAddresses[i] != address(0),
                 "One/more zero addresses given"
@@ -262,7 +262,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
             }
         }
 
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i = 0; i < numberOfAddressesGiven; ) {
             participantsWhitelistedForSurvey[participantWalletAddresses[i]] = false;
             unchecked {
                 --numberOfWhitelistedParticipants;
@@ -381,11 +381,11 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
     function getWhitelistedParticipantsFromRegisteredParticipants(
         address[] calldata registeredAddresses
     ) external view returns (address[] memory) {
-        uint256 length = registeredAddresses.length;
+        uint256 numberOfAddressesGiven = registeredAddresses.length;
 
-        require(length != 0, "No addresses passed");
+        require(numberOfAddressesGiven != 0, "No addresses passed");
         uint256 whitelistedCount = 0;
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i = 0; i < numberOfAddressesGiven; ) {
             if (participantsWhitelistedForSurvey[registeredAddresses[i]]) {
                 whitelistedCount++;
             }
@@ -396,7 +396,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
 
         address[] memory whitelistedAddresses = new address[](whitelistedCount);
         uint256 index = 0;
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i = 0; i < numberOfAddressesGiven; ) {
             if (participantsWhitelistedForSurvey[registeredAddresses[i]]) {
                 whitelistedAddresses[index++] = registeredAddresses[i];
             }
