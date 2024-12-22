@@ -102,8 +102,8 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         _;
     }
 
-    modifier onlyIfSenderIsTheWhitelistedParticipant(address messageSender) {
-        require(msg.sender == messageSender, "Only valid sender");
+    modifier onlyIfSenderIsTheWhitelistedParticipant(address participantWalletAddress) {
+        require(msg.sender == participantWalletAddress, "Only valid sender");
         _;
     }
 
