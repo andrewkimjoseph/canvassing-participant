@@ -13,7 +13,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
 
     mapping(address => bool) private participantsWhitelistedForSurvey;
     mapping(address => bool) private participantsWhoHaveClaimedRewards;
-    mapping(address => bool) private usersScreenedForSurvey;
+    mapping(address => bool) private participantsScreenedForSurvey;
 
     uint256 public rewardAmountPerParticipantInWei;
     uint256 public targetNumberOfParticipants;
@@ -74,21 +74,21 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
 
     modifier onlyUnscreenedAddress(address participantWalletAddress) {
         require(
-            usersScreenedForSurvey[participantWalletAddress],
+            participantsScreenedForSurvey[participantWalletAddress],
             "Only unscreened address"
         );
         _;
     }
     modifier mustBeScreened(address participantWalletAddress) {
         require(
-            usersScreenedForSurvey[participantWalletAddress],
+            participantsScreenedForSurvey[participantWalletAddress],
             "Must be screened"
         );
         _;
     }
     modifier mustBeUnscreened(address participantWalletAddress) {
         require(
-            !usersScreenedForSurvey[participantWalletAddress],
+            !participantsScreenedForSurvey[participantWalletAddress],
             "Must be unscreened"
         );
         _;
@@ -167,7 +167,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
     {
         require(participantWalletAddress != address(0), "Zero address passed");
 
-        usersScreenedForSurvey[participantWalletAddress] = true;
+        participantsScreenedForSurvey[participantWalletAddress] = true;
         unchecked {
             ++numberOfScreenedParticipants;
         }
