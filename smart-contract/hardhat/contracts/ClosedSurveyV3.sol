@@ -21,15 +21,13 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
     uint256 public numberOfWhitelistedParticipants;
     uint256 public numberOfScreenedParticipants;
 
-    event OneParticipantWhitelisted(address participantWalletAddress);
-    event MultipleParticipantsWhitelisted(address[] participantWalletAddresses);
+    event ParticipantWhitelisted(address participantWalletAddress);
 
     event ParticipantScreened(address participantWalletAddress);
 
-    event OneWhitelistedParticipantBlacklisted(
+    event WhitelistedParticipantBlacklisted(
         address participantWalletAddress
     );
-    event MultipleWhitelistedParticipantsBlacklisted(address[] walletAddresses);
 
     event ParticipantRewarded(
         address participantWalletAddress,
@@ -163,7 +161,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         emit ParticipantScreened(participantWalletAddress);
     }
 
-    function whitelistOneParticipant(address participantWalletAddress)
+    function whitelistParticipant(address participantWalletAddress)
         external
         onlyOwner
         mustBeBlacklisted(participantWalletAddress)
@@ -174,10 +172,10 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         unchecked {
             ++numberOfWhitelistedParticipants;
         }
-        emit OneParticipantWhitelisted(participantWalletAddress);
+        emit ParticipantWhitelisted(participantWalletAddress);
     }
 
-    function blacklistOneParticipant(address participantWalletAddress)
+    function blacklistWhitelistedParticipant(address participantWalletAddress)
         external
         onlyOwner
         onlyWhitelistedParticipant(participantWalletAddress)
@@ -188,86 +186,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         unchecked {
             --numberOfWhitelistedParticipants;
         }
-        emit OneWhitelistedParticipantBlacklisted(participantWalletAddress);
-    }
-
-    function whitelistMultipleParticipants(
-        address[] calldata participantWalletAddresses
-    ) external onlyOwner {
-        uint256 numberOfAddressesGiven = participantWalletAddresses.length;
-
-        require(numberOfAddressesGiven > 0, "No addresses passed");
-
-        for (uint256 i = 0; i < numberOfAddressesGiven; ) {
-            require(
-                participantWalletAddresses[i] != address(0),
-                "One/more zero addresses given"
-            );
-
-            require(
-                !participantsWhitelistedForSurvey[
-                    participantWalletAddresses[i]
-                ],
-                "One/more given addresses already whitelisted"
-            );
-
-            unchecked {
-                ++i;
-            }
-        }
-
-        for (uint256 i = 0; i < numberOfAddressesGiven; ) {
-            participantsWhitelistedForSurvey[
-                participantWalletAddresses[i]
-            ] = true;
-            unchecked {
-                ++numberOfWhitelistedParticipants;
-            }
-            unchecked {
-                ++i;
-            }
-        }
-
-        emit MultipleParticipantsWhitelisted(participantWalletAddresses);
-    }
-
-    function blacklistMultipleParticipants(
-        address[] calldata participantWalletAddresses
-    ) external onlyOwner {
-        uint256 numberOfAddressesGiven = participantWalletAddresses.length;
-
-        require(numberOfAddressesGiven > 0, "No addresses passed");
-
-        for (uint256 i = 0; i < numberOfAddressesGiven; ) {
-            require(
-                participantWalletAddresses[i] != address(0),
-                "One/more zero addresses given"
-            );
-
-            require(
-                participantsWhitelistedForSurvey[participantWalletAddresses[i]],
-                "One/more given addresses already blacklisted"
-            );
-
-            unchecked {
-                ++i;
-            }
-        }
-
-        for (uint256 i = 0; i < numberOfAddressesGiven; ) {
-            participantsWhitelistedForSurvey[
-                participantWalletAddresses[i]
-            ] = false;
-            unchecked {
-                --numberOfWhitelistedParticipants;
-            }
-            unchecked {
-                ++i;
-            }
-        }
-        emit MultipleWhitelistedParticipantsBlacklisted(
-            participantWalletAddresses
-        );
+        emit WhitelistedParticipantBlacklisted(participantWalletAddress);
     }
 
     function processRewardClaimByParticipant(address walletAddress)
