@@ -102,7 +102,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         _;
     }
 
-    modifier onlyIfSenderIsCorrect(address participantWalletAddress) {
+    modifier onlyIfSenderIsGivenParticipant(address participantWalletAddress) {
         require(msg.sender == participantWalletAddress, "Only valid sender");
         _;
     }
@@ -162,7 +162,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
 
     function screenParticipant(address participantWalletAddress)
         external
-        onlyIfSenderIsCorrect(participantWalletAddress)
+        onlyIfSenderIsGivenParticipant(participantWalletAddress)
         mustBeBlacklisted(participantWalletAddress)
     {
         require(participantWalletAddress != address(0), "Zero address passed");
@@ -280,7 +280,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         nonReentrant
         onlyIfContractHasEnoughcUSD
         onlyWhenAllParticipantHaveNotBeenRewarded
-        onlyIfSenderIsCorrect(walletAddress)
+        onlyIfSenderIsGivenParticipant(walletAddress)
         onlyWhitelistedParticipant(walletAddress)
         onlyUnrewardedParticipant(walletAddress)
     {
