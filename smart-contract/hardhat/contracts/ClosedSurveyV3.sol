@@ -12,7 +12,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
     IERC20Metadata public immutable cUSD;
 
     mapping(address => bool) private participantsWhitelistedForSurvey;
-    mapping(address => bool) private participantsWhoHaveClaimedRewards;
+    mapping(address => bool) private rewardedParticipants;
     mapping(address => bool) private participantsScreenedForSurvey;
 
     uint256 public rewardAmountPerParticipantInWei;
@@ -21,18 +21,12 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
     uint256 public numberOfWhitelistedParticipants;
     uint256 public numberOfScreenedParticipants;
 
-    event OneParticipantWhitelisted(address participantWalletAddress);
-    event MultipleParticipantsWhitelisted(
-        address[] participantWalletAddresses
-    );
+    event ParticipantWhitelisted(address participantWalletAddress);
 
     event ParticipantScreened(address participantWalletAddress);
 
-    event OneWhitelistedParticipantBlacklisted(
+    event WhitelistedParticipantBlacklisted(
         address participantWalletAddress
-    );
-    event MultipleWhitelistedParticipantsBlacklisted(
-        address[] walletAddresses
     );
 
     event ParticipantRewarded(
@@ -51,7 +45,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         uint256 newcUSDRewardAmountPerParticipantInWei
     );
 
-    event TargetNumberOfParticipantsUpdates(
+    event TargetNumberOfParticipantsUpdated(
         uint256 oldTargetNumberOfParticipants,
         uint256 newTargetNumberOfParticipants
     );
@@ -74,7 +68,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
 
     modifier onlyUnscreenedAddress(address participantWalletAddress) {
         require(
-            participantsScreenedForSurvey[participantWalletAddress],
+            !participantsScreenedForSurvey[participantWalletAddress],
             "Only unscreened address"
         );
         _;
@@ -86,23 +80,16 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         );
         _;
     }
-    modifier mustBeUnscreened(address participantWalletAddress) {
-        require(
-            !participantsScreenedForSurvey[participantWalletAddress],
-            "Must be unscreened"
-        );
-        _;
-    }
 
     modifier onlyUnrewardedParticipant(address participantWalletAddress) {
         require(
-            !participantsWhoHaveClaimedRewards[participantWalletAddress],
+            !rewardedParticipants[participantWalletAddress],
             "Participant already rewarded"
         );
         _;
     }
 
-    modifier onlyIfSenderIsWhitelistedParticipant(address participantWalletAddress) {
+    modifier onlyIfSenderIsGivenParticipant(address participantWalletAddress) {
         require(msg.sender == participantWalletAddress, "Only valid sender");
         _;
     }
@@ -162,8 +149,8 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
 
     function screenParticipant(address participantWalletAddress)
         external
-        onlyOwner
-        mustBeBlacklisted(participantWalletAddress)
+        onlyIfSenderIsGivenParticipant(participantWalletAddress)
+        onlyUnscreenedAddress(participantWalletAddress)
     {
         require(participantWalletAddress != address(0), "Zero address passed");
 
@@ -174,7 +161,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         emit ParticipantScreened(participantWalletAddress);
     }
 
-    function whitelistOneParticipant(address participantWalletAddress)
+    function whitelistParticipant(address participantWalletAddress)
         external
         onlyOwner
         mustBeBlacklisted(participantWalletAddress)
@@ -185,10 +172,10 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         unchecked {
             ++numberOfWhitelistedParticipants;
         }
-        emit OneParticipantWhitelisted(participantWalletAddress);
+        emit ParticipantWhitelisted(participantWalletAddress);
     }
 
-    function blacklistOneParticipant(address participantWalletAddress)
+    function blacklistWhitelistedParticipant(address participantWalletAddress)
         external
         onlyOwner
         onlyWhitelistedParticipant(participantWalletAddress)
@@ -199,79 +186,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         unchecked {
             --numberOfWhitelistedParticipants;
         }
-        emit OneWhitelistedParticipantBlacklisted(participantWalletAddress);
-    }
-
-    function whitelistMultipleParticipants(address[] calldata participantWalletAddresses)
-        external
-        onlyOwner
-    {
-        uint256 numberOfAddressesGiven = participantWalletAddresses.length;
-
-        require(numberOfAddressesGiven > 0, "No addresses passed");
-
-        for (uint256 i = 0; i < numberOfAddressesGiven; ) {
-            require(
-                participantWalletAddresses[i] != address(0),
-                "One/more zero addresses given"
-            );
-
-            require(
-                !participantsWhitelistedForSurvey[participantWalletAddresses[i]],
-                "One/more given addresses already whitelisted"
-            );
-
-            unchecked {
-                ++i;
-            }
-        }
-
-        for (uint256 i = 0; i < numberOfAddressesGiven; ) {
-            participantsWhitelistedForSurvey[participantWalletAddresses[i]] = true;
-            unchecked {
-                ++numberOfWhitelistedParticipants;
-            }
-            unchecked {
-                ++i;
-            }
-        }
-
-        emit MultipleParticipantsWhitelisted(participantWalletAddresses);
-    }
-
-    function blacklistMultipleParticipants(
-        address[] calldata participantWalletAddresses
-    ) external onlyOwner {
-        uint256 numberOfAddressesGiven = participantWalletAddresses.length;
-
-        require(numberOfAddressesGiven > 0, "No addresses passed");
-
-        for (uint256 i = 0; i < numberOfAddressesGiven; ) {
-            require(
-                participantWalletAddresses[i] != address(0),
-                "One/more zero addresses given"
-            );
-
-            require(
-                participantsWhitelistedForSurvey[participantWalletAddresses[i]],
-                "One/more given addresses already blacklisted"
-            );
-
-            unchecked {
-                ++i;
-            }
-        }
-
-        for (uint256 i = 0; i < numberOfAddressesGiven; ) {
-            participantsWhitelistedForSurvey[participantWalletAddresses[i]] = false;
-            unchecked {
-                --numberOfWhitelistedParticipants;
-            }
-            unchecked {
-                ++i;
-            }
-        }
-        emit MultipleWhitelistedParticipantsBlacklisted(participantWalletAddresses);
+        emit WhitelistedParticipantBlacklisted(participantWalletAddress);
     }
 
     function processRewardClaimByParticipant(address walletAddress)
@@ -280,9 +195,10 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         nonReentrant
         onlyIfContractHasEnoughcUSD
         onlyWhenAllParticipantHaveNotBeenRewarded
-        onlyIfSenderIsWhitelistedParticipant(walletAddress)
+        onlyIfSenderIsGivenParticipant(walletAddress)
         onlyWhitelistedParticipant(walletAddress)
         onlyUnrewardedParticipant(walletAddress)
+        mustBeScreened(walletAddress)
     {
         bool rewardTransferIsSuccesful = rewardParticipant(walletAddress);
 
@@ -294,7 +210,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
     function markParticipantAsHavingClaimedReward(
         address participantWalletAddress
     ) private {
-        participantsWhoHaveClaimedRewards[participantWalletAddress] = true;
+        rewardedParticipants[participantWalletAddress] = true;
         emit ParticipantMarkedAsRewarded(participantWalletAddress);
     }
 
@@ -327,8 +243,11 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         onlyIfContractHasAnycUSD
     {
         uint256 balance = cUSD.balanceOf(address(this));
-        cUSD.transfer(owner(), balance);
-        emit RewardFundsWithdrawn(owner(), balance);
+        bool transferIsSuccessful = cUSD.transfer(owner(), balance);
+
+        if (transferIsSuccessful) {
+            emit RewardFundsWithdrawn(owner(), balance);
+        }
     }
 
     function updateRewardAmountPerParticipant(
@@ -364,7 +283,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
 
         targetNumberOfParticipants = newTargetNumberOfParticipants;
 
-        emit TargetNumberOfParticipantsUpdates(
+        emit TargetNumberOfParticipantsUpdated(
             oldTargetNumberOfParticipants,
             newTargetNumberOfParticipants
         );
@@ -407,12 +326,10 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         return whitelistedAddresses;
     }
 
-    function checkIfParticipantHasAlreadyClaimedReward(address participantWalletAddress)
-        external
-        view
-        returns (bool)
-    {
-        return participantsWhoHaveClaimedRewards[participantWalletAddress];
+    function checkIfParticipantHasAlreadyClaimedReward(
+        address participantWalletAddress
+    ) external view returns (bool) {
+        return rewardedParticipants[participantWalletAddress];
     }
 
     function checkIfParticipantIsWhitelisted(address participantWalletAddress)
