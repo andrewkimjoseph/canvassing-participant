@@ -22,18 +22,14 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
     uint256 public numberOfScreenedParticipants;
 
     event OneParticipantWhitelisted(address participantWalletAddress);
-    event MultipleParticipantsWhitelisted(
-        address[] participantWalletAddresses
-    );
+    event MultipleParticipantsWhitelisted(address[] participantWalletAddresses);
 
     event ParticipantScreened(address participantWalletAddress);
 
     event OneWhitelistedParticipantBlacklisted(
         address participantWalletAddress
     );
-    event MultipleWhitelistedParticipantsBlacklisted(
-        address[] walletAddresses
-    );
+    event MultipleWhitelistedParticipantsBlacklisted(address[] walletAddresses);
 
     event ParticipantRewarded(
         address participantWalletAddress,
@@ -195,10 +191,9 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         emit OneWhitelistedParticipantBlacklisted(participantWalletAddress);
     }
 
-    function whitelistMultipleParticipants(address[] calldata participantWalletAddresses)
-        external
-        onlyOwner
-    {
+    function whitelistMultipleParticipants(
+        address[] calldata participantWalletAddresses
+    ) external onlyOwner {
         uint256 numberOfAddressesGiven = participantWalletAddresses.length;
 
         require(numberOfAddressesGiven > 0, "No addresses passed");
@@ -210,7 +205,9 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
             );
 
             require(
-                !participantsWhitelistedForSurvey[participantWalletAddresses[i]],
+                !participantsWhitelistedForSurvey[
+                    participantWalletAddresses[i]
+                ],
                 "One/more given addresses already whitelisted"
             );
 
@@ -220,7 +217,9 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         }
 
         for (uint256 i = 0; i < numberOfAddressesGiven; ) {
-            participantsWhitelistedForSurvey[participantWalletAddresses[i]] = true;
+            participantsWhitelistedForSurvey[
+                participantWalletAddresses[i]
+            ] = true;
             unchecked {
                 ++numberOfWhitelistedParticipants;
             }
@@ -256,7 +255,9 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         }
 
         for (uint256 i = 0; i < numberOfAddressesGiven; ) {
-            participantsWhitelistedForSurvey[participantWalletAddresses[i]] = false;
+            participantsWhitelistedForSurvey[
+                participantWalletAddresses[i]
+            ] = false;
             unchecked {
                 --numberOfWhitelistedParticipants;
             }
@@ -264,7 +265,9 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
                 ++i;
             }
         }
-        emit MultipleWhitelistedParticipantsBlacklisted(participantWalletAddresses);
+        emit MultipleWhitelistedParticipantsBlacklisted(
+            participantWalletAddresses
+        );
     }
 
     function processRewardClaimByParticipant(address walletAddress)
@@ -321,8 +324,11 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         onlyIfContractHasAnycUSD
     {
         uint256 balance = cUSD.balanceOf(address(this));
-        cUSD.transfer(owner(), balance);
-        emit RewardFundsWithdrawn(owner(), balance);
+        bool transferIsSuccessful = cUSD.transfer(owner(), balance);
+
+        if (transferIsSuccessful) {
+            emit RewardFundsWithdrawn(owner(), balance);
+        }
     }
 
     function updateRewardAmountPerParticipant(
@@ -401,11 +407,9 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         return whitelistedAddresses;
     }
 
-    function checkIfParticipantHasAlreadyClaimedReward(address participantWalletAddress)
-        external
-        view
-        returns (bool)
-    {
+    function checkIfParticipantHasAlreadyClaimedReward(
+        address participantWalletAddress
+    ) external view returns (bool) {
         return rewardedParticipants[participantWalletAddress];
     }
 
