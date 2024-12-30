@@ -283,6 +283,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         onlyIfSenderIsGivenParticipant(walletAddress)
         onlyWhitelistedParticipant(walletAddress)
         onlyUnrewardedParticipant(walletAddress)
+        mustBeScreened(walletAddress)
     {
         bool rewardTransferIsSuccesful = rewardParticipant(walletAddress);
 
