@@ -12,7 +12,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
     IERC20Metadata public immutable cUSD;
 
     mapping(address => bool) private participantsWhitelistedForSurvey;
-    mapping(address => bool) private participantsWhoHaveClaimedRewards;
+    mapping(address => bool) private rewardedParticipants;
     mapping(address => bool) private participantsScreenedForSurvey;
 
     uint256 public rewardAmountPerParticipantInWei;
@@ -96,13 +96,13 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
 
     modifier onlyUnrewardedParticipant(address participantWalletAddress) {
         require(
-            !participantsWhoHaveClaimedRewards[participantWalletAddress],
+            !rewardedParticipants[participantWalletAddress],
             "Participant already rewarded"
         );
         _;
     }
 
-    modifier onlyIfSenderIsWhitelistedParticipant(address participantWalletAddress) {
+    modifier onlyIfSenderIsCorrect(address participantWalletAddress) {
         require(msg.sender == participantWalletAddress, "Only valid sender");
         _;
     }
@@ -280,7 +280,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         nonReentrant
         onlyIfContractHasEnoughcUSD
         onlyWhenAllParticipantHaveNotBeenRewarded
-        onlyIfSenderIsWhitelistedParticipant(walletAddress)
+        onlyIfSenderIsCorrect(walletAddress)
         onlyWhitelistedParticipant(walletAddress)
         onlyUnrewardedParticipant(walletAddress)
     {
@@ -294,7 +294,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
     function markParticipantAsHavingClaimedReward(
         address participantWalletAddress
     ) private {
-        participantsWhoHaveClaimedRewards[participantWalletAddress] = true;
+        rewardedParticipants[participantWalletAddress] = true;
         emit ParticipantMarkedAsRewarded(participantWalletAddress);
     }
 
@@ -412,7 +412,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         view
         returns (bool)
     {
-        return participantsWhoHaveClaimedRewards[participantWalletAddress];
+        return rewardedParticipants[participantWalletAddress];
     }
 
     function checkIfParticipantIsWhitelisted(address participantWalletAddress)
