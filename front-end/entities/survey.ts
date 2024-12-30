@@ -13,5 +13,7 @@ export interface Survey {
     rewardAmountIncUSD: number | null;
     contractAddress: Address | null;
     isAvailable: boolean | null;
-    timeCreated: admin.firestore.Timestamp | null
+    timeCreated: admin.firestore.Timestamp | null;
+    targetCountry: string | null;
+    targetGender: string | null;
   }
