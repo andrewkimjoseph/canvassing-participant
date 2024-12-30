@@ -5,6 +5,7 @@ import { db } from '@/firebase';
 import { Reward } from '@/entities/reward';
 import { Address } from 'viem';
 import { checkIfUserAddressIsWhitelisted } from '@/services/web3/checkIfUserAddressIsWhitelisted';
+import useParticipantStore from './useParticipantStore';
 
 interface SurveyStoreState {
   surveys: Survey[];
@@ -18,6 +19,9 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
 
   fetchSurveys: async (walletAddress) => {
     set({ loading: true });
+
+    const { participant } = useParticipantStore.getState();
+
     try {
       // Fetch the rewards for the user's wallet
       const rewardQuery = query(
@@ -47,8 +51,8 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
       // Filter surveys to check whitelist status using their contractAddress
       const filteredSurveys = [];
       for (const survey of surveys) {
-        // if (!survey.isAvailable) continue; // Skip if the survey is marked as unavailable
         if (!survey.contractAddress) continue; // Skip if no contract address in survey
+
         const userIsWhitelisted = await checkIfUserAddressIsWhitelisted(
           walletAddress,
           {
@@ -56,7 +60,16 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
             _contractAddress: survey.contractAddress as Address,
           }
         );
-        if (userIsWhitelisted) {
+
+        const countryIsValid =
+          survey.targetCountry === 'A' ||
+          survey.targetCountry === participant?.country;
+
+        const genderIsValid =
+          survey.targetGender === 'A' ||
+          survey.targetGender === participant?.gender;
+
+        if (userIsWhitelisted && countryIsValid && genderIsValid) {
           filteredSurveys.push(survey);
         }
       }
