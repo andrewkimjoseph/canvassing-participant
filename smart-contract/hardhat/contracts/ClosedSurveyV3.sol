@@ -162,7 +162,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
 
     function screenParticipant(address participantWalletAddress)
         external
-        onlyOwner
+        onlyIfSenderIsCorrect(participantWalletAddress)
         mustBeBlacklisted(participantWalletAddress)
     {
         require(participantWalletAddress != address(0), "Zero address passed");
