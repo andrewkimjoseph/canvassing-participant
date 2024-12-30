@@ -74,7 +74,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
 
     modifier onlyUnscreenedAddress(address participantWalletAddress) {
         require(
-            participantsScreenedForSurvey[participantWalletAddress],
+            !participantsScreenedForSurvey[participantWalletAddress],
             "Only unscreened address"
         );
         _;
@@ -83,13 +83,6 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         require(
             participantsScreenedForSurvey[participantWalletAddress],
             "Must be screened"
-        );
-        _;
-    }
-    modifier mustBeUnscreened(address participantWalletAddress) {
-        require(
-            !participantsScreenedForSurvey[participantWalletAddress],
-            "Must be unscreened"
         );
         _;
     }
@@ -163,7 +156,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
     function screenParticipant(address participantWalletAddress)
         external
         onlyIfSenderIsGivenParticipant(participantWalletAddress)
-        mustBeUnscreened(participantWalletAddress)
+        onlyUnscreenedAddress(participantWalletAddress)
     {
         require(participantWalletAddress != address(0), "Zero address passed");
 
