@@ -51,7 +51,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         uint256 newcUSDRewardAmountPerParticipantInWei
     );
 
-    event TargetNumberOfParticipantsUpdates(
+    event TargetNumberOfParticipantsUpdated(
         uint256 oldTargetNumberOfParticipants,
         uint256 newTargetNumberOfParticipants
     );
@@ -364,7 +364,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
 
         targetNumberOfParticipants = newTargetNumberOfParticipants;
 
-        emit TargetNumberOfParticipantsUpdates(
+        emit TargetNumberOfParticipantsUpdated(
             oldTargetNumberOfParticipants,
             newTargetNumberOfParticipants
         );
