@@ -8,5 +8,6 @@ export interface Participant {
     username: string;
     walletAddress: string;
     timeCreated: admin.firestore.Timestamp;
+    timeUpdated: admin.firestore.Timestamp;
   }
   
