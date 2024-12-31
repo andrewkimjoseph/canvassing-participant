@@ -65,6 +65,7 @@ export default function SignUpPage() {
         walletAddress: address,
         username: `user_${address.slice(2, 7)}`,
         timeCreated: Timestamp.now(),
+        timeUpdated: Timestamp.now()
       });
 
       toaster.create({
