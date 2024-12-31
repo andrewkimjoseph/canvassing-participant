@@ -49,7 +49,7 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
       }));
 
       // Filter surveys to check whitelist status using their contractAddress
-      const filteredSurveys = [];
+      const filteredSurveys: Survey[] = [];
       for (const survey of surveys) {
         if (!survey.contractAddress) continue; // Skip if no contract address in survey
 
