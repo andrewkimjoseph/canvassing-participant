@@ -14,7 +14,7 @@ import { TermsIconC } from '@/components/icons/more-options-icons/terms-icon';
 import { PrivacyIconC } from '@/components/icons/more-options-icons/privacy-icon';
 import { FAQsIconC } from '@/components/icons/more-options-icons/faqs-icons';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
-import { ProfileIconC } from '@/components/icons/profile-icon';
+import { ProfileIconC } from '@/components/icons/more-options-icons/profile-icon';
 
 
 export default function More() {
