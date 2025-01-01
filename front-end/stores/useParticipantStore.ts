@@ -7,7 +7,7 @@ import {
   where, 
   addDoc, 
   doc, 
-  updateDoc, 
+  updateDoc,
   Timestamp
 } from 'firebase/firestore';
 import { Participant } from '@/entities/participant';
@@ -18,6 +18,7 @@ interface ParticipantStoreState {
   loading: boolean;
   getParticipant: (walletAddress: string) => Promise<Participant | null>;
   setParticipant: (participantData: Omit<Participant, 'id'>) => Promise<void>;
+  updateParticipantUsername: (username: string) => Promise<void>;
 }
 
 const useParticipantStore = create<ParticipantStoreState>()(
@@ -81,10 +82,43 @@ const useParticipantStore = create<ParticipantStoreState>()(
           throw error;
         }
       },
+
+      updateParticipantUsername: async (username: string) => {
+        set({ loading: true });
+        try {
+          const currentParticipant = get().participant;
+          
+          if (!currentParticipant?.id) {
+            throw new Error('No participant loaded in store');
+          }
+
+          const participantRef = doc(db, 'participants', currentParticipant.id);
+
+          const data = {
+            username: username,
+            timeUpdated: Timestamp.now(),
+          }
+          await updateDoc(participantRef, data);
+
+          const updatedParticipant: Participant = {
+            ...currentParticipant,
+            ...data,
+          };
+
+          set({ 
+            participant: updatedParticipant,
+            loading: false 
+          });
+        } catch (error) {
+          console.error('Error updating participant:', error);
+          set({ loading: false });
+          throw error;
+        }
+      },
     }),
     {
-      name: 'participant-storage', // Unique name for localStorage
-      partialize: (state) => ({ participant: state.participant }), // Only persist participant data
+      name: 'participant-storage',
+      partialize: (state) => ({ participant: state.participant }),
     }
   )
 );
