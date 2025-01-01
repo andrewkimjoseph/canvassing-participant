@@ -14,6 +14,7 @@ import { TermsIconC } from '@/components/icons/more-options-icons/terms-icon';
 import { PrivacyIconC } from '@/components/icons/more-options-icons/privacy-icon';
 import { FAQsIconC } from '@/components/icons/more-options-icons/faqs-icons';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
+import { ProfileIconC } from '@/components/icons/more-options-icons/profile-icon';
 
 
 export default function More() {
@@ -77,6 +78,13 @@ export default function More() {
 }
 
 const getMoreOptions = (walletAddress?: string) => [
+  {
+    SVGIcon: ProfileIconC,
+    primaryText: 'View Profile',
+    secondaryText: 'Manage your account details',
+    link: `/more/profile`,
+    eventName: 'Profile clicked',
+  },
   {
     SVGIcon: SupportIconC,
     primaryText: 'Support',
