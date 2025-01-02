@@ -17,4 +17,5 @@ export interface Survey {
     targetCountry: string | null;
     targetGender: string | null;
     isAlreadyBookedByUser: boolean | null;
+    isTest: boolean | null;
   }
