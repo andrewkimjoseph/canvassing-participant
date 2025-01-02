@@ -4,8 +4,9 @@ import { Survey } from '@/entities/survey';
 import { db } from '@/firebase';
 import { Reward } from '@/entities/reward';
 import { Address } from 'viem';
-import { checkIfUserAddressIsWhitelisted } from '@/services/web3/checkIfUserAddressIsWhitelisted';
 import useParticipantStore from './useParticipantStore';
+import { checkIfSurveyIsFullyBooked } from '@/services/web3/checkIfSurveyIsFullyBooked';
+import { checkIfParticipantIsScreenedForSurvey } from '@/services/checkIfParticipantHasBeenBookedForSurvey';
 
 interface SurveyStoreState {
   surveys: Survey[];
@@ -48,35 +49,48 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
         ...(doc.data() as Survey),
       }));
 
-      // Filter surveys to check whitelist status using their contractAddress
       const filteredSurveys: Survey[] = [];
-      for (const survey of surveys) {
-        if (!survey.contractAddress) continue; // Skip if no contract address in survey
+      for (let survey of surveys) {
+        // Check if the survey is fully booked
+        const surveyIsFullyBooked = await checkIfSurveyIsFullyBooked({
+          _surveyContractAddress: survey.contractAddress as Address,
+        });
 
-        const userIsWhitelisted = await checkIfUserAddressIsWhitelisted(
-          walletAddress,
-          {
-            _walletAddress: walletAddress,
-            _contractAddress: survey.contractAddress as Address,
-          }
-        );
 
+
+        // Check if the participant's country matches the survey's target country
         const countryIsValid =
           survey.targetCountry === 'A' ||
           survey.targetCountry === participant?.country;
 
+        // Check if the participant's gender matches the survey's target gender
         const genderIsValid =
           survey.targetGender === 'A' ||
           survey.targetGender === participant?.gender;
 
-        if (userIsWhitelisted && countryIsValid && genderIsValid) {
-          filteredSurveys.push(survey);
+        // Apply all filters
+        if (!survey.isAvailable) continue;
+        if (!survey.contractAddress) continue;
+        if (surveyIsFullyBooked) continue;
+        if (!countryIsValid) continue;
+        if (!genderIsValid) continue;
+
+        const surveyIsAlreadyBookedByUser = await checkIfParticipantIsScreenedForSurvey({
+          _participantId: participant?.id as string,
+          _participantWalletAddress: participant?.walletAddress as string,
+          _surveyContractAddress: survey.contractAddress as string,
+          _surveyId: survey.id,
+        });
+
+        if (surveyIsAlreadyBookedByUser) {
+          survey.isAlreadyBookedByUser = true;
         }
+
+        filteredSurveys.push(survey);
       }
 
       set({ surveys: filteredSurveys, loading: false });
     } catch (error) {
-      console.error('Error fetching surveys:', error);
       set({ loading: false });
     }
   },
