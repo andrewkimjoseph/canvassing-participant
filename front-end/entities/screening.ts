@@ -6,6 +6,7 @@ export interface Screening {
     participantWalletAddress: string | null;
     participantId: string | null;
     surveyId: string | null;
+    transactionHash: string | null;
     timeCreated: admin.firestore.Timestamp;
   }
   
