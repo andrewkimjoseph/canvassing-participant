@@ -75,12 +75,13 @@ const CustomHeader = () => {
           </DrawerTrigger>
 
           <Link
-            href="/"
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
               trackAmplitudeEvent('Canvassing Logo clicked', {
                 participantWalletAddress: participant?.walletAddress,
                 participantId: participant?.id,
               });
+              window.location.replace('/');
             }}
           >
             <LogoC />
