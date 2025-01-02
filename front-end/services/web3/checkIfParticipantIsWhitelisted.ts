@@ -1,9 +1,9 @@
-import { canvassingSurveyContractABI } from "@/utils/abis/canvassingSurveyContractABI";
+import { closedSurveyV3ContractABI } from "@/utils/abis/closedSurveyV3ContractABI";
 import { Address, createPublicClient, custom } from "viem";
 // import { celoAlfajores } from "viem/chains";
 import { celo } from "viem/chains";
 
-export const checkIfUserAddressIsWhitelisted = async (
+export const checkIfParticipantIsWhitelisted = async (
   _signerAddress: `0x${string}` | undefined,
   {
     _walletAddress,
@@ -20,13 +20,12 @@ export const checkIfUserAddressIsWhitelisted = async (
         const userIsWhitelisted =
           await publicClient.readContract({
             address: _contractAddress,
-            abi: canvassingSurveyContractABI,
-            functionName: "checkIfUserAddressIsWhitelisted",
+            abi: closedSurveyV3ContractABI,
+            functionName: "checkIfParticipantIsWhitelisted",
             args: [_walletAddress],
           });
         return userIsWhitelisted as boolean;
       } catch (err) {
-        console.error(err);
         return false;
       }
     } catch (error) {
