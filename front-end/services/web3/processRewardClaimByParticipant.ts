@@ -1,4 +1,4 @@
-import { canvassingSurveyContractABI } from '@/utils/abis/canvassingSurveyContractABI';
+import { closedSurveyV3ContractABI } from '@/utils/abis/closedSurveyV3ContractABI';
 import { Address, createPublicClient, createWalletClient, custom } from 'viem';
 // import { celoAlfajores } from 'viem/chains';
 import { celo } from 'viem/chains';
@@ -41,7 +41,7 @@ export const processRewardClaimByParticipant = async (
       await publicClient.simulateContract({
         account: address,
         address: smartContractAddress,
-        abi: canvassingSurveyContractABI,
+        abi: closedSurveyV3ContractABI,
         functionName: 'processRewardClaimByParticipant',
         args: [participantWalletAddress],
       });
@@ -59,7 +59,6 @@ export const processRewardClaimByParticipant = async (
       transactionHash: processRewardClaimByParticipantTxnHash,
     };
   } catch (err) {
-    console.error(err);
     return { success: false, transactionHash: null };
   }
 };
