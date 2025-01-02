@@ -27,11 +27,9 @@ const useSingleResearcherStore = create<SingleResearcherStoreState>((set) => ({
         
         set({ researcher: researcherData, loading: false });
       } else {
-        console.error('Researcher not found');
         set({ researcher: null, loading: false });
       }
     } catch (error) {
-      console.error('Error fetching researcher:', error);
       set({ researcher: null, loading: false });
     }
   },
