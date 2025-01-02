@@ -12,10 +12,11 @@ import {
   where,
 } from 'firebase/firestore';
 
-export const screenParticipant = async ({
+export const screenParticipantInDB = async ({
   _participant,
   _survey,
-}: ScreenParticipantProps): Promise<boolean> => {
+  _transactionHash
+}: ScreenParticipantInDBProps): Promise<boolean> => {
   let success: boolean = false;
 
   try {
@@ -27,6 +28,7 @@ export const screenParticipant = async ({
       participantId: _participant.id,
       surveyId: _survey.id,
       timeCreated: Timestamp.now(),
+      transactionHash: _transactionHash,
     };
     await addDoc(screeningRef, {
       ...screening,
@@ -40,7 +42,8 @@ export const screenParticipant = async ({
   }
 };
 
-export type ScreenParticipantProps = {
+export type ScreenParticipantInDBProps = {
   _participant: Participant;
   _survey: Survey;
+  _transactionHash: string;
 };
