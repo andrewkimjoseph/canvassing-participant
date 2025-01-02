@@ -30,7 +30,6 @@ const useRewardStore = create<RewardStoreState>()(
           })) as Reward[];
           set({ rewards: data, loading: false });
         } catch (error) {
-          console.error('Error fetching rewards:', error);
           set({ loading: false });
         }
       },
