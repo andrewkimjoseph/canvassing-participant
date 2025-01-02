@@ -303,6 +303,14 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         return rewardedParticipants[participantWalletAddress];
     }
 
+    function checkIfParticipantIsScreened(address participantWalletAddress)
+        external
+        view
+        returns (bool)
+    {
+        return participantsScreenedForSurvey[participantWalletAddress];
+    }
+
     function checkIfParticipantIsWhitelisted(address participantWalletAddress)
         external
         view

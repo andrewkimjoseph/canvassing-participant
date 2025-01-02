@@ -313,6 +313,25 @@
 						"type": "address"
 					}
 				],
+				"name": "checkIfParticipantIsScreened",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "participantWalletAddress",
+						"type": "address"
+					}
+				],
 				"name": "checkIfParticipantIsWhitelisted",
 				"outputs": [
 					{
@@ -685,11 +704,11 @@
 			]
 		},
 		"smart-contract/hardhat/contracts/ClosedSurveyV3.sol": {
-			"keccak256": "0x1f28e166363e80c2b494d71cad49c19f1de630c655962d452cdaa70d4eeb191a",
+			"keccak256": "0x194f280b09a95ce512dffeb3bfa20ecb99792d7fc9cd5b5d7899020cd0dc9d27",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://c6cade2b2fdd08cd9d45c1cc2f9da5ca189de6d59cba173ececce2048e63b7c2",
-				"dweb:/ipfs/QmXHbgargPrrKKXKcisjurhcWUb93cheEwqeNS2AyYig7j"
+				"bzz-raw://68cdcbf9f624035b5df6041eb15766f01436802cc8b41fe1067496b0b3d3254c",
+				"dweb:/ipfs/QmZoKo8qtr1mFBBt3GprwR6QbwiWHs5jK5bpqhAGnDMMa9"
 			]
 		}
 	},
