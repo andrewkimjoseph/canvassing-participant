@@ -146,7 +146,6 @@ export default function SuccessPage() {
         });
       }
     } catch (error) {
-      console.error('Error processing reward claim:', error);
       toaster.create({
         description:
           'An unexpected error occurred. Kindly reach out to support via the "More" tab.',

@@ -18,7 +18,6 @@ export const NigeriaKenyaProvider: React.FC<{
         const allowedCountries = ['NG', 'KE'];
         setIsAllowedCountry(allowedCountries.includes(data.country_code));
       } catch (error) {
-        console.error('Error detecting country:', error);
         setIsAllowedCountry(false);
       }
     };
