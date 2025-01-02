@@ -1,6 +1,6 @@
 import { FC, ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
-import { Box } from '@chakra-ui/react';
+import { Flex, Box } from '@chakra-ui/react';
 import CustomHeader from './custom-header';
 
 interface Props {
@@ -13,10 +13,10 @@ const CustomLayout: FC<Props> = ({ children }) => {
   const showHeader = !noHeaderRoutes.includes(pathname);
 
   return (
-    <div className="bg-white flex flex-col">
+    <Flex bgColor={"#ECECEC"} flexDirection={"column"}>
       {showHeader && <CustomHeader />}
       <Box w="100vw">{children}</Box>
-    </div>
+    </Flex>
   );
 };
 
