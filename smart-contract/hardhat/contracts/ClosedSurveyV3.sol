@@ -196,9 +196,9 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         onlyIfContractHasEnoughcUSD
         onlyWhenAllParticipantHaveNotBeenRewarded
         onlyIfSenderIsGivenParticipant(walletAddress)
+        mustBeScreened(walletAddress)
         onlyWhitelistedParticipant(walletAddress)
         onlyUnrewardedParticipant(walletAddress)
-        mustBeScreened(walletAddress)
     {
         bool rewardTransferIsSuccesful = rewardParticipant(walletAddress);
 
@@ -332,6 +332,14 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         return rewardedParticipants[participantWalletAddress];
     }
 
+    function checkIfParticipantIsScreened(address participantWalletAddress)
+        external
+        view
+        returns (bool)
+    {
+        return participantsScreenedForSurvey[participantWalletAddress];
+    }    
+
     function checkIfParticipantIsWhitelisted(address participantWalletAddress)
         external
         view
@@ -362,6 +370,14 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
 
     function getTargetNumberOfParticipants() external view returns (uint256) {
         return targetNumberOfParticipants;
+    }
+
+    function getNumberOfScreenedParticipants()
+        external
+        view
+        returns (uint256)
+    {
+        return numberOfScreenedParticipants;
     }
 
     function getNumberOfWhitelistedParticipants()
