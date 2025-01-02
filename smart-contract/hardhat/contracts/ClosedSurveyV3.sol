@@ -25,9 +25,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
 
     event ParticipantScreened(address participantWalletAddress);
 
-    event WhitelistedParticipantBlacklisted(
-        address participantWalletAddress
-    );
+    event WhitelistedParticipantBlacklisted(address participantWalletAddress);
 
     event ParticipantRewarded(
         address participantWalletAddress,
@@ -341,6 +339,10 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
 
     function getTargetNumberOfParticipants() external view returns (uint256) {
         return targetNumberOfParticipants;
+    }
+
+    function getNumberOfScreenedParticipants() external view returns (uint256) {
+        return numberOfScreenedParticipants;
     }
 
     function getNumberOfWhitelistedParticipants()

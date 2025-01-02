@@ -358,6 +358,19 @@
 			},
 			{
 				"inputs": [],
+				"name": "getNumberOfScreenedParticipants",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
 				"name": "getNumberOfWhitelistedParticipants",
 				"outputs": [
 					{
@@ -704,11 +717,11 @@
 			]
 		},
 		"smart-contract/hardhat/contracts/ClosedSurveyV3.sol": {
-			"keccak256": "0x194f280b09a95ce512dffeb3bfa20ecb99792d7fc9cd5b5d7899020cd0dc9d27",
+			"keccak256": "0x0024b3e2d0fe904804c444bd90e2803509e1184bc48aa43df303a712801dbb03",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://68cdcbf9f624035b5df6041eb15766f01436802cc8b41fe1067496b0b3d3254c",
-				"dweb:/ipfs/QmZoKo8qtr1mFBBt3GprwR6QbwiWHs5jK5bpqhAGnDMMa9"
+				"bzz-raw://cd2c0cf7723b4f7058621d4f1306e2e4a1d1b24fcd570341146efce418a30294",
+				"dweb:/ipfs/QmZ8VJEb8qemNxLoHu2YymtY2aeY9MaUEhEus81Df3Ph6z"
 			]
 		}
 	},
