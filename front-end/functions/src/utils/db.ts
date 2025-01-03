@@ -28,3 +28,17 @@ export const createRewardDocument = async (
   });
   return rewardDoc.id;
 };
+
+
+export const updateRewardWhitelistingTransactionHash = async (
+  rewardId: string,
+  whitelistingTransactionHash: string
+) => {
+  const rewardDoc = firestore.collection('rewards').doc(rewardId);
+  await rewardDoc.update({
+    whitelistingTransactionHash: whitelistingTransactionHash,
+    timeUpdated: admin.firestore.FieldValue.serverTimestamp(),
+  });
+
+  console.log('Reward doc updated', rewardId);
+};
