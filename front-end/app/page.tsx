@@ -104,6 +104,18 @@ export default function Home() {
     }
   }, [surveys]);
 
+  const startSurveyFn = async (survey: Survey) => {
+    setIsBeingBooked((prevStatus) => ({
+      ...prevStatus,
+      [survey.id]: true,
+    }));
+    router.push(`/survey/${survey.id}`);
+    setIsBeingBooked((prevStatus) => ({
+      ...prevStatus,
+      [survey.id]: false,
+    }));
+  }
+
   const bookSurveyFn = async (survey: Survey) => {
     setIsBeingBooked((prevStatus) => ({
       ...prevStatus,
@@ -299,7 +311,7 @@ export default function Home() {
           surveys.map((survey) => (
             <Box
               key={survey.id}
-              bgColor={isBeingBooked[survey.id] ? '#CDFFD8' : 'white'}
+              bgColor={isBeingBooked[survey.id] || survey.isAlreadyBookedByUser ? '#CDFFD8' : 'white'}
               h="25"
               w="full"
               borderRadius={10}
@@ -315,7 +327,7 @@ export default function Home() {
                 });
 
                 if (survey.isAlreadyBookedByUser) {
-                  router.push(`/survey/${survey.id}`);
+                  startSurveyFn(survey);
                 } else {
                   bookSurveyFn(survey);
                 }
@@ -359,7 +371,7 @@ export default function Home() {
                 </Flex>
 
                 <Button
-                  bgColor={'#363062'}
+                  bgColor={survey.isAlreadyBookedByUser ? "green": "#363062"}
                   borderRadius={20}
                   w={'1/6'}
                   mr={2}
