@@ -40,5 +40,5 @@ export const updateRewardWhitelistingTransactionHash = async (
     timeUpdated: admin.firestore.FieldValue.serverTimestamp(),
   });
 
-  console.log('Reward doc updated', rewardId);
+  console.log('Reward doc updated:', rewardId);
 };
