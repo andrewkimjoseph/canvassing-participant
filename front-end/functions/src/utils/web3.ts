@@ -54,7 +54,7 @@ export const whitelistParticipant = async (
       whitelistParticipantRqst
     );
 
-    console.log('Transaction successful, at hash:', whitelistParticipantRqstTxnHash);
+    console.log('Whitelisting successful, at hash:', whitelistParticipantRqstTxnHash);
 
     return { success: true, txnHash: whitelistParticipantRqstTxnHash };
   } catch (err) {
