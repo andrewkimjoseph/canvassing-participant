@@ -48,28 +48,28 @@ export default function SuccessPage() {
   const submissionId = searchParams.get('submissionId');
   const respondentId = searchParams.get('respondentId');
 
-  useEffect(() => {
-    if (!surveyId || !participant?.id) return;
+  // useEffect(() => {
+  //   if (!surveyId || !participant?.id) return;
 
-    const rewardsCollection = collection(db, 'rewards');
-    const rewardsQuery = query(
-      rewardsCollection,
-      where('participantId', '==', participant.id),
-      where('surveyId', '==', surveyId)
-    );
+  //   const rewardsCollection = collection(db, 'rewards');
+  //   const rewardsQuery = query(
+  //     rewardsCollection,
+  //     where('participantId', '==', participant.id),
+  //     where('surveyId', '==', surveyId)
+  //   );
 
-    const unsubscribe = onSnapshot(rewardsQuery, (querySnapshot) => {
-      if (!querySnapshot.empty) {
-        const rewardDoc = querySnapshot.docs[0];
-        const reward = rewardDoc.data() as Reward;
-        if (reward.whitelistingTransactionHash) {
-          setIsAbleToClaim(false);
-        }
-      }
-    });
+  //   const unsubscribe = onSnapshot(rewardsQuery, (querySnapshot) => {
+  //     if (!querySnapshot.empty) {
+  //       const rewardDoc = querySnapshot.docs[0];
+  //       const reward = rewardDoc.data() as Reward;
+  //       if (reward.whitelistingTransactionHash) {
+  //         setIsAbleToClaim(false);
+  //       }
+  //     }
+  //   });
 
-    return () => unsubscribe();
-  }, [surveyId, participant?.id]);
+  //   return () => unsubscribe();
+  // }, [surveyId, participant?.id]);
 
   const processRewardClaimByParticipantFn = async () => {
     setIsProcessingRewardClaim(true);
@@ -280,7 +280,7 @@ export default function SuccessPage() {
           processRewardClaimByParticipantFn();
         }}
         loading={isProcessingRewardClaim}
-        disabled={!isAbleToClaim}
+        // disabled={!isAbleToClaim}
         loadingText={<SpinnerIconC />}
       >
         <Text fontSize="16" fontWeight="bold" color="white">
