@@ -1,7 +1,7 @@
 
 import * as admin from 'firebase-admin';
 import { Survey, WebhookData } from '../../types/types';
-import { createRewardDocument } from '../db';
+import { createRewardDocument, updateRewardWhitelistingTransactionHash } from '../db';
 import { whitelistParticipant } from '../web3';
 import { Address } from 'viem';
 
@@ -66,6 +66,8 @@ export const processWebhook = async (
   if (!whitelistTxn.success) {
     throw new Error('[FATAL] Whitelisting failed.');
   }
+
+  await updateRewardWhitelistingTransactionHash(rewardId, whitelistTxn.txnHash as string);
 
   return whitelistTxn;
 };
