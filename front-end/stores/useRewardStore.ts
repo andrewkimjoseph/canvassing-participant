@@ -28,6 +28,7 @@ const useRewardStore = create<RewardStoreState>()(
             id: doc.id,
             ...doc.data(),
           })) as Reward[];
+          data.sort((a, b) => (b.timeCreated?.seconds ?? 0) - (a.timeCreated?.seconds ?? 0)); // Sort rewards from latest to earliest
           set({ rewards: data, loading: false });
         } catch (error) {
           set({ loading: false });
