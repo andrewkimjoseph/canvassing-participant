@@ -20,11 +20,13 @@ import {
   getDocs,
   updateDoc,
   Timestamp,
+  onSnapshot,
 } from 'firebase/firestore';
 import { db } from '@/firebase';
 import useParticipantStore from '@/stores/useParticipantStore';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 import { SpinnerIconC } from '@/components/icons/spinner-icon';
+import { Reward } from '@/entities/reward';
 
 export default function SuccessPage() {
   const [userAddress, setUserAddress] = useState('');
@@ -34,6 +36,9 @@ export default function SuccessPage() {
   const router = useRouter();
   const { survey, fetchSurvey } = useSingleSurveyStore();
   const [isProcessingRewardClaim, setIsProcessingRewardClaim] = useState(false);
+
+  const [isAbleToClaim, setIsAbleToClaim] = useState(false);
+
   const { participant } = useParticipantStore.getState();
   const params = useParams();
   const searchParams = useSearchParams();
@@ -42,6 +47,29 @@ export default function SuccessPage() {
   const surveyId = params.surveyId;
   const submissionId = searchParams.get('submissionId');
   const respondentId = searchParams.get('respondentId');
+
+  useEffect(() => {
+    if (!surveyId || !participant?.id) return;
+
+    const rewardsCollection = collection(db, 'rewards');
+    const rewardsQuery = query(
+      rewardsCollection,
+      where('participantId', '==', participant.id),
+      where('surveyId', '==', surveyId)
+    );
+
+    const unsubscribe = onSnapshot(rewardsQuery, (querySnapshot) => {
+      if (!querySnapshot.empty) {
+        const rewardDoc = querySnapshot.docs[0];
+        const reward = rewardDoc.data() as Reward;
+        if (reward.whitelistingTransactionHash) {
+          setIsAbleToClaim(false);
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, [surveyId, participant?.id]);
 
   const processRewardClaimByParticipantFn = async () => {
     setIsProcessingRewardClaim(true);
@@ -70,7 +98,7 @@ export default function SuccessPage() {
 
     const contractBalance = await getContractBalance(address, {
       _contractAddress: survey.contractAddress as Address,
-      _chainId: chainId
+      _chainId: chainId,
     });
 
     if (contractBalance < survey.rewardAmountIncUSD) {
@@ -88,7 +116,7 @@ export default function SuccessPage() {
       const claimIsProcessed = await processRewardClaimByParticipant(address, {
         _participantWalletAddress: address as Address,
         _smartContractAddress: survey.contractAddress as Address,
-        _chainId: chainId
+        _chainId: chainId,
       });
 
       if (claimIsProcessed.success) {
@@ -252,6 +280,7 @@ export default function SuccessPage() {
           processRewardClaimByParticipantFn();
         }}
         loading={isProcessingRewardClaim}
+        disabled={!isAbleToClaim}
         loadingText={<SpinnerIconC />}
       >
         <Text fontSize="16" fontWeight="bold" color="white">
