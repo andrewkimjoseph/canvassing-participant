@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Box, Text, Flex, Link } from '@chakra-ui/react';
@@ -27,6 +27,7 @@ export default function Home() {
   }>({});
 
   const { address, isConnected } = useAccount();
+  const chainId = useChainId()
   const {
     participant,
     loading: participantLoading,
@@ -53,7 +54,7 @@ export default function Home() {
     if (isConnected && address) {
       await getParticipant(address);
 
-      await fetchSurveys(address);
+      await fetchSurveys(address, chainId);
 
       if (surveys && participant) {
         const identifyEvent = new Identify();
@@ -111,6 +112,7 @@ export default function Home() {
 
     const surveyIsFullyBooked = await checkIfSurveyIsFullyBooked({
       _surveyContractAddress: survey.contractAddress as Address,
+      _chainId: chainId
     });
 
     if (surveyIsFullyBooked) {
@@ -138,6 +140,7 @@ export default function Home() {
       const screenParticipantRslt = await screenParticipantInBC({
         _smartContractAddress: survey.contractAddress as Address,
         _participantWalletAddress: participant?.walletAddress as Address,
+        _chainId: chainId
       });
 
       if (screenParticipantRslt.success) {

@@ -1,7 +1,6 @@
 import { closedSurveyV3ContractABI } from '@/utils/abis/closedSurveyV3ContractABI';
 import { Address, createPublicClient, createWalletClient, custom } from 'viem';
-// import { celoAlfajores } from 'viem/chains';
-import { celo } from 'viem/chains';
+import { celoAlfajores, celo } from 'viem/chains';
 
 export type ProcessRewardClaimResult = {
   success: boolean;
@@ -11,6 +10,7 @@ export type ProcessRewardClaimResult = {
 export type ProcessRewardClaimByParticipantProps = {
   _smartContractAddress: Address;
   _participantWalletAddress: Address;
+  _chainId: number;
 };
 
 export const processRewardClaimByParticipant = async (
@@ -18,6 +18,7 @@ export const processRewardClaimByParticipant = async (
   {
     _smartContractAddress: smartContractAddress,
     _participantWalletAddress: participantWalletAddress,
+    _chainId
   }: ProcessRewardClaimByParticipantProps
 ): Promise<ProcessRewardClaimResult> => {
   if (!window.ethereum) {
@@ -25,12 +26,12 @@ export const processRewardClaimByParticipant = async (
   }
 
   const privateClient = createWalletClient({
-    chain: celo,
+    chain: _chainId === celo.id ? celo : celoAlfajores,
     transport: custom(window.ethereum),
   });
 
   const publicClient = createPublicClient({
-    chain: celo,
+    chain: _chainId === celo.id ? celo : celoAlfajores,
     transport: custom(window.ethereum),
   });
 

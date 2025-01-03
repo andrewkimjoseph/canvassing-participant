@@ -11,14 +11,14 @@ import { checkIfParticipantIsScreenedForSurvey } from '@/services/checkIfPartici
 interface SurveyStoreState {
   surveys: Survey[];
   loading: boolean;
-  fetchSurveys: (walletAddress: Address) => Promise<void>;
+  fetchSurveys: (walletAddress: Address, chainId: number) => Promise<void>;
 }
 
 const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
   surveys: [],
   loading: false,
 
-  fetchSurveys: async (walletAddress) => {
+  fetchSurveys: async (walletAddress, chainId) => {
     set({ loading: true });
 
     const { participant } = useParticipantStore.getState();
@@ -54,6 +54,7 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
         // Check if the survey is fully booked
         const surveyIsFullyBooked = await checkIfSurveyIsFullyBooked({
           _surveyContractAddress: survey.contractAddress as Address,
+          _chainId: chainId
         });
 
 
@@ -81,6 +82,7 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
           _participantWalletAddress: participant?.walletAddress as string,
           _surveyContractAddress: survey.contractAddress as string,
           _surveyId: survey.id,
+          _chainId: chainId
         });
 
         if (surveyIsAlreadyBookedByUser) {

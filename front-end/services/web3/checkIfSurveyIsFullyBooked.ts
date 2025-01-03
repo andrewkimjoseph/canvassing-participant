@@ -1,17 +1,16 @@
 import { closedSurveyV3ContractABI } from '@/utils/abis/closedSurveyV3ContractABI';
 import { Address, createPublicClient, custom } from 'viem';
-// import { celoAlfajores } from "viem/chains";
-import { celo } from 'viem/chains';
+import { celoAlfajores, celo } from "viem/chains";
 
 export const checkIfSurveyIsFullyBooked = async (
-  { _surveyContractAddress }: CheckIfSurveyIsFullyBookedProps
+  { _surveyContractAddress, _chainId}: CheckIfSurveyIsFullyBookedProps
 ): Promise<boolean> => {
   let surveyIsFullyBooked: boolean = false;
 
   try {
     const publicClient = createPublicClient({
-      chain: celo,
-      transport: custom(window.ethereum),
+      chain: _chainId === celo.id ? celo : celoAlfajores,
+     transport: custom(window.ethereum),
     });
 
     // Get the number of target participants
@@ -45,4 +44,5 @@ export const checkIfSurveyIsFullyBooked = async (
 
 export type CheckIfSurveyIsFullyBookedProps = {
   _surveyContractAddress: Address;
+  _chainId: number;
 };

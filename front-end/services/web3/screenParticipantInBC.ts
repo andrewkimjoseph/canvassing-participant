@@ -1,6 +1,6 @@
 import { closedSurveyV3ContractABI } from '@/utils/abis/closedSurveyV3ContractABI';
 import { Address, createPublicClient, createWalletClient, custom } from 'viem';
-// import { celoAlfajores } from 'viem/chains';
+import { celoAlfajores } from 'viem/chains';
 import { celo } from 'viem/chains';
 
 export type ScreenParticipantResult = {
@@ -11,12 +11,14 @@ export type ScreenParticipantResult = {
 export type ScreenParticipantProps = {
   _smartContractAddress: Address;
   _participantWalletAddress: Address;
+  _chainId: number;
 };
 
 export const screenParticipantInBC = async (
   {
     _smartContractAddress: smartContractAddress,
     _participantWalletAddress: participantWalletAddress,
+    _chainId
   }: ScreenParticipantProps
 ): Promise<ScreenParticipantResult> => {
   if (!window.ethereum) {
@@ -24,12 +26,12 @@ export const screenParticipantInBC = async (
   }
 
   const privateClient = createWalletClient({
-    chain: celo,
+    chain: _chainId === celo.id ? celo : celoAlfajores,
     transport: custom(window.ethereum),
   });
 
   const publicClient = createPublicClient({
-    chain: celo,
+    chain: _chainId === celo.id ? celo : celoAlfajores,
     transport: custom(window.ethereum),
   });
 

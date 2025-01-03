@@ -7,12 +7,14 @@ export const checkIfParticipantIsScreenedForSurvey = async ({
   _participantWalletAddress,
   _surveyId,
   _surveyContractAddress,
+  _chainId
 }: CheckIfParticipantIsScreenedForSurveyProps): Promise<boolean> => {
   let participantIsScreened: boolean = false;
 
   const participantIsScreenedBC = await checkIfParticipantIsScreenedInBC({
     _participantWalletAddress: _participantWalletAddress as Address,
     _surveyContractAddress: _surveyContractAddress as Address,
+    _chainId: _chainId
   });
 
   if (!participantIsScreenedBC) {
@@ -40,4 +42,5 @@ export type CheckIfParticipantIsScreenedForSurveyProps = {
   _participantId: string;
   _surveyId: string;
   _surveyContractAddress: string;
+  _chainId: number;
 };

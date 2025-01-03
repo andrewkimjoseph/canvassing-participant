@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { useAccount } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 import { Box, Image, Text, Flex, Spinner } from '@chakra-ui/react';
 
@@ -28,6 +28,7 @@ import { SpinnerIconC } from '@/components/icons/spinner-icon';
 
 export default function SuccessPage() {
   const [userAddress, setUserAddress] = useState('');
+  const chainId = useChainId();
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
   const router = useRouter();
@@ -69,6 +70,7 @@ export default function SuccessPage() {
 
     const contractBalance = await getContractBalance(address, {
       _contractAddress: survey.contractAddress as Address,
+      _chainId: chainId
     });
 
     if (contractBalance < survey.rewardAmountIncUSD) {
@@ -86,6 +88,7 @@ export default function SuccessPage() {
       const claimIsProcessed = await processRewardClaimByParticipant(address, {
         _participantWalletAddress: address as Address,
         _smartContractAddress: survey.contractAddress as Address,
+        _chainId: chainId
       });
 
       if (claimIsProcessed.success) {
