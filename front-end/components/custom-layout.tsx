@@ -13,9 +13,9 @@ const CustomLayout: FC<Props> = ({ children }) => {
   const showHeader = !noHeaderRoutes.includes(pathname);
 
   return (
-    <Flex bgColor={"#ECECEC"} flexDirection={"column"}>
+    <Flex bgColor={"#ECECEC"} flexDirection={"column"} minHeight="100vh">
       {showHeader && <CustomHeader />}
-      <Box w="100vw">{children}</Box>
+      <Box w="100vw" flex="1">{children}</Box>
     </Flex>
   );
 };

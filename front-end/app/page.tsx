@@ -211,7 +211,7 @@ export default function Home() {
   }
 
   return (
-    <Flex flexDirection={'column'} w={'100%'} bgColor={'#ECECEC'} px={4}>
+    <Flex flexDirection={'column'} w={'100%'} bgColor={'#ECECEC'} px={4} h={"full"}>
       <Toaster />
 
       <Flex justify="flex-start">
@@ -264,18 +264,18 @@ export default function Home() {
         </Text>
       </Flex>
 
-      <Box w="full" h="100vh">
+      <Box w="full" h={"full"}>
         
         {surveys.length > 0 && !surveyLoading && (
           <Flex justify="flex-start">
             <Text
               fontSize="lg"
-              fontWeight="bold"
+              fontWeight="normal"
               color="gray"
               textAlign="left"
               pb={3}
             >
-              Book any survey to continue ...
+              Book/start any survey to continue ...
             </Text>
           </Flex>
         )}
@@ -352,7 +352,9 @@ export default function Home() {
                   w={'1/6'}
                   mr={2}
                   loading={isBeingBooked[survey.id] as boolean}
-                  loadingText={<SpinnerIconC />}
+                  loadingText={<Box pr={4}>
+                    <SpinnerIconC />
+                  </Box>}
                   disabled={Object.values(isBeingBooked).some(
                     (status) => status
                   )}
