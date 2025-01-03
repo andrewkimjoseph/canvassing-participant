@@ -113,6 +113,9 @@ export default function SuccessPage() {
     }
 
     try {
+      
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
       const claimIsProcessed = await processRewardClaimByParticipant(address, {
         _participantWalletAddress: address as Address,
         _smartContractAddress: survey.contractAddress as Address,
