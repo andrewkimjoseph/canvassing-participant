@@ -7,6 +7,7 @@ export interface Participant {
     gender: string;
     username: string;
     walletAddress: string;
+    isAdmin: boolean;
     timeCreated: admin.firestore.Timestamp;
     timeUpdated: admin.firestore.Timestamp;
   }

@@ -1,31 +1,38 @@
+// src/index.ts
 import * as functions from 'firebase-functions/v2';
 import * as admin from 'firebase-admin';
-admin.initializeApp();
-const firestore = admin.firestore();
+import { WebhookPayload } from './types/types';
+import { processWebhook } from './utils/tallyForms/webhookProcessor';
 
-interface FormField {
-  key: string;
-  label: string;
-  type: string;
-  value: string | string[];
-}
+export const createUnclaimedRewardUponSubmissionV2Mainnet = functions.https.onRequest(
+  async (request, response) => {
+    try {
+      await processWebhook(request.body.data, 'mainnet');
+      console.log('Process completed successfully.');
+      response.status(200).send('Process completed successfully.');
+    } catch (error) {
+      console.error('Error processing webhook:', error);
+      response.status(500).send('Internal server error');
+    }
+  }
+);
 
-interface WebhookData {
-  responseId: string;
-  submissionId: string;
-  respondentId: string;
-  formId: string;
-  formName: string;
-  createdAt: string;
-  fields: FormField[];
-}
+export const createUnclaimedRewardUponSubmissionV2Testnet = functions.https.onRequest(
+  async (request, response) => {
+    try {
+      await processWebhook(request.body.data, 'testnet');
+      console.log('Process completed successfully.');
+      response.status(200).send('Process completed successfully.');
+    } catch (error) {
+      console.error('Error processing webhook:', error);
+      response.status(500).send('Internal server error');
+    }
+  }
+);
 
-interface WebhookPayload {
-  data: WebhookData;
-}
-
-export const createUnclaimedRewardUponFormSubmission =
-  functions.https.onRequest(async (request, response) => {
+// LEGACY FUNCTION - Consider moving to separate file if needed
+export const createUnclaimedRewardUponFormSubmission = functions.https.onRequest(
+  async (request, response) => {
     try {
       const webhookPayload = request.body as WebhookPayload;
       const data = webhookPayload.data;
@@ -51,22 +58,22 @@ export const createUnclaimedRewardUponFormSubmission =
         return;
       }
 
-      // Fetch participant ID from the "participants" collection
-      const participantSnapshot = await firestore
+      const participantSnapshot = await admin.firestore()
         .collection('participants')
         .where('walletAddress', '==', walletAddress)
         .limit(1)
         .get();
+        
       if (participantSnapshot.empty) {
         response
           .status(400)
           .send('Participant not found for the given wallet address.');
         return;
       }
+      
       const participantId = participantSnapshot.docs[0].id;
 
-      // Create a new document in the "rewards" collection
-      const rewardDoc = firestore.collection('rewards').doc();
+      const rewardDoc = admin.firestore().collection('rewards').doc();
       await rewardDoc.set({
         id: rewardDoc.id,
         surveyId,
@@ -89,4 +96,5 @@ export const createUnclaimedRewardUponFormSubmission =
       console.error('Error processing webhook:', error);
       response.status(500).send('Internal server error');
     }
-  });
+  }
+);

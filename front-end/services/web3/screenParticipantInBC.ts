@@ -1,26 +1,26 @@
 import { closedSurveyV3ContractABI } from '@/utils/abis/closedSurveyV3ContractABI';
 import { Address, createPublicClient, createWalletClient, custom } from 'viem';
-import { celoAlfajores, celo } from 'viem/chains';
+import { celoAlfajores } from 'viem/chains';
+import { celo } from 'viem/chains';
 
-export type ProcessRewardClaimResult = {
+export type ScreenParticipantResult = {
   success: boolean;
   transactionHash: string | null;
 };
 
-export type ProcessRewardClaimByParticipantProps = {
+export type ScreenParticipantProps = {
   _smartContractAddress: Address;
   _participantWalletAddress: Address;
   _chainId: number;
 };
 
-export const processRewardClaimByParticipant = async (
-  _signerAddress: `0x${string}` | undefined,
+export const screenParticipantInBC = async (
   {
     _smartContractAddress: smartContractAddress,
     _participantWalletAddress: participantWalletAddress,
     _chainId
-  }: ProcessRewardClaimByParticipantProps
-): Promise<ProcessRewardClaimResult> => {
+  }: ScreenParticipantProps
+): Promise<ScreenParticipantResult> => {
   if (!window.ethereum) {
     return { success: false, transactionHash: null };
   }
@@ -38,26 +38,26 @@ export const processRewardClaimByParticipant = async (
   try {
     const [address] = await privateClient.getAddresses();
 
-    const { request: processRewardClaimByParticipantRqst } =
+    const { request: screenParticipantRqst } =
       await publicClient.simulateContract({
         account: address,
         address: smartContractAddress,
         abi: closedSurveyV3ContractABI,
-        functionName: 'processRewardClaimByParticipant',
+        functionName: 'screenParticipant',
         args: [participantWalletAddress],
       });
 
-    const processRewardClaimByParticipantTxnHash =
-      await privateClient.writeContract(processRewardClaimByParticipantRqst);
+    const screenParticipantTxnHash =
+      await privateClient.writeContract(screenParticipantRqst);
 
-    const processRewardClaimByParticipantTxnReceipt =
+    const screenParticipantTxnReceipt =
       await publicClient.waitForTransactionReceipt({
-        hash: processRewardClaimByParticipantTxnHash,
+        hash: screenParticipantTxnHash,
       });
 
     return {
-      success: processRewardClaimByParticipantTxnReceipt.status === 'success',
-      transactionHash: processRewardClaimByParticipantTxnHash,
+      success: screenParticipantTxnReceipt.status === 'success',
+      transactionHash: screenParticipantTxnHash,
     };
   } catch (err) {
     return { success: false, transactionHash: null };

@@ -45,7 +45,6 @@ const useParticipantStore = create<ParticipantStoreState>()(
             return null;
           }
         } catch (error) {
-          console.error('Error checking participant:', error);
           set({ loading: false });
           return null;
         }
@@ -77,7 +76,6 @@ const useParticipantStore = create<ParticipantStoreState>()(
 
           set({ participant: newParticipant, loading: false });
         } catch (error) {
-          console.error('Error creating participant:', error);
           set({ loading: false });
           throw error;
         }
@@ -110,7 +108,6 @@ const useParticipantStore = create<ParticipantStoreState>()(
             loading: false 
           });
         } catch (error) {
-          console.error('Error updating participant:', error);
           set({ loading: false });
           throw error;
         }

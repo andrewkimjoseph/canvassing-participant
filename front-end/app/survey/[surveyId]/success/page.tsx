@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { useAccount } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 import { Box, Image, Text, Flex, Spinner } from '@chakra-ui/react';
 
@@ -20,19 +20,25 @@ import {
   getDocs,
   updateDoc,
   Timestamp,
+  onSnapshot,
 } from 'firebase/firestore';
 import { db } from '@/firebase';
 import useParticipantStore from '@/stores/useParticipantStore';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 import { SpinnerIconC } from '@/components/icons/spinner-icon';
+import { Reward } from '@/entities/reward';
 
 export default function SuccessPage() {
   const [userAddress, setUserAddress] = useState('');
+  const chainId = useChainId();
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
   const router = useRouter();
   const { survey, fetchSurvey } = useSingleSurveyStore();
   const [isProcessingRewardClaim, setIsProcessingRewardClaim] = useState(false);
+
+  const [isAbleToClaim, setIsAbleToClaim] = useState(false);
+
   const { participant } = useParticipantStore.getState();
   const params = useParams();
   const searchParams = useSearchParams();
@@ -41,6 +47,29 @@ export default function SuccessPage() {
   const surveyId = params.surveyId;
   const submissionId = searchParams.get('submissionId');
   const respondentId = searchParams.get('respondentId');
+
+  // useEffect(() => {
+  //   if (!surveyId || !participant?.id) return;
+
+  //   const rewardsCollection = collection(db, 'rewards');
+  //   const rewardsQuery = query(
+  //     rewardsCollection,
+  //     where('participantId', '==', participant.id),
+  //     where('surveyId', '==', surveyId)
+  //   );
+
+  //   const unsubscribe = onSnapshot(rewardsQuery, (querySnapshot) => {
+  //     if (!querySnapshot.empty) {
+  //       const rewardDoc = querySnapshot.docs[0];
+  //       const reward = rewardDoc.data() as Reward;
+  //       if (reward.whitelistingTransactionHash) {
+  //         setIsAbleToClaim(false);
+  //       }
+  //     }
+  //   });
+
+  //   return () => unsubscribe();
+  // }, [surveyId, participant?.id]);
 
   const processRewardClaimByParticipantFn = async () => {
     setIsProcessingRewardClaim(true);
@@ -69,6 +98,7 @@ export default function SuccessPage() {
 
     const contractBalance = await getContractBalance(address, {
       _contractAddress: survey.contractAddress as Address,
+      _chainId: chainId,
     });
 
     if (contractBalance < survey.rewardAmountIncUSD) {
@@ -83,9 +113,13 @@ export default function SuccessPage() {
     }
 
     try {
+      
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
       const claimIsProcessed = await processRewardClaimByParticipant(address, {
         _participantWalletAddress: address as Address,
         _smartContractAddress: survey.contractAddress as Address,
+        _chainId: chainId,
       });
 
       if (claimIsProcessed.success) {
@@ -128,7 +162,7 @@ export default function SuccessPage() {
             surveyId: survey?.id,
           });
 
-          router.replace(`/survey/${surveyId}/transaction-successful`);
+          window.location.replace(`/survey/${surveyId}/transaction-successful`);
         } else {
           toaster.create({
             description:
@@ -146,7 +180,6 @@ export default function SuccessPage() {
         });
       }
     } catch (error) {
-      console.error('Error processing reward claim:', error);
       toaster.create({
         description:
           'An unexpected error occurred. Kindly reach out to support via the "More" tab.',
@@ -250,6 +283,7 @@ export default function SuccessPage() {
           processRewardClaimByParticipantFn();
         }}
         loading={isProcessingRewardClaim}
+        // disabled={!isAbleToClaim}
         loadingText={<SpinnerIconC />}
       >
         <Text fontSize="16" fontWeight="bold" color="white">

@@ -27,11 +27,9 @@ const useSingleSurveyStore = create<SingleSurveyStoreState>((set) => ({
         
         set({ survey: surveyData, loading: false });
       } else {
-        console.error('Survey not found');
         set({ survey: null, loading: false });
       }
     } catch (error) {
-      console.error('Error fetching survey:', error);
       set({ survey: null, loading: false });
     }
   },

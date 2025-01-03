@@ -2,17 +2,10 @@
 
 import { useEffect, useState } from 'react';
 
-import {
-  Box,
-  Image,
-  Button,
-  Text,
-  Flex,
-} from '@chakra-ui/react';
-import { useParams, useRouter } from 'next/navigation'
+import { Box, Image, Button, Text, Flex } from '@chakra-ui/react';
+import { useParams, useRouter } from 'next/navigation';
 import useParticipantStore from '@/stores/useParticipantStore';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
-
 
 export default function TransactionSuccessfulPage() {
   const [isMounted, setIsMounted] = useState(false);
@@ -23,7 +16,7 @@ export default function TransactionSuccessfulPage() {
 
   const { participant } = useParticipantStore();
   const { trackAmplitudeEvent } = useAmplitudeContext();
-  
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -33,7 +26,7 @@ export default function TransactionSuccessfulPage() {
   }
 
   return (
-    <Flex flexDirection={'column'} w={'100%'} h={"100vh"} bgColor={'#ECECEC'}>
+    <Flex flexDirection={'column'} w={'100%'} h={'100vh'} bgColor={'#ECECEC'}>
       <Box
         width="100%"
         height={'35%'}
@@ -50,7 +43,14 @@ export default function TransactionSuccessfulPage() {
           blur={'md'}
         />
       </Box>
-      <Text fontSize={'x-large'} mb={2} color="#363062" fontWeight="bold" textAlign={'center'} mt={4}>
+      <Text
+        fontSize={'x-large'}
+        mb={2}
+        color="#363062"
+        fontWeight="bold"
+        textAlign={'center'}
+        mt={4}
+      >
         Your transaction was successful!
       </Text>
 
@@ -62,13 +62,15 @@ export default function TransactionSuccessfulPage() {
         mt={5}
         alignSelf={'center'}
         mb={16}
-        onClick={()=>{
+        onClick={() => {
           trackAmplitudeEvent('Go home clicked', {
             participantWalletAddress: participant?.walletAddress,
             participantId: participant?.id,
             surveyId: surveyId,
           });
-          router.push("/")}}
+
+          window.location.replace('/');
+        }}
       >
         <Text fontSize="16" fontWeight="bold" color="white">
           Back to Homepage

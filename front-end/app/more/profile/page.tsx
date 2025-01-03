@@ -12,6 +12,7 @@ import { SpinnerIconC } from '@/components/icons/spinner-icon';
 import { Timestamp } from 'firebase-admin/firestore';
 import { Toaster, toaster } from '@/components/ui/toaster';
 import { serverTimestamp } from 'firebase/firestore';
+import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 
 export default function Profile() {
   const [isMounted, setIsMounted] = useState(false);
@@ -21,9 +22,9 @@ export default function Profile() {
 
   const { address, isConnected } = useAccount();
   const router = useRouter();
-  const { participant, getParticipant } =
-    useParticipantStore();
+  const { participant, getParticipant } = useParticipantStore();
 
+  const { trackAmplitudeEvent } = useAmplitudeContext();
 
   const updateUsernameFn = async () => {
     setIsUpdatingUsername(true);
@@ -41,14 +42,14 @@ export default function Profile() {
 
     if (participant?.timeUpdated) {
       const timeUpdated = participant.timeUpdated;
-      
 
       const currentTime = Timestamp.now();
       const timeDifference = currentTime.seconds - timeUpdated.seconds;
       if (timeDifference < 1800) {
         // 1800 seconds in half an hour
         toaster.create({
-          description: 'You can only update your username once every half an hour.',
+          description:
+            'You can only update your username once every half an hour.',
           duration: 3000,
           type: 'error',
         });
@@ -59,12 +60,18 @@ export default function Profile() {
     }
 
     try {
-      await useParticipantStore.getState().updateParticipantUsername(newUsername);
+      await useParticipantStore
+        .getState()
+        .updateParticipantUsername(newUsername);
 
       toaster.create({
         description: 'Username updated successfully',
         duration: 3000,
         type: 'success',
+      });
+
+      trackAmplitudeEvent('Username updated', {
+        walletAddress: address,
       });
 
       setIsUpdatingUsername(false);

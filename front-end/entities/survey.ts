@@ -16,4 +16,6 @@ export interface Survey {
     timeCreated: admin.firestore.Timestamp | null;
     targetCountry: string | null;
     targetGender: string | null;
+    isAlreadyBookedByUser: boolean | null;
+    isTest: boolean | null;
   }
