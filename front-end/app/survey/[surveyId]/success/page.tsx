@@ -159,7 +159,7 @@ export default function SuccessPage() {
             surveyId: survey?.id,
           });
 
-          router.replace(`/survey/${surveyId}/transaction-successful`);
+          window.location.replace(`/survey/${surveyId}/transaction-successful`);
         } else {
           toaster.create({
             description:
