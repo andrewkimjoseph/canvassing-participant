@@ -1,4 +1,4 @@
-import { createWalletClient, Address, http, encodeFunctionData } from 'viem';
+import { createWalletClient, Address, http, createPublicClient } from 'viem';
 import { mnemonicToAccount } from 'viem/accounts';
 import { CHAIN_CONFIGS } from '../config/config';
 import { WhitelistParticipantResult } from '../types/types';
@@ -12,9 +12,14 @@ export const whitelistParticipant = async (
 ): Promise<WhitelistParticipantResult> => {
   const config = CHAIN_CONFIGS[network];
   const account = mnemonicToAccount(SRP);
-  
+
   const privateClient = createWalletClient({
     account,
+    chain: config.chain,
+    transport: http(config.rpcUrl),
+  });
+
+  const publicClient = createPublicClient({
     chain: config.chain,
     transport: http(config.rpcUrl),
   });
@@ -22,7 +27,13 @@ export const whitelistParticipant = async (
   try {
     const whitelistABI = [
       {
-        inputs: [{ internalType: 'address', name: 'participantWalletAddress', type: 'address' }],
+        inputs: [
+          {
+            internalType: 'address',
+            name: 'participantWalletAddress',
+            type: 'address',
+          },
+        ],
         name: 'whitelistParticipant',
         outputs: [],
         stateMutability: 'nonpayable',
@@ -30,26 +41,24 @@ export const whitelistParticipant = async (
       },
     ];
 
-    const txnRqst = await privateClient.prepareTransactionRequest({
-      account,
-      data: encodeFunctionData({
+    const { request: whitelistParticipantRqst } =
+      await publicClient.simulateContract({
+        account,
+        address: surveyContractAddress as Address,
         abi: whitelistABI,
         functionName: 'whitelistParticipant',
         args: [participantWalletAddress],
-      }),
-    });
+      });
 
-    const serializedTxn = await privateClient.signTransaction({
-      ...txnRqst,
-      chain: config.chain,
-    });
-    
-    const screenParticipantTxnHash = await privateClient.sendRawTransaction({
-      serializedTransaction: serializedTxn,
-    });
+    const whitelistParticipantRqstTxnHash = await privateClient.writeContract(
+      whitelistParticipantRqst
+    );
 
-    return { success: true, txnHash: screenParticipantTxnHash };
+    console.log('Transaction successful, at hash:', whitelistParticipantRqstTxnHash);
+
+    return { success: true, txnHash: whitelistParticipantRqstTxnHash };
   } catch (err) {
+    console.error(err);
     return { success: false, txnHash: null };
   }
 };
