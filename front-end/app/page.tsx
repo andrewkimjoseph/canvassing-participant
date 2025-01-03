@@ -151,11 +151,20 @@ export default function Home() {
         });
 
         if (participantIsScreenedInDB) {
+
+          toaster.create({
+            description:
+              'Booking success. You are being redirected to the survey page... ',
+            duration: 3000,
+            type: 'success',
+          });
+       
+          router.push(`/survey/${survey.id}`);
+
           trackAmplitudeEvent('Survey booked', {
             walletAddress: address,
             surveyId: survey.id,
           });
-          router.push(`/survey/${survey.id}`);
         } else {
           toaster.create({
             description:
