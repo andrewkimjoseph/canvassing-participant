@@ -69,10 +69,12 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
           survey.targetGender === 'A' ||
           survey.targetGender === participant?.gender;
 
+
+        
+
         // Apply all filters
         if (!survey.isAvailable) continue;
         if (!survey.contractAddress) continue;
-        if (surveyIsFullyBooked) continue;
         if (!countryIsValid) continue;
         if (!genderIsValid) continue;
         if (survey.isTest && !participant?.isAdmin) continue;
@@ -89,6 +91,8 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
           survey.isAlreadyBookedByUser = true;
         }
 
+        if (surveyIsFullyBooked && !survey.isAlreadyBookedByUser) continue;
+ 
         filteredSurveys.push(survey);
       }
 
