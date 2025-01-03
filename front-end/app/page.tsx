@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
-import { Box, Button, Text, Flex, Link } from '@chakra-ui/react';
+import { Button } from '@/components/ui/button';
+import { Box, Text, Flex, Link } from '@chakra-ui/react';
 import { Avatar } from '@/components/ui/avatar';
 import useParticipantStore from '@/stores/useParticipantStore';
 import useMultipleSurveysStore from '@/stores/useMultipleSurveysStore';
@@ -11,9 +12,20 @@ import useRewardStore from '@/stores/useRewardStore';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 import { SpinnerIconC } from '@/components/icons/spinner-icon';
 import { Identify } from '@amplitude/analytics-browser';
+import { screenParticipantInDB } from '@/services/db/screenParticipantInDB';
+import { screenParticipantInBC } from '@/services/web3/screenParticipantInBC';
+import { Survey } from '@/entities/survey';
+import { Address } from 'viem';
+import { Participant } from '@/entities/participant';
+import { checkIfSurveyIsFullyBooked } from '@/services/web3/checkIfSurveyIsFullyBooked';
+import { Toaster, toaster } from '@/components/ui/toaster';
 
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isBeingBooked, setIsBeingBooked] = useState<{
+    [key: string]: boolean;
+  }>({});
+
   const { address, isConnected } = useAccount();
   const {
     participant,
@@ -46,7 +58,10 @@ export default function Home() {
       if (surveys && participant) {
         const identifyEvent = new Identify();
         identifyEvent.set('[Canvassing] Surveys Taken', surveys.length);
-        identifyEvent.setOnce('[Canvassing] Wallet Address', participant.walletAddress);
+        identifyEvent.setOnce(
+          '[Canvassing] Wallet Address',
+          participant.walletAddress
+        );
         identifyEvent.setOnce('[Canvassing] Gender', participant.gender);
         identifyEvent.setOnce('[Canvassing] Country', participant.country);
         identifyEvent.setOnce('[Canvassing] Username', participant.username);
@@ -78,6 +93,100 @@ export default function Home() {
     }
   }, [isInitialized, participant, participantLoading, router]);
 
+  useEffect(() => {
+    if (surveys.length > 0) {
+      const initialStatus = surveys.reduce((acc, survey) => {
+        acc[survey.id] = false;
+        return acc;
+      }, {} as { [key: string]: boolean });
+      setIsBeingBooked(initialStatus);
+    }
+  }, [surveys]);
+
+  const bookSurveyFn = async (survey: Survey) => {
+    setIsBeingBooked((prevStatus) => ({
+      ...prevStatus,
+      [survey.id]: true,
+    }));
+
+    const surveyIsFullyBooked = await checkIfSurveyIsFullyBooked({
+      _surveyContractAddress: survey.contractAddress as Address,
+    });
+
+    if (surveyIsFullyBooked) {
+      toaster.create({
+        description: 'Sorry, the survey is fully booked.',
+        duration: 3000,
+        type: 'error',
+      });
+
+      trackAmplitudeEvent('Survey fully booked', {
+        walletAddress: address,
+        surveyId: survey.id,
+      });
+
+      setIsBeingBooked((prevStatus) => ({
+        ...prevStatus,
+        [survey.id]: false,
+      }));
+
+      window.location.replace("/");
+      return;
+    }
+
+    try {
+      const screenParticipantRslt = await screenParticipantInBC({
+        _smartContractAddress: survey.contractAddress as Address,
+        _participantWalletAddress: participant?.walletAddress as Address,
+      });
+
+      if (screenParticipantRslt.success) {
+        const participantIsScreenedInDB = await screenParticipantInDB({
+          _participant: participant as Participant,
+          _survey: survey,
+          _transactionHash: screenParticipantRslt.transactionHash as string,
+        });
+
+        if (participantIsScreenedInDB) {
+          trackAmplitudeEvent('Survey booked', {
+            walletAddress: address,
+            surveyId: survey.id,
+          });
+          router.push(`/survey/${survey.id}`);
+        } else {
+          toaster.create({
+            description:
+              'Booking record creation failed.  Kindly reach out to support via the "More" tab. ',
+            duration: 3000,
+            type: 'error',
+          });
+
+          router.refresh();
+        }
+      } else {
+        toaster.create({
+          description:
+            'On-chain booking failed. Kindly reach out to support via the "More" tab. ',
+          duration: 3000,
+          type: 'error',
+        });
+
+        router.refresh();
+      }
+    } catch (error) {
+      toaster.create({
+        description: 'An error occured during booking. Try again later.',
+        duration: 3000,
+        type: 'error',
+      });
+    } finally {
+      setIsBeingBooked((prevStatus) => ({
+        ...prevStatus,
+        [survey.id]: false,
+      }));
+    }
+  };
+
   // Show loading state while initializing or checking participant
   if (!isInitialized || participantLoading) {
     return (
@@ -103,6 +212,8 @@ export default function Home() {
 
   return (
     <Flex flexDirection={'column'} w={'100%'} bgColor={'#ECECEC'} px={4}>
+      <Toaster />
+
       <Flex justify="flex-start">
         <Text
           fontSize="2xl"
@@ -154,80 +265,104 @@ export default function Home() {
       </Flex>
 
       <Box w="full" h="100vh">
+        
+        {surveys.length > 0 && !surveyLoading && (
+          <Flex justify="flex-start">
+            <Text
+              fontSize="lg"
+              fontWeight="bold"
+              color="gray"
+              textAlign="left"
+              pb={3}
+            >
+              Book any survey to continue ...
+            </Text>
+          </Flex>
+        )}
         {surveyLoading ? (
-          <Flex justify="center" >
+          <Flex justify="center">
             <SpinnerIconC />
           </Flex>
         ) : surveys.length > 0 ? (
           surveys.map((survey) => (
-            <Link key={survey.id} href={`survey/${survey.id}`}>
-              <Box
-                bgColor="white"
-                h="25"
-                w="full"
-                borderRadius={10}
-                flexDirection={'column'}
-                pb={2}
-                mb={4}
-                mt={0}
-                pt={1}
-                onClick={() => {
-                  trackAmplitudeEvent('Survey clicked', {
-                    walletAddress: address,
-                    surveyId: survey.id,
-                  });
-                }}
-              >
-                <Box bgColor="#CFCED8" h="30" borderRadius={10} mx={2}>
-                  <Flex
-                    flexDirection="column"
-                    alignItems="top"
-                    pl={2}
-                    pt={2}
-                    mt={1}
-                  >
-                    <Text fontSize={'larger'} mb={2} color="#363062">
-                      {survey.topic}
-                    </Text>
-                    <Text fontSize={'sm'} mb={2} color="black">
-                      {survey.brief}
-                    </Text>
-                  </Flex>
-                </Box>
+            <Box
+              key={survey.id}
+              bgColor={isBeingBooked[survey.id] ? '#CDFFD8' : 'white'}
+              h="25"
+              w="full"
+              borderRadius={10}
+              flexDirection={'column'}
+              pb={2}
+              mb={4}
+              mt={0}
+              pt={1}
+              onClick={() => {
+                trackAmplitudeEvent('Survey clicked', {
+                  walletAddress: address,
+                  surveyId: survey.id,
+                });
+
+                if (survey.isAlreadyBookedByUser) {
+                  router.push(`/survey/${survey.id}`);
+                } else {
+                  bookSurveyFn(survey);
+                }
+              }}
+            >
+              <Box bgColor="#CFCED8" h="30" borderRadius={10} mx={2}>
                 <Flex
-                  flexDirection="row"
+                  flexDirection="column"
+                  alignItems="top"
                   pl={2}
                   pt={2}
-                  justifyContent={'space-between'}
-                  alignItems={'center'}
+                  mt={1}
                 >
-                  <Flex
-                    flexDirection="row"
-                    justifyContent={'start'}
-                    alignItems={'center'}
-                  >
-                    <Text fontSize={'lg'} color="green">
-                      ${survey.rewardAmountIncUSD}
-                    </Text>
-
-                    <Text fontSize={'lg'} color="grey" pl={1}>
-                      per survey
-                    </Text>
-                  </Flex>
-
-                  <Button
-                    bgColor={'#363062'}
-                    borderRadius={20}
-                    w={'1/6'}
-                    mr={1}
-                  >
-                    <Text fontSize="8" color="white">
-                      Start
-                    </Text>
-                  </Button>
+                  <Text fontSize={'larger'} mb={2} color="#363062">
+                    {survey.topic}
+                  </Text>
+                  <Text fontSize={'sm'} mb={2} color="black">
+                    {survey.brief}
+                  </Text>
                 </Flex>
               </Box>
-            </Link>
+              <Flex
+                flexDirection="row"
+                pl={2}
+                pt={2}
+                justifyContent={'space-between'}
+                alignItems={'center'}
+              >
+                <Flex
+                  flexDirection="row"
+                  justifyContent={'start'}
+                  alignItems={'center'}
+                >
+                  <Text fontSize={'lg'} color="green">
+                    ${survey.rewardAmountIncUSD}
+                  </Text>
+
+                  <Text fontSize={'lg'} color="grey" pl={1}>
+                    per survey
+                  </Text>
+                </Flex>
+
+                <Button
+                  bgColor={'#363062'}
+                  borderRadius={20}
+                  w={'1/6'}
+                  mr={2}
+                  loading={isBeingBooked[survey.id] as boolean}
+                  loadingText={<SpinnerIconC />}
+                  disabled={Object.values(isBeingBooked).some(
+                    (status) => status
+                  )}
+                >
+                  <Text fontSize="8" color="white">
+                    {survey.isAlreadyBookedByUser ? 'Start' : 'Book'}
+                  </Text>
+                </Button>
+              </Flex>
+            </Box>
           ))
         ) : (
           <Box
