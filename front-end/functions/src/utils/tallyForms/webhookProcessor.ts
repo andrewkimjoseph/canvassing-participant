@@ -42,7 +42,7 @@ export const processWebhook = async (
   }
 
   const surveySnapshot = await firestore
-    .collection('survey')
+    .collection('surveys')
     .where('id', '==', surveyId)
     .limit(1)
     .get();
