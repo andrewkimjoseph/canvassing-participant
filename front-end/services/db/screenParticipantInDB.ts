@@ -2,14 +2,11 @@ import { Participant } from '@/entities/participant';
 import { Screening } from '@/entities/screening';
 import { Survey } from '@/entities/survey';
 import { db } from '@/firebase';
-import { Timestamp } from 'firebase-admin/firestore';
 import {
-  addDoc,
   collection,
   doc,
-  getDocs,
-  query,
-  where,
+  Timestamp,
+  setDoc
 } from 'firebase/firestore';
 
 export const screenParticipantInDB = async ({
@@ -20,24 +17,26 @@ export const screenParticipantInDB = async ({
   let success: boolean = false;
 
   try {
-    const screeningRef = collection(db, 'screenings');
+    const screeningId = doc(collection(db, 'screenings')).id;
+    const screeningRef = doc(db, 'screenings', screeningId);
 
-    const screening: Screening = {
-      id: screeningRef.id,
+    const data = {
+      id: screeningId,
       participantWalletAddress: _participant.walletAddress,
       participantId: _participant.id,
       surveyId: _survey.id,
       timeCreated: Timestamp.now(),
       transactionHash: _transactionHash,
     };
-    await addDoc(screeningRef, {
-      ...screening,
-    });
+
+    await setDoc(screeningRef, data);
 
     success = true;
 
     return success;
   } catch (error) {
+
+    console.log(error);
     return success;
   }
 };
