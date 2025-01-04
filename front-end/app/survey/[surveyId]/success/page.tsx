@@ -114,6 +114,12 @@ export default function SuccessPage() {
 
     try {
       
+      toaster.create({
+        description: 'Claim process initiated. Please wait ...',
+        duration: 3000,
+        type: 'info',
+      });
+      
       await new Promise((resolve) => setTimeout(resolve, 3000));
 
       const claimIsProcessed = await processRewardClaimByParticipant(address, {

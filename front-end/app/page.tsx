@@ -149,6 +149,14 @@ export default function Home() {
     }
 
     try {
+
+      toaster.create({
+        description:
+          'Booking in progress. Please wait...',
+        duration: 3000,
+        type: 'info',
+      });
+
       const screenParticipantRslt = await screenParticipantInBC({
         _smartContractAddress: survey.contractAddress as Address,
         _participantWalletAddress: participant?.walletAddress as Address,
