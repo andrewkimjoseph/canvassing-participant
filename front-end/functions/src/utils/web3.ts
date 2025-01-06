@@ -1,4 +1,4 @@
-import { createWalletClient, Address, http, createPublicClient } from 'viem';
+import { createWalletClient, Address, http, encodeFunctionData } from 'viem';
 import { mnemonicToAccount } from 'viem/accounts';
 import { CHAIN_CONFIGS } from '../config/config';
 import { WhitelistParticipantResult } from '../types/types';
@@ -19,10 +19,10 @@ export const whitelistParticipant = async (
     transport: http(config.rpcUrl),
   });
 
-  const publicClient = createPublicClient({
-    chain: config.chain,
-    transport: http(config.rpcUrl),
-  });
+  // const publicClient = createPublicClient({
+  //   chain: config.chain,
+  //   transport: http(config.rpcUrl),
+  // });
 
   try {
     const whitelistABI = [
@@ -41,22 +41,44 @@ export const whitelistParticipant = async (
       },
     ];
 
-    const { request: whitelistParticipantRqst } =
-      await publicClient.simulateContract({
-        account,
-        address: surveyContractAddress as Address,
+
+    const txnRqst = await privateClient.prepareTransactionRequest({
+      account,
+      data: encodeFunctionData({
         abi: whitelistABI,
         functionName: 'whitelistParticipant',
         args: [participantWalletAddress],
-      });
+      }),
+    });
 
-    const whitelistParticipantRqstTxnHash = await privateClient.writeContract(
-      whitelistParticipantRqst
-    );
+    const serializedWhitelistParticipantTxn = await privateClient.signTransaction({
+      ...txnRqst,
+      chain: config.chain,
+    });
+    
+    const serializedWhitelistParticipantTxnHash = await privateClient.sendRawTransaction({
+      serializedTransaction: serializedWhitelistParticipantTxn,
+    });
 
-    console.log('Whitelisting successful, at hash:', whitelistParticipantRqstTxnHash);
 
-    return { success: true, txnHash: whitelistParticipantRqstTxnHash };
+    // const { request: whitelistParticipantRqst } =
+    //   await publicClient.simulateContract({
+    //     account,
+    //     address: surveyContractAddress as Address,
+    //     abi: whitelistABI,
+    //     functionName: 'whitelistParticipant',
+    //     args: [participantWalletAddress],
+    //   });
+
+    //   privateClient
+
+    // const whitelistParticipantRqstTxnHash = await privateClient.writeContract(
+    //   whitelistParticipantRqst
+    // );
+
+    console.log('Whitelisting successful, at hash:', serializedWhitelistParticipantTxnHash);
+
+    return { success: true, txnHash: serializedWhitelistParticipantTxnHash };
   } catch (err) {
     console.error(err);
     return { success: false, txnHash: null };

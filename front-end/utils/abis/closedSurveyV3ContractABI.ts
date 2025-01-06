@@ -3,6 +3,19 @@ export const closedSurveyV3ContractABI = [
 		"inputs": [
 			{
 				"internalType": "address",
+				"name": "participantWalletAddress",
+				"type": "address"
+			}
+		],
+		"name": "blacklistWhitelistedParticipant",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
 				"name": "researcherWalletAddress",
 				"type": "address"
 			},
@@ -153,6 +166,33 @@ export const closedSurveyV3ContractABI = [
 		"type": "event"
 	},
 	{
+		"inputs": [],
+		"name": "pauseSurvey",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "walletAddress",
+				"type": "address"
+			}
+		],
+		"name": "processRewardClaimByParticipant",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -191,6 +231,19 @@ export const closedSurveyV3ContractABI = [
 		"type": "event"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "participantWalletAddress",
+				"type": "address"
+			}
+		],
+		"name": "screenParticipant",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -210,6 +263,19 @@ export const closedSurveyV3ContractABI = [
 		"type": "event"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -221,6 +287,39 @@ export const closedSurveyV3ContractABI = [
 		],
 		"name": "Unpaused",
 		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "unpauseSurvey",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_newRewardAmountPerParticipantInWei",
+				"type": "uint256"
+			}
+		],
+		"name": "updateRewardAmountPerParticipant",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_newTargetNumberOfParticipants",
+				"type": "uint256"
+			}
+		],
+		"name": "updateTargetNumberOfParticipants",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"anonymous": false,
@@ -243,22 +342,16 @@ export const closedSurveyV3ContractABI = [
 				"type": "address"
 			}
 		],
-		"name": "blacklistWhitelistedParticipant",
+		"name": "whitelistParticipant",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
 		"inputs": [],
-		"name": "cUSD",
-		"outputs": [
-			{
-				"internalType": "contract IERC20Metadata",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
+		"name": "withdrawAllRewardFundsToResearcher",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -332,6 +425,19 @@ export const closedSurveyV3ContractABI = [
 				"internalType": "bool",
 				"name": "",
 				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "cUSD",
+		"outputs": [
+			{
+				"internalType": "contract IERC20Metadata",
+				"name": "",
+				"type": "address"
 			}
 		],
 		"stateMutability": "view",
@@ -443,13 +549,6 @@ export const closedSurveyV3ContractABI = [
 	},
 	{
 		"inputs": [],
-		"name": "pauseSurvey",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
 		"name": "paused",
 		"outputs": [
 			{
@@ -459,26 +558,6 @@ export const closedSurveyV3ContractABI = [
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "walletAddress",
-				"type": "address"
-			}
-		],
-		"name": "processRewardClaimByParticipant",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -495,19 +574,6 @@ export const closedSurveyV3ContractABI = [
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "participantWalletAddress",
-				"type": "address"
-			}
-		],
-		"name": "screenParticipant",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"inputs": [],
 		"name": "targetNumberOfParticipants",
 		"outputs": [
@@ -518,72 +584,6 @@ export const closedSurveyV3ContractABI = [
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "unpauseSurvey",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_newRewardAmountPerParticipantInWei",
-				"type": "uint256"
-			}
-		],
-		"name": "updateRewardAmountPerParticipant",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_newTargetNumberOfParticipants",
-				"type": "uint256"
-			}
-		],
-		"name": "updateTargetNumberOfParticipants",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "participantWalletAddress",
-				"type": "address"
-			}
-		],
-		"name": "whitelistParticipant",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "withdrawAllRewardFundsToResearcher",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	}
 ]

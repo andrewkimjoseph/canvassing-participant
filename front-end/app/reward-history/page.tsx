@@ -17,7 +17,7 @@ import { SpinnerIconC } from '@/components/icons/spinner-icon';
 export default function RewardHistory() {
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
-  const { rewards } = useRewardStore();
+  const { rewards, fetchRewards } = useRewardStore();
   const router = useRouter();
   const { participant, getParticipant } = useParticipantStore();
   const { trackAmplitudeEvent } = useAmplitudeContext();
@@ -25,6 +25,7 @@ export default function RewardHistory() {
   const checkParticipantStatus = useCallback(() => {
     if (isConnected && address) {
       getParticipant(address);
+      fetchRewards(address);
     }
   }, [isConnected, address, getParticipant]);
 

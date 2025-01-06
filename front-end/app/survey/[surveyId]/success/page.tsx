@@ -78,7 +78,7 @@ export default function SuccessPage() {
       toaster.create({
         description:
           'Invalid survey claim request. Kindly reach out to support via the "More" tab.',
-        duration: 3000,
+        duration: 6000,
         type: 'error',
       });
       setIsProcessingRewardClaim(false);
@@ -89,7 +89,7 @@ export default function SuccessPage() {
       toaster.create({
         description:
           'Invalid form submission/participant. Kindly reach out to support via the "More" tab.',
-        duration: 3000,
+        duration: 6000,
         type: 'error',
       });
       setIsProcessingRewardClaim(false);
@@ -105,7 +105,7 @@ export default function SuccessPage() {
       toaster.create({
         description:
           'Not enough balance to pay you out. Kindly reach out to support via the "More" tab.',
-        duration: 3000,
+        duration: 6000,
         type: 'error',
       });
       setIsProcessingRewardClaim(false);
@@ -116,7 +116,7 @@ export default function SuccessPage() {
       
       toaster.create({
         description: 'Claim process initiated. Please wait ...',
-        duration: 3000,
+        duration: 6000,
         type: 'info',
       });
       
@@ -131,7 +131,7 @@ export default function SuccessPage() {
       if (claimIsProcessed.success) {
         toaster.create({
           description: 'Waiting for your reward record to be updated ...',
-          duration: 3000,
+          duration: 6000,
           type: 'info',
         });
 
@@ -155,7 +155,7 @@ export default function SuccessPage() {
 
           toaster.create({
             description: 'Reward claimed successfully!',
-            duration: 3000,
+            duration: 6000,
             type: 'success',
           });
 
@@ -173,7 +173,7 @@ export default function SuccessPage() {
           toaster.create({
             description:
               'Reward record not found. Kindly reach out to support via the "More" tab.',
-            duration: 3000,
+            duration: 6000,
             type: 'error',
           });
         }
@@ -181,7 +181,7 @@ export default function SuccessPage() {
         toaster.create({
           description:
             'Reward claim was unsuccessful. Kindly reach out to support via the "More" tab.',
-          duration: 3000,
+          duration: 6000,
           type: 'error',
         });
       }
@@ -189,7 +189,7 @@ export default function SuccessPage() {
       toaster.create({
         description:
           'An unexpected error occurred. Kindly reach out to support via the "More" tab.',
-        duration: 3000,
+        duration: 6000,
         type: 'error',
       });
     }
