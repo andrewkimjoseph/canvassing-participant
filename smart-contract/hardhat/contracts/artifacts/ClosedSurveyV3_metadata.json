@@ -313,6 +313,25 @@
 						"type": "address"
 					}
 				],
+				"name": "checkIfParticipantIsScreened",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "participantWalletAddress",
+						"type": "address"
+					}
+				],
 				"name": "checkIfParticipantIsWhitelisted",
 				"outputs": [
 					{
@@ -327,6 +346,19 @@
 			{
 				"inputs": [],
 				"name": "getNumberOfRewardedParticipants",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getNumberOfScreenedParticipants",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -371,25 +403,6 @@
 						"internalType": "uint256",
 						"name": "",
 						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address[]",
-						"name": "registeredAddresses",
-						"type": "address[]"
-					}
-				],
-				"name": "getWhitelistedParticipantsFromRegisteredParticipants",
-				"outputs": [
-					{
-						"internalType": "address[]",
-						"name": "",
-						"type": "address[]"
 					}
 				],
 				"stateMutability": "view",
@@ -704,11 +717,11 @@
 			]
 		},
 		"smart-contract/hardhat/contracts/ClosedSurveyV3.sol": {
-			"keccak256": "0x5ff7c985cf5ed0547e99d6af34804b4a7f4c1d75e718b277c91758bc68acdf25",
+			"keccak256": "0x2ed073eceaa5413af87e00b238f5c2769b5da19d64fd076fa74fdede1def5df3",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://09c2f112b0fbd68f6a64c9534b7ca52689e7cee5137e72b34cda9bef5238f8ea",
-				"dweb:/ipfs/QmV4CYG5DcKfhvZZi6PdCsFmhyLJDMoqNJmGKCoT4tXBNX"
+				"bzz-raw://72b167d339edc1354d6843713d79344db541e94078fe627878cc180a06fb9dbd",
+				"dweb:/ipfs/QmW3YvSGTrpB7JuhLr13DXbZJAEUqnFHDjZyeowYz3LktJ"
 			]
 		}
 	},

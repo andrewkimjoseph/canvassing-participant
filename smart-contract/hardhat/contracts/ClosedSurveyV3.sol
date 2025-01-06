@@ -25,9 +25,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
 
     event ParticipantScreened(address participantWalletAddress);
 
-    event WhitelistedParticipantBlacklisted(
-        address participantWalletAddress
-    );
+    event WhitelistedParticipantBlacklisted(address participantWalletAddress);
 
     event ParticipantRewarded(
         address participantWalletAddress,
@@ -58,6 +56,10 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         _;
     }
 
+
+    /**
+     * @dev Throws if called for a [participantWalletAddress] that is whitelisted.
+     */
     modifier mustBeBlacklisted(address participantWalletAddress) {
         require(
             !participantsWhitelistedForSurvey[participantWalletAddress],
@@ -110,7 +112,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         _;
     }
 
-    modifier onlyWhenAllParticipantHaveNotBeenRewarded() {
+    modifier onlyWhenAllParticipantsHaveNotBeenRewarded() {
         require(
             numberOfRewardedParticipants < targetNumberOfParticipants,
             "All participants have been rewarded"
@@ -194,7 +196,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         whenNotPaused
         nonReentrant
         onlyIfContractHasEnoughcUSD
-        onlyWhenAllParticipantHaveNotBeenRewarded
+        onlyWhenAllParticipantsHaveNotBeenRewarded
         onlyIfSenderIsGivenParticipant(walletAddress)
         onlyWhitelistedParticipant(walletAddress)
         onlyUnrewardedParticipant(walletAddress)
@@ -297,39 +299,18 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         _unpause();
     }
 
-    function getWhitelistedParticipantsFromRegisteredParticipants(
-        address[] calldata registeredAddresses
-    ) external view returns (address[] memory) {
-        uint256 numberOfAddressesGiven = registeredAddresses.length;
-
-        require(numberOfAddressesGiven != 0, "No addresses passed");
-        uint256 whitelistedCount = 0;
-        for (uint256 i = 0; i < numberOfAddressesGiven; ) {
-            if (participantsWhitelistedForSurvey[registeredAddresses[i]]) {
-                whitelistedCount++;
-            }
-            unchecked {
-                ++i;
-            }
-        }
-
-        address[] memory whitelistedAddresses = new address[](whitelistedCount);
-        uint256 index = 0;
-        for (uint256 i = 0; i < numberOfAddressesGiven; ) {
-            if (participantsWhitelistedForSurvey[registeredAddresses[i]]) {
-                whitelistedAddresses[index++] = registeredAddresses[i];
-            }
-            unchecked {
-                ++i;
-            }
-        }
-        return whitelistedAddresses;
-    }
-
     function checkIfParticipantHasAlreadyClaimedReward(
         address participantWalletAddress
     ) external view returns (bool) {
         return rewardedParticipants[participantWalletAddress];
+    }
+
+    function checkIfParticipantIsScreened(address participantWalletAddress)
+        external
+        view
+        returns (bool)
+    {
+        return participantsScreenedForSurvey[participantWalletAddress];
     }
 
     function checkIfParticipantIsWhitelisted(address participantWalletAddress)
@@ -362,6 +343,10 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
 
     function getTargetNumberOfParticipants() external view returns (uint256) {
         return targetNumberOfParticipants;
+    }
+
+    function getNumberOfScreenedParticipants() external view returns (uint256) {
+        return numberOfScreenedParticipants;
     }
 
     function getNumberOfWhitelistedParticipants()
