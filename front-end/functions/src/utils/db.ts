@@ -12,20 +12,18 @@ export const createRewardDocument = async (
 ): Promise<string> => {
   let rewardId: string | null = null;
 
+  const surveyId = data.fields.find(
+    (field) => field.label === 'surveyId'
+  )?.value;
+
   const existingReward = await firestore
     .collection('rewards')
-    .where(
-      'surveyId',
-      '==',
-      data.fields.find((field) => field.label === 'surveyId')?.value
-    )
+    .where('surveyId', '==', surveyId)
     .where('participantId', '==', participantId)
-    .where('respondentId', '==', data.respondentId)
-    .where('formId', '==', data.formId)
-    .where('submissionId', '==', data.submissionId)
     .get();
 
   if (existingReward.empty) {
+    console.log('New reward being created ...');
     const rewardDoc = firestore.collection('rewards').doc();
 
     await rewardDoc.set({
@@ -48,6 +46,8 @@ export const createRewardDocument = async (
   } else {
     let reward = existingReward.docs[0].data() as Reward;
     rewardId = reward.id;
+
+    console.log('Existing reward, [id] being returned ...:', rewardId);
   }
 
   return rewardId;
