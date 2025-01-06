@@ -56,6 +56,10 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         _;
     }
 
+
+    /**
+     * @dev Throws if called for a [participantWalletAddress] that is whitelisted.
+     */
     modifier mustBeBlacklisted(address participantWalletAddress) {
         require(
             !participantsWhitelistedForSurvey[participantWalletAddress],
@@ -108,7 +112,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         _;
     }
 
-    modifier onlyWhenAllParticipantHaveNotBeenRewarded() {
+    modifier onlyWhenAllParticipantsHaveNotBeenRewarded() {
         require(
             numberOfRewardedParticipants < targetNumberOfParticipants,
             "All participants have been rewarded"
@@ -192,7 +196,7 @@ contract ClosedSurveyV3 is Ownable, ReentrancyGuard, Pausable {
         whenNotPaused
         nonReentrant
         onlyIfContractHasEnoughcUSD
-        onlyWhenAllParticipantHaveNotBeenRewarded
+        onlyWhenAllParticipantsHaveNotBeenRewarded
         onlyIfSenderIsGivenParticipant(walletAddress)
         onlyWhitelistedParticipant(walletAddress)
         onlyUnrewardedParticipant(walletAddress)
