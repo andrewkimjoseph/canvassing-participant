@@ -1,5 +1,9 @@
 import * as admin from 'firebase-admin';
-import { Reward, WebhookData } from '../types/types';
+import {
+  Reward,
+  UpdateRewardSignatureProps,
+  WebhookData,
+} from '../types/types';
 
 admin.initializeApp();
 
@@ -53,15 +57,29 @@ export const createRewardDocument = async (
   return rewardId;
 };
 
-export const updateRewardWhitelistingTransactionHash = async (
-  rewardId: string,
-  whitelistingTransactionHash: string
-) => {
+export const updateRewardSignature = async ({
+  signature,
+  nonce,
+  rewardId,
+}: UpdateRewardSignatureProps) => {
   const rewardDoc = firestore.collection('rewards').doc(rewardId);
-  await rewardDoc.update({
-    whitelistingTransactionHash: whitelistingTransactionHash,
-    timeUpdated: admin.firestore.FieldValue.serverTimestamp(),
-  });
 
-  console.log('Reward doc updated:', rewardId);
+  const reward = (await rewardDoc.get()).data() as Reward;
+
+  if (reward.signature && reward.nonce) {
+    console.log('Reward doc already updated:', rewardId);
+    console.log('Signature:', reward.signature);
+    console.log('Nonce:', reward.nonce);
+  } else {
+    await rewardDoc.update({
+      signature: signature,
+      timeUpdated: admin.firestore.FieldValue.serverTimestamp(),
+      nonce: nonce,
+    });
+
+    console.log('Signature:', signature);
+    console.log('Nonce:', nonce);
+
+    console.log('Reward doc updated:', rewardId);
+  }
 };

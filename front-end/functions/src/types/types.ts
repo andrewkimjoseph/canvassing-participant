@@ -40,9 +40,22 @@ export interface Survey {
   isTest: boolean | null;
 }
 
-export interface WhitelistParticipantResult {
+export interface SignForRewardProps {
+  participantWalletAddress: Address;
+  rewardId: string;
+  network: 'mainnet' | 'testnet';
+}
+
+export interface SignForRewardResult {
   success: boolean;
-  txnHash: Address | null;
+  signature: Address | null;
+  nonce: number;
+}
+
+export interface UpdateRewardSignatureProps {
+  signature: Address | null;
+  rewardId: string;
+  nonce: number;
 }
 
 export interface Reward {
@@ -59,5 +72,6 @@ export interface Reward {
   timeUpdated: admin.firestore.Timestamp | null;
   transactionHash: string | null;
   amountIncUSD: number | null;
-  whitelistingTransactionHash: string | null;
+  signature: string | null;
+  nonce: number | null;
 }

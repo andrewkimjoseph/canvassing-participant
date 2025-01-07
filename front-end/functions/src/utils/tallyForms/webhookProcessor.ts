@@ -1,8 +1,8 @@
 
 import * as admin from 'firebase-admin';
-import { Survey, WebhookData } from '../../types/types';
-import { createRewardDocument, updateRewardWhitelistingTransactionHash } from '../db';
-import { whitelistParticipant } from '../web3';
+import { WebhookData } from '../../types/types';
+import { createRewardDocument, updateRewardSignature } from '../db';
+import { signForReward } from '../web3';
 import { Address } from 'viem';
 
 const firestore = admin.firestore();
@@ -51,23 +51,28 @@ export const processWebhook = async (
     throw new Error('Survey not found.');
   }
 
-  const survey = surveySnapshot.docs[0].data() as Survey;
   const participantId = participantSnapshot.docs[0].id;
 
   const rewardId = await createRewardDocument(data, participantId, walletAddress);
   console.log('Reward document created:', rewardId);
 
-  const whitelistTxn = await whitelistParticipant(
-    survey.contractAddress as Address,
-    walletAddress,
-    network
+  const signForRewardResult = await signForReward(
+  {
+    participantWalletAddress: walletAddress as Address,
+    rewardId: rewardId,
+    network: network
+  }
   );
 
-  if (!whitelistTxn.success) {
+  if (!signForRewardResult.success) {
     throw new Error('[FATAL] Whitelisting failed.');
   }
 
-  await updateRewardWhitelistingTransactionHash(rewardId, whitelistTxn.txnHash as string);
+  await updateRewardSignature({
+    signature: signForRewardResult.signature,
+    rewardId: rewardId,
+    nonce: signForRewardResult.nonce
+  });
 
-  return whitelistTxn;
+  return signForRewardResult;
 };

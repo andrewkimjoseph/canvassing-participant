@@ -1,4 +1,4 @@
-import { closedSurveyV3ContractABI } from '@/utils/abis/closedSurveyV3ContractABI';
+import { closedSurveyV4ContractABI } from '@/utils/abis/closedSurveyV4ContractABI';
 import { Address, createPublicClient, createWalletClient, custom } from 'viem';
 import { celoAlfajores, celo } from 'viem/chains';
 
@@ -10,7 +10,10 @@ export type ProcessRewardClaimResult = {
 export type ProcessRewardClaimByParticipantProps = {
   _smartContractAddress: Address;
   _participantWalletAddress: Address;
+  _rewardId: string,
+  _nonce: number
   _chainId: number;
+  _signature: string;
 };
 
 export const processRewardClaimByParticipant = async (
@@ -18,6 +21,9 @@ export const processRewardClaimByParticipant = async (
   {
     _smartContractAddress: smartContractAddress,
     _participantWalletAddress: participantWalletAddress,
+    _rewardId,
+    _nonce,
+    _signature,
     _chainId
   }: ProcessRewardClaimByParticipantProps
 ): Promise<ProcessRewardClaimResult> => {
@@ -42,9 +48,9 @@ export const processRewardClaimByParticipant = async (
       await publicClient.simulateContract({
         account: address,
         address: smartContractAddress,
-        abi: closedSurveyV3ContractABI,
+        abi: closedSurveyV4ContractABI,
         functionName: 'processRewardClaimByParticipant',
-        args: [participantWalletAddress],
+        args: [participantWalletAddress, _rewardId, _nonce, _signature],
       });
 
     const processRewardClaimByParticipantTxnHash =

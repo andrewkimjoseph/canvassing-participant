@@ -1,4 +1,5 @@
 import * as admin from 'firebase-admin';
+import { Address } from 'viem';
 
 export interface Reward {
   id: string;
@@ -14,5 +15,6 @@ export interface Reward {
   timeUpdated: admin.firestore.Timestamp | null;
   transactionHash: string | null;
   amountIncUSD: number | null;
-  whitelistingTransactionHash: string | null;
+  signature: Address | null;
+  nonce: number | null;
 }

@@ -1,86 +1,47 @@
-import { createWalletClient, Address, http, encodeFunctionData } from 'viem';
+import { createWalletClient, Address, http, keccak256, encodePacked } from 'viem';
 import { mnemonicToAccount } from 'viem/accounts';
 import { CHAIN_CONFIGS } from '../config/config';
-import { WhitelistParticipantResult } from '../types/types';
+import { SignForRewardProps, SignForRewardResult } from '../types/types';
+import * as admin from 'firebase-admin';
 
 const SRP = process.env.SRP as Address;
 
-export const whitelistParticipant = async (
-  surveyContractAddress: string,
-  participantWalletAddress: string,
-  network: 'mainnet' | 'testnet'
-): Promise<WhitelistParticipantResult> => {
-  const config = CHAIN_CONFIGS[network];
-  const account = mnemonicToAccount(SRP);
-
-  const privateClient = createWalletClient({
-    account,
-    chain: config.chain,
-    transport: http(config.rpcUrl),
-  });
-
-  // const publicClient = createPublicClient({
-  //   chain: config.chain,
-  //   transport: http(config.rpcUrl),
-  // });
-
+export const signForReward = async (
+{participantWalletAddress, rewardId, network}: SignForRewardProps
+): Promise<SignForRewardResult> => {
   try {
-    const whitelistABI = [
-      {
-        inputs: [
-          {
-            internalType: 'address',
-            name: 'participantWalletAddress',
-            type: 'address',
-          },
-        ],
-        name: 'whitelistParticipant',
-        outputs: [],
-        stateMutability: 'nonpayable',
-        type: 'function',
-      },
+    const config = CHAIN_CONFIGS[network];
+    const account = mnemonicToAccount(SRP);
+
+    const privateClient = createWalletClient({
+      account,
+      chain: config.chain,
+      transport: http(config.rpcUrl),
+    });
+
+    const nonce = admin.firestore.Timestamp.now().nanoseconds;
+
+    const [types, data] = [
+      ['address', 'string', 'uint256'],
+      [participantWalletAddress, rewardId, nonce],
     ];
 
+    const messageHash = keccak256(encodePacked(types, data), 'bytes');
 
-    const txnRqst = await privateClient.prepareTransactionRequest({
-      account,
-      data: encodeFunctionData({
-        abi: whitelistABI,
-        functionName: 'whitelistParticipant',
-        args: [participantWalletAddress],
-      }),
-    });
-
-    const serializedWhitelistParticipantTxn = await privateClient.signTransaction({
-      ...txnRqst,
-      chain: config.chain,
+    const signature = await privateClient.signMessage({
+      message: {
+        raw: messageHash,
+      },
     });
     
-    const serializedWhitelistParticipantTxnHash = await privateClient.sendRawTransaction({
-      serializedTransaction: serializedWhitelistParticipantTxn,
-    });
+    console.log('Signing successful:', signature);
 
-
-    // const { request: whitelistParticipantRqst } =
-    //   await publicClient.simulateContract({
-    //     account,
-    //     address: surveyContractAddress as Address,
-    //     abi: whitelistABI,
-    //     functionName: 'whitelistParticipant',
-    //     args: [participantWalletAddress],
-    //   });
-
-    //   privateClient
-
-    // const whitelistParticipantRqstTxnHash = await privateClient.writeContract(
-    //   whitelistParticipantRqst
-    // );
-
-    console.log('Whitelisting successful, at hash:', serializedWhitelistParticipantTxnHash);
-
-    return { success: true, txnHash: serializedWhitelistParticipantTxnHash };
+    return { success: true, signature: signature, nonce: nonce }
   } catch (err) {
     console.error(err);
-    return { success: false, txnHash: null };
+    return { success: false, signature: null, nonce: 0 };
   }
-};
+}
+
+
+
