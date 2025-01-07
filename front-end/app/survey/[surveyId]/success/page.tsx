@@ -20,13 +20,14 @@ import {
   getDocs,
   updateDoc,
   Timestamp,
-  onSnapshot,
+
 } from 'firebase/firestore';
 import { db } from '@/firebase';
 import useParticipantStore from '@/stores/useParticipantStore';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 import { SpinnerIconC } from '@/components/icons/spinner-icon';
 import { Reward } from '@/entities/reward';
+import { firestore } from 'firebase-admin';
 
 export default function SuccessPage() {
   const [userAddress, setUserAddress] = useState('');
@@ -48,28 +49,6 @@ export default function SuccessPage() {
   const submissionId = searchParams.get('submissionId');
   const respondentId = searchParams.get('respondentId');
 
-  // useEffect(() => {
-  //   if (!surveyId || !participant?.id) return;
-
-  //   const rewardsCollection = collection(db, 'rewards');
-  //   const rewardsQuery = query(
-  //     rewardsCollection,
-  //     where('participantId', '==', participant.id),
-  //     where('surveyId', '==', surveyId)
-  //   );
-
-  //   const unsubscribe = onSnapshot(rewardsQuery, (querySnapshot) => {
-  //     if (!querySnapshot.empty) {
-  //       const rewardDoc = querySnapshot.docs[0];
-  //       const reward = rewardDoc.data() as Reward;
-  //       if (reward.whitelistingTransactionHash) {
-  //         setIsAbleToClaim(false);
-  //       }
-  //     }
-  //   });
-
-  //   return () => unsubscribe();
-  // }, [surveyId, participant?.id]);
 
   const processRewardClaimByParticipantFn = async () => {
     setIsProcessingRewardClaim(true);
@@ -119,12 +98,21 @@ export default function SuccessPage() {
         duration: 6000,
         type: 'info',
       });
-      
-      await new Promise((resolve) => setTimeout(resolve, 3000));
 
+      const rewardsQuery = query(
+        collection(db, 'rewards'),
+        where('surveyId', '==', surveyId),
+        where('participantId', '==', participant.id)
+      );
+
+      const reward = (await getDocs(rewardsQuery)).docs[0].data() as Reward;
+      
       const claimIsProcessed = await processRewardClaimByParticipant(address, {
         _participantWalletAddress: address as Address,
         _smartContractAddress: survey.contractAddress as Address,
+        _rewardId: reward.id,
+        _nonce: reward.nonce as number,
+        _signature: reward.signature as string,
         _chainId: chainId,
       });
 
