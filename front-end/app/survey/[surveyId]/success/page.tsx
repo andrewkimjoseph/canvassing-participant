@@ -111,7 +111,7 @@ export default function SuccessPage() {
         _participantWalletAddress: address as Address,
         _smartContractAddress: survey.contractAddress as Address,
         _rewardId: reward.id,
-        _nonce: reward.nonce as number,
+        _nonce: BigInt(reward.nonce as string),
         _signature: reward.signature as string,
         _chainId: chainId,
       });

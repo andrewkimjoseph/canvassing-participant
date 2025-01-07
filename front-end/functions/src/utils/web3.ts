@@ -19,7 +19,7 @@ export const signForReward = async (
       transport: http(config.rpcUrl),
     });
 
-    const nonce = BigInt('0x' + randomBytes(32).toString('hex')).toString();
+    const nonce = BigInt('0x' + randomBytes(32).toString('hex'));
 
     const [types, data] = [
       ['address', 'string', 'uint256'],
@@ -33,10 +33,12 @@ export const signForReward = async (
         raw: messageHash,
       },
     });
+
+    const stringifiedNonce = nonce.toString();
     
     console.log('Signing successful:', signature);
 
-    return { success: true, signature: signature, nonce: nonce }
+    return { success: true, signature: signature, nonce: stringifiedNonce }
   } catch (err) {
     console.error(err);
     return { success: false, signature: null, nonce: '' };

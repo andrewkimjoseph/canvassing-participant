@@ -16,5 +16,5 @@ export interface Reward {
   transactionHash: string | null;
   amountIncUSD: number | null;
   signature: Address | null;
-  nonce: number | null;
+  nonce: string | null;
 }
