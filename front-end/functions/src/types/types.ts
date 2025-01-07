@@ -40,16 +40,22 @@ export interface Survey {
   isTest: boolean | null;
 }
 
-
-export interface WhitelistParticipantProps {
+export interface SignForRewardProps {
   participantWalletAddress: Address;
- rewardId: string;
-   network: 'mainnet' | 'testnet'
+  rewardId: string;
+  network: 'mainnet' | 'testnet';
 }
 
-export interface WhitelistParticipantResult {
+export interface SignForRewardResult {
   success: boolean;
   signature: Address | null;
+  nonce: number;
+}
+
+export interface UpdateRewardSignatureProps {
+  signature: Address | null;
+  rewardId: string;
+  nonce: number;
 }
 
 export interface Reward {
