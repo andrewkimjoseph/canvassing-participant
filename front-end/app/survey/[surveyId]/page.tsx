@@ -19,7 +19,6 @@ import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 import { SpinnerIconC } from '@/components/icons/spinner-icon';
 
 export default function SurveyPage() {
-  const [userAddress, setUserAddress] = useState('');
   const [isMounted, setIsMounted] = useState(false);
 
   const { address, isConnected } = useAccount();
@@ -36,12 +35,6 @@ export default function SurveyPage() {
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
-  useEffect(() => {
-    if (isConnected && address) {
-      setUserAddress(address);
-    }
-  }, [address, isConnected]);
 
   useEffect(() => {
     if (isMounted && surveyId) {

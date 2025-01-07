@@ -6,7 +6,7 @@ import { useAccount, useChainId } from 'wagmi';
 
 import { Box, Image, Text, Flex, Spinner } from '@chakra-ui/react';
 
-import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { processRewardClaimByParticipant } from '@/services/web3/processRewardClaimByParticipant';
 import { Address } from 'viem';
 import { Toaster, toaster } from '@/components/ui/toaster';
@@ -20,25 +20,19 @@ import {
   getDocs,
   updateDoc,
   Timestamp,
-
 } from 'firebase/firestore';
 import { db } from '@/firebase';
 import useParticipantStore from '@/stores/useParticipantStore';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 import { SpinnerIconC } from '@/components/icons/spinner-icon';
 import { Reward } from '@/entities/reward';
-import { firestore } from 'firebase-admin';
 
 export default function SuccessPage() {
-  const [userAddress, setUserAddress] = useState('');
   const chainId = useChainId();
   const [isMounted, setIsMounted] = useState(false);
-  const { address, isConnected } = useAccount();
-  const router = useRouter();
+  const { address } = useAccount();
   const { survey, fetchSurvey } = useSingleSurveyStore();
   const [isProcessingRewardClaim, setIsProcessingRewardClaim] = useState(false);
-
-  const [isAbleToClaim, setIsAbleToClaim] = useState(false);
 
   const { participant } = useParticipantStore.getState();
   const params = useParams();
@@ -95,7 +89,7 @@ export default function SuccessPage() {
       
       toaster.create({
         description: 'Claim process initiated. Please wait ...',
-        duration: 6000,
+        duration: 9000,
         type: 'info',
       });
 
@@ -111,7 +105,7 @@ export default function SuccessPage() {
         _participantWalletAddress: address as Address,
         _smartContractAddress: survey.contractAddress as Address,
         _rewardId: reward.id,
-        _nonce: reward.nonce as number,
+        _nonce: BigInt(reward.nonce as string),
         _signature: reward.signature as string,
         _chainId: chainId,
       });
@@ -194,12 +188,6 @@ export default function SuccessPage() {
       fetchSurvey(surveyId as string);
     }
   }, [surveyId, fetchSurvey]);
-
-  useEffect(() => {
-    if (isConnected && address) {
-      setUserAddress(address);
-    }
-  }, [address, isConnected]);
 
   if (!isMounted)
     return (

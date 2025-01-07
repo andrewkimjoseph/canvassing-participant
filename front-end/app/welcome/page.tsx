@@ -10,7 +10,7 @@ import { WelcomePageIconC } from '@/components/icons/welcome-page-icon';
 export default function WelcomePage() {
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
-  const { participant, getParticipant, loading } = useParticipantStore();
+  const { participant, getParticipant } = useParticipantStore();
   const router = useRouter();
 
   useEffect(() => {

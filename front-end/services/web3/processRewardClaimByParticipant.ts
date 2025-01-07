@@ -11,7 +11,7 @@ export type ProcessRewardClaimByParticipantProps = {
   _smartContractAddress: Address;
   _participantWalletAddress: Address;
   _rewardId: string,
-  _nonce: number
+  _nonce: BigInt
   _chainId: number;
   _signature: string;
 };

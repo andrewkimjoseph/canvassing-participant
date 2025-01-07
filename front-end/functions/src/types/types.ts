@@ -49,13 +49,13 @@ export interface SignForRewardProps {
 export interface SignForRewardResult {
   success: boolean;
   signature: Address | null;
-  nonce: number;
+  nonce: string;
 }
 
 export interface UpdateRewardSignatureProps {
   signature: Address | null;
   rewardId: string;
-  nonce: number;
+  nonce: string;
 }
 
 export interface Reward {
@@ -72,6 +72,6 @@ export interface Reward {
   timeUpdated: admin.firestore.Timestamp | null;
   transactionHash: string | null;
   amountIncUSD: number | null;
-  signature: string | null;
-  nonce: number | null;
+  signature: Address | null;
+  nonce: string | null;
 }
