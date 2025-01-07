@@ -9,7 +9,6 @@ import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 
 export default function TransactionSuccessfulPage() {
   const [isMounted, setIsMounted] = useState(false);
-  const router = useRouter();
 
   const params = useParams();
   const surveyId = params.surveyId;
