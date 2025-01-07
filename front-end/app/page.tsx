@@ -130,7 +130,7 @@ export default function Home() {
     if (surveyIsFullyBooked) {
       toaster.create({
         description: 'Sorry, the survey is fully booked.',
-        duration: 3000,
+        duration: 6000,
         type: 'error',
       });
 
@@ -153,7 +153,7 @@ export default function Home() {
       toaster.create({
         description:
           'Booking in progress. Please wait...',
-        duration: 3000,
+        duration: 9000,
         type: 'info',
       });
 
@@ -175,7 +175,7 @@ export default function Home() {
           toaster.create({
             description:
               'Booking success. You are being redirected to the survey page... ',
-            duration: 3000,
+            duration: 9000,
             type: 'success',
           });
        
@@ -199,7 +199,7 @@ export default function Home() {
         toaster.create({
           description:
             'On-chain booking failed. Kindly reach out to support via the "More" tab. ',
-          duration: 3000,
+          duration: 6000,
           type: 'error',
         });
 
@@ -208,7 +208,7 @@ export default function Home() {
     } catch (error) {
       toaster.create({
         description: 'An error occured during booking. Try again later.',
-        duration: 3000,
+        duration: 6000,
         type: 'error',
       });
     } finally {
