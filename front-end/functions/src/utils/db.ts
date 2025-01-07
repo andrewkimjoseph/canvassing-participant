@@ -53,13 +53,13 @@ export const createRewardDocument = async (
   return rewardId;
 };
 
-export const updateRewardWhitelistingTransactionHash = async (
+export const updateRewardSignature = async (
   rewardId: string,
-  whitelistingTransactionHash: string
+  signature: string
 ) => {
   const rewardDoc = firestore.collection('rewards').doc(rewardId);
   await rewardDoc.update({
-    whitelistingTransactionHash: whitelistingTransactionHash,
+    signature: signature,
     timeUpdated: admin.firestore.FieldValue.serverTimestamp(),
   });
 

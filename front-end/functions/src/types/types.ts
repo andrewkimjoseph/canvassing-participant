@@ -40,9 +40,16 @@ export interface Survey {
   isTest: boolean | null;
 }
 
+
+export interface WhitelistParticipantProps {
+  participantWalletAddress: Address;
+ rewardId: string;
+   network: 'mainnet' | 'testnet'
+}
+
 export interface WhitelistParticipantResult {
   success: boolean;
-  txnHash: Address | null;
+  signature: Address | null;
 }
 
 export interface Reward {
