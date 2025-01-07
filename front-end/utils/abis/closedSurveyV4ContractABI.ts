@@ -1,22 +1,9 @@
-export const closedSurveyV3ContractABI = [
+export const closedSurveyV4ContractABI = [
 	{
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "participantWalletAddress",
-				"type": "address"
-			}
-		],
-		"name": "blacklistWhitelistedParticipant",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "researcherWalletAddress",
+				"name": "researcher",
 				"type": "address"
 			},
 			{
@@ -31,12 +18,39 @@ export const closedSurveyV3ContractABI = [
 			},
 			{
 				"internalType": "address",
-				"name": "cUSDTokenAddress",
+				"name": "cUSDToken",
 				"type": "address"
 			}
 		],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
+	},
+	{
+		"inputs": [],
+		"name": "ECDSAInvalidSignature",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "length",
+				"type": "uint256"
+			}
+		],
+		"name": "ECDSAInvalidSignatureLength",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "s",
+				"type": "bytes32"
+			}
+		],
+		"name": "ECDSAInvalidSignatureS",
+		"type": "error"
 	},
 	{
 		"inputs": [],
@@ -71,6 +85,34 @@ export const closedSurveyV3ContractABI = [
 		"type": "error"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "participant",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "rewardId",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "nonce",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bytes",
+				"name": "signature",
+				"type": "bytes"
+			}
+		],
+		"name": "processRewardClaimByParticipant",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "ReentrancyGuardReentrantCall",
 		"type": "error"
@@ -100,7 +142,7 @@ export const closedSurveyV3ContractABI = [
 			{
 				"indexed": false,
 				"internalType": "address",
-				"name": "participantWalletAddress",
+				"name": "participant",
 				"type": "address"
 			}
 		],
@@ -113,7 +155,7 @@ export const closedSurveyV3ContractABI = [
 			{
 				"indexed": false,
 				"internalType": "address",
-				"name": "participantWalletAddress",
+				"name": "participant",
 				"type": "address"
 			},
 			{
@@ -132,24 +174,11 @@ export const closedSurveyV3ContractABI = [
 			{
 				"indexed": false,
 				"internalType": "address",
-				"name": "participantWalletAddress",
+				"name": "participant",
 				"type": "address"
 			}
 		],
 		"name": "ParticipantScreened",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "address",
-				"name": "participantWalletAddress",
-				"type": "address"
-			}
-		],
-		"name": "ParticipantWhitelisted",
 		"type": "event"
 	},
 	{
@@ -168,19 +197,6 @@ export const closedSurveyV3ContractABI = [
 	{
 		"inputs": [],
 		"name": "pauseSurvey",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "walletAddress",
-				"type": "address"
-			}
-		],
-		"name": "processRewardClaimByParticipant",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -217,7 +233,7 @@ export const closedSurveyV3ContractABI = [
 			{
 				"indexed": false,
 				"internalType": "address",
-				"name": "researcherWalletAddress",
+				"name": "researcher",
 				"type": "address"
 			},
 			{
@@ -234,7 +250,7 @@ export const closedSurveyV3ContractABI = [
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "participantWalletAddress",
+				"name": "participant",
 				"type": "address"
 			}
 		],
@@ -242,6 +258,25 @@ export const closedSurveyV3ContractABI = [
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "bytes",
+				"name": "signature",
+				"type": "bytes"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "participant",
+				"type": "address"
+			}
+		],
+		"name": "SignatureUsed",
+		"type": "event"
 	},
 	{
 		"anonymous": false,
@@ -327,25 +362,12 @@ export const closedSurveyV3ContractABI = [
 			{
 				"indexed": false,
 				"internalType": "address",
-				"name": "participantWalletAddress",
+				"name": "participant",
 				"type": "address"
 			}
 		],
 		"name": "WhitelistedParticipantBlacklisted",
 		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "participantWalletAddress",
-				"type": "address"
-			}
-		],
-		"name": "whitelistParticipant",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
 	},
 	{
 		"inputs": [],
@@ -358,7 +380,7 @@ export const closedSurveyV3ContractABI = [
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "participantWalletAddress",
+				"name": "participant",
 				"type": "address"
 			}
 		],
@@ -377,49 +399,11 @@ export const closedSurveyV3ContractABI = [
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "participantWalletAddress",
-				"type": "address"
-			}
-		],
-		"name": "checkIfParticipantIsBlacklisted",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "participantWalletAddress",
+				"name": "participant",
 				"type": "address"
 			}
 		],
 		"name": "checkIfParticipantIsScreened",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "participantWalletAddress",
-				"type": "address"
-			}
-		],
-		"name": "checkIfParticipantIsWhitelisted",
 		"outputs": [
 			{
 				"internalType": "bool",
