@@ -1,4 +1,4 @@
-import { closedSurveyV3ContractABI } from '@/utils/abis/closedSurveyV3ContractABI';
+import { closedSurveyV4ContractABI } from '@/utils/abis/closedSurveyV4ContractABI';
 import { Address, createPublicClient, createWalletClient, custom } from 'viem';
 import { celoAlfajores } from 'viem/chains';
 import { celo } from 'viem/chains';
@@ -42,7 +42,7 @@ export const screenParticipantInBC = async (
       await publicClient.simulateContract({
         account: address,
         address: smartContractAddress,
-        abi: closedSurveyV3ContractABI,
+        abi: closedSurveyV4ContractABI,
         functionName: 'screenParticipant',
         args: [participantWalletAddress],
       });
