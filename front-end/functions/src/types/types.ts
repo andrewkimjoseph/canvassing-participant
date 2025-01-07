@@ -72,5 +72,6 @@ export interface Reward {
   timeUpdated: admin.firestore.Timestamp | null;
   transactionHash: string | null;
   amountIncUSD: number | null;
-  whitelistingTransactionHash: string | null;
+  signature: string | null;
+  nonce: number | null;
 }
