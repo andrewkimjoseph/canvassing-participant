@@ -27,7 +27,6 @@ import useParticipantStore from '@/stores/useParticipantStore';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 import { SpinnerIconC } from '@/components/icons/spinner-icon';
 import { Reward } from '@/entities/reward';
-import { firestore } from 'firebase-admin';
 
 export default function SuccessPage() {
   const [userAddress, setUserAddress] = useState('');
@@ -95,7 +94,7 @@ export default function SuccessPage() {
       
       toaster.create({
         description: 'Claim process initiated. Please wait ...',
-        duration: 6000,
+        duration: 9000,
         type: 'info',
       });
 
