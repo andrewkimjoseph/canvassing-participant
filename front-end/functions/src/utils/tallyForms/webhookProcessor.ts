@@ -68,7 +68,11 @@ export const processWebhook = async (
     throw new Error('[FATAL] Whitelisting failed.');
   }
 
-  await updateRewardSignature(rewardId, signForRewardResult.signature as Address);
+  await updateRewardSignature({
+    signature: signForRewardResult.signature,
+    rewardId: rewardId,
+    nonce: signForRewardResult.nonce
+  });
 
   return signForRewardResult;
 };

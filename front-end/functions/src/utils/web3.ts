@@ -1,14 +1,14 @@
 import { createWalletClient, Address, http, keccak256, encodePacked } from 'viem';
 import { mnemonicToAccount } from 'viem/accounts';
 import { CHAIN_CONFIGS } from '../config/config';
-import { WhitelistParticipantProps, WhitelistParticipantResult } from '../types/types';
+import { SignForRewardProps, SignForRewardResult } from '../types/types';
 import * as admin from 'firebase-admin';
 
 const SRP = process.env.SRP as Address;
 
 export const signForReward = async (
-{participantWalletAddress, rewardId, network}: WhitelistParticipantProps
-): Promise<WhitelistParticipantResult> => {
+{participantWalletAddress, rewardId, network}: SignForRewardProps
+): Promise<SignForRewardResult> => {
   try {
     const config = CHAIN_CONFIGS[network];
     const account = mnemonicToAccount(SRP);
@@ -19,7 +19,7 @@ export const signForReward = async (
       transport: http(config.rpcUrl),
     });
 
-    const nonce = admin.firestore.FieldValue.serverTimestamp();
+    const nonce = admin.firestore.Timestamp.now().nanoseconds;
 
     const [types, data] = [
       ['address', 'string', 'uint256'],
@@ -36,10 +36,10 @@ export const signForReward = async (
     
     console.log('Signing successful:', signature);
 
-    return { success: true, signature: signature }
+    return { success: true, signature: signature, nonce: nonce }
   } catch (err) {
     console.error(err);
-    return { success: false, signature: null };
+    return { success: false, signature: null, nonce: 0 };
   }
 }
 

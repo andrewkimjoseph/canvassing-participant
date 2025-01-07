@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import { Reward, WebhookData } from '../types/types';
+import { Reward, UpdateRewardSignatureProps, WebhookData } from '../types/types';
 
 admin.initializeApp();
 
@@ -54,13 +54,13 @@ export const createRewardDocument = async (
 };
 
 export const updateRewardSignature = async (
-  rewardId: string,
-  signature: string
+{signature, nonce, rewardId}: UpdateRewardSignatureProps
 ) => {
   const rewardDoc = firestore.collection('rewards').doc(rewardId);
   await rewardDoc.update({
     signature: signature,
     timeUpdated: admin.firestore.FieldValue.serverTimestamp(),
+    nonce: nonce
   });
 
   console.log('Reward doc updated:', rewardId);
