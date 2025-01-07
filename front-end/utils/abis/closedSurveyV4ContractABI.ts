@@ -357,42 +357,10 @@ export const closedSurveyV4ContractABI = [
 		"type": "function"
 	},
 	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "address",
-				"name": "participant",
-				"type": "address"
-			}
-		],
-		"name": "WhitelistedParticipantBlacklisted",
-		"type": "event"
-	},
-	{
 		"inputs": [],
 		"name": "withdrawAllRewardFundsToResearcher",
 		"outputs": [],
 		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "participant",
-				"type": "address"
-			}
-		],
-		"name": "checkIfParticipantHasAlreadyClaimedReward",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -429,6 +397,19 @@ export const closedSurveyV4ContractABI = [
 	},
 	{
 		"inputs": [],
+		"name": "getNumberOfClaimedRewards",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "getNumberOfRewardedParticipants",
 		"outputs": [
 			{
@@ -455,7 +436,7 @@ export const closedSurveyV4ContractABI = [
 	},
 	{
 		"inputs": [],
-		"name": "getNumberOfWhitelistedParticipants",
+		"name": "getNumberOfUsedSignatures",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -507,7 +488,7 @@ export const closedSurveyV4ContractABI = [
 	},
 	{
 		"inputs": [],
-		"name": "numberOfWhitelistedParticipants",
+		"name": "numberOfUsedSignatures",
 		"outputs": [
 			{
 				"internalType": "uint256",
