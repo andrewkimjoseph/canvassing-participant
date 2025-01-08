@@ -54,6 +54,8 @@ export interface CreateRewardResult {
 }
 
 export interface SignForRewardProps {
+  surveyContractAddress: Address,
+  chainId: number,
   participantWalletAddress: Address;
   rewardId: string;
   network: 'mainnet' | 'testnet';

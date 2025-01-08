@@ -1,8 +1,9 @@
 import * as admin from 'firebase-admin';
-import { WebhookData } from '../../types/types';
+import { Survey, WebhookData } from '../../types/types';
 import { createRewardDocument, updateRewardSignature } from '../db';
 import { signForReward } from '../web3';
 import { Address } from 'viem';
+import { CHAIN_CONFIGS } from '../../config/config';
 
 const firestore = admin.firestore();
 
@@ -25,6 +26,8 @@ export const processWebhook = async (
   network: 'mainnet' | 'testnet'
 ) => {
   const { walletAddress, surveyId } = extractFormData(data);
+
+  const chainConfig = CHAIN_CONFIGS[network];
 
   if (!walletAddress || !surveyId) {
     throw new Error('Missing wallet address or survey ID in form submission.');
@@ -50,6 +53,8 @@ export const processWebhook = async (
     throw new Error('Survey not found.');
   }
 
+  const survey =  surveySnapshot.docs[0].data() as Survey;
+
   const participantId = participantSnapshot.docs[0].id;
 
   const rewardCreationResult = await createRewardDocument({
@@ -63,6 +68,8 @@ export const processWebhook = async (
   }
 
   const signForRewardResult = await signForReward({
+    surveyContractAddress: survey.contractAddress as Address,
+    chainId: chainConfig.id,
     participantWalletAddress: walletAddress as Address,
     rewardId: rewardCreationResult.rewardId,
     network: network,
