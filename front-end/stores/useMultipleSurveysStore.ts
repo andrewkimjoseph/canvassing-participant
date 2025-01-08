@@ -101,10 +101,9 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
           survey.isAlreadyBookedByUser = true;
         }
 
-
         if (surveyIsFullyBooked) continue;
 
-        if (survey.isAlreadyBookedByUser && participantHasCompletedSurvey) continue;
+        if (!participantHasCompletedSurvey) continue;
  
         filteredSurveys.push(survey);
       }
