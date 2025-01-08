@@ -99,6 +99,8 @@ export default function SuccessPage() {
         where('participantId', '==', participant.id)
       );
 
+      await new Promise((resolve) => setTimeout(resolve, 4500));
+
       const reward = (await getDocs(rewardsQuery)).docs[0].data() as Reward;
       
       const claimIsProcessed = await processRewardClaimByParticipant(address, {
