@@ -19,19 +19,20 @@ export const faqs = [
       title: "How many questions are there for a single survey?",
       content: "5 - 10 questions that require little to no typing input."
     },
+
     {
       id: 5,  
+      title: "How do the surveys work?",
+      content: "When a survey is available, it requires you to book. Then, you can finish it any time within 72 hours. Once you complete the survey, you will claim your reward, which will then be deposited in your wallet."
+    },
+    {
+      id: 6,  
       title: "What happens when I book a slot in a survey?",
       content: "You are assured of the survey being available to you."
     },
     {
-      id: 6,
+      id: 7,
       title: "I have been missing out on survey booking, what could be wrong?", 
       content: "Survey booking is on a first come, first served basis. Because of the high volumes, once a survey is listed, people rush and thus, the booking closes faster. You just need to be quick enough."
     },
-    {
-      id: 7,
-      title: "How much money can I make from answering surveys per month?",
-      content: "If you book and complete all possible surveys in a month, you could make up to 0.12 cUSD, which is enough for airtime."
-    }
   ];
