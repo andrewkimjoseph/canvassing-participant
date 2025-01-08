@@ -7,6 +7,7 @@ import { Address } from 'viem';
 import useParticipantStore from './useParticipantStore';
 import { checkIfSurveyIsFullyBooked } from '@/services/web3/checkIfSurveyIsFullyBooked';
 import { checkIfParticipantIsScreenedForSurvey } from '@/services/checkIfParticipantHasBeenBookedForSurvey';
+import { checkIfParticipantHasCompletedSurvey } from '@/services/db/checkIfParticipantHasCompletedSurvey';
 
 interface SurveyStoreState {
   surveys: Survey[];
@@ -88,14 +89,21 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
           _chainId: chainId
         });
 
+
+        const participantHasCompletedSurvey = await checkIfParticipantHasCompletedSurvey({
+          _participantId: participant?.id as string,
+          _participantWalletAddress: participant?.walletAddress as string,
+          _surveyId: survey.id,
+        });
+
+
         if (surveyIsAlreadyBookedByUser) {
           survey.isAlreadyBookedByUser = true;
         }
 
-
         if (surveyIsFullyBooked) continue;
 
-        if (survey.isAlreadyBookedByUser) continue;
+        if (!participantHasCompletedSurvey) continue;
  
         filteredSurveys.push(survey);
       }

@@ -154,7 +154,7 @@ export default function Home() {
       toaster.create({
         description: 'Booking in progress. Please wait...',
         duration: 9000,
-        type: 'info',
+        type: "warning",
       });
 
       const screenParticipantRslt = await screenParticipantInBC({
@@ -189,7 +189,7 @@ export default function Home() {
             description:
               'Booking record creation failed.  Kindly reach out to support via the "More" tab. ',
             duration: 3000,
-            type: 'error',
+            type: 'warning',
           });
 
           router.refresh();
@@ -199,7 +199,7 @@ export default function Home() {
           description:
             'On-chain booking failed. Kindly reach out to support via the "More" tab. ',
           duration: 6000,
-          type: 'error',
+          type: 'warning',
         });
 
         router.refresh();
@@ -208,7 +208,7 @@ export default function Home() {
       toaster.create({
         description: 'An error occured during booking. Try again later.',
         duration: 6000,
-        type: 'error',
+        type: 'warning',
       });
     } finally {
       setIsBeingBooked((prevStatus) => ({
@@ -401,7 +401,7 @@ export default function Home() {
                     (status) => status
                   )}
                 >
-                  <Text fontSize="8" color="white">
+                  <Text fontSize="8" color="white" mx={4}>
                     {survey.isAlreadyBookedByUser ? 'Start' : 'Book'}
                   </Text>
                 </Button>

@@ -88,7 +88,7 @@ export default function SignUpPage() {
       toaster.create({
         description: 'Failed to create account. Please try again.',
         duration: 3000,
-        type: 'error',
+        type: 'warning',
       });
       setIsCreatingParticipant(false);
     }

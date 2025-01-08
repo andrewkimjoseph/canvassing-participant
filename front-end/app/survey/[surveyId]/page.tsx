@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { usePathname } from 'next/navigation';
-import { Box, Image, Button, Text, Flex } from '@chakra-ui/react';
+import { Box, Button, Text, Flex } from '@chakra-ui/react';
 import {
   AccordionItem,
   AccordionItemContent,
@@ -11,7 +11,7 @@ import {
   AccordionRoot,
 } from '@/components/ui/accordion';
 import useSingleSurveyStore from '@/stores/useSingleSurveyStore';
-
+import { Toaster, toaster } from '@/components/ui/toaster';
 import useParticipantStore from '@/stores/useParticipantStore';
 import { useRouter } from 'next/navigation';
 import useSingleResearcherStore from '@/stores/useResearcherStore';
@@ -20,7 +20,7 @@ import { SpinnerIconC } from '@/components/icons/spinner-icon';
 
 export default function SurveyPage() {
   const [isMounted, setIsMounted] = useState(false);
-
+  const [userAddress, setUserAddress] = useState('');
   const { address, isConnected } = useAccount();
   const pathname = usePathname();
   const surveyId = pathname?.split('/').pop();
@@ -30,11 +30,18 @@ export default function SurveyPage() {
 
   const { survey, loading, fetchSurvey } = useSingleSurveyStore();
   const { researcher, fetchResearcher } = useSingleResearcherStore();
-  const { participant } = useParticipantStore();
+  const { participant, getParticipant } = useParticipantStore();
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (isConnected && address) {
+      setUserAddress(address);
+      getParticipant(address);
+    }
+  }, [address, isConnected]);
 
   useEffect(() => {
     if (isMounted && surveyId) {
@@ -69,6 +76,7 @@ export default function SurveyPage() {
 
   return (
     <Flex flexDirection="column" w="100%" h="100vh" bgColor="#ECECEC">
+      <Toaster />
       <Box bgColor="white" borderRadius={10} pb={2} mb={4} mt={2} pt={1} mx={2}>
         <Flex flexDirection="column" alignItems="top" pl={2} pt={2} mt={1}>
           <Text fontSize="lg" mb={2} color="#363062">
@@ -200,18 +208,33 @@ export default function SurveyPage() {
         mt={16}
         alignSelf="center"
         onClick={() => {
-          router.push(
-            `${survey.formLink}?walletAddress=${participant?.walletAddress}&surveyId=${survey.id}` ||
-              '#'
-          );
+          if (survey.id && participant?.walletAddress) {
+            toaster.create({
+              description: 'Redirecting you to survey page, please wait ...',
+              duration: 6000,
+              type: 'info',
+            });
 
-          trackAmplitudeEvent('Start survey clicked', {
-            participantWalletAddress: participant?.walletAddress,
-            participantId: participant?.id,
-            surveyId: survey.id,
-            researcherId: researcher?.id,
-            researcherName: researcher?.name,
-          });
+            router.push(
+              `${survey.formLink}?walletAddress=${participant?.walletAddress}&surveyId=${survey.id}` ||
+                '#'
+            );
+
+            trackAmplitudeEvent('Start survey clicked', {
+              participantWalletAddress: participant?.walletAddress,
+              participantId: participant?.id,
+              surveyId: survey.id,
+              researcherId: researcher?.id,
+              researcherName: researcher?.name,
+            });
+          } else {
+            toaster.create({
+              description:
+                'Survey loading delayed, refresh the page and try again.',
+              duration: 6000,
+              type: 'warning',
+            });
+          }
         }}
       >
         <Text fontSize="16" fontWeight="bold" color="white">

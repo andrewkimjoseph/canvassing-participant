@@ -30,7 +30,8 @@ import { Reward } from '@/entities/reward';
 export default function SuccessPage() {
   const chainId = useChainId();
   const [isMounted, setIsMounted] = useState(false);
-  const { address } = useAccount();
+  const [userAddress, setUserAddress] = useState('');
+  const { address, isConnected } = useAccount();
   const { survey, fetchSurvey } = useSingleSurveyStore();
   const [isProcessingRewardClaim, setIsProcessingRewardClaim] = useState(false);
 
@@ -43,6 +44,12 @@ export default function SuccessPage() {
   const submissionId = searchParams.get('submissionId');
   const respondentId = searchParams.get('respondentId');
 
+  useEffect(() => {
+    if (isConnected && address) {
+      setUserAddress(address);
+    }
+  }, [address, isConnected]);
+
 
   const processRewardClaimByParticipantFn = async () => {
     setIsProcessingRewardClaim(true);
@@ -52,7 +59,7 @@ export default function SuccessPage() {
         description:
           'Invalid survey claim request. Kindly reach out to support via the "More" tab.',
         duration: 6000,
-        type: 'error',
+        type: 'warning',
       });
       setIsProcessingRewardClaim(false);
       return;
@@ -63,7 +70,7 @@ export default function SuccessPage() {
         description:
           'Invalid form submission/participant. Kindly reach out to support via the "More" tab.',
         duration: 6000,
-        type: 'error',
+        type: 'warning',
       });
       setIsProcessingRewardClaim(false);
       return;
@@ -79,7 +86,7 @@ export default function SuccessPage() {
         description:
           'Not enough balance to pay you out. Kindly reach out to support via the "More" tab.',
         duration: 6000,
-        type: 'error',
+        type: 'warning',
       });
       setIsProcessingRewardClaim(false);
       return;
@@ -158,7 +165,7 @@ export default function SuccessPage() {
             description:
               'Reward record not found. Kindly reach out to support via the "More" tab.',
             duration: 6000,
-            type: 'error',
+            type: 'warning',
           });
         }
       } else {
@@ -166,7 +173,7 @@ export default function SuccessPage() {
           description:
             'Reward claim was unsuccessful. Kindly reach out to support via the "More" tab.',
           duration: 6000,
-          type: 'error',
+          type: 'warning',
         });
       }
     } catch (error) {
@@ -174,7 +181,7 @@ export default function SuccessPage() {
         description:
           'An unexpected error occurred. Kindly reach out to support via the "More" tab.',
         duration: 6000,
-        type: 'error',
+        type: 'warning',
       });
     }
 
