@@ -1,4 +1,3 @@
-
 import * as admin from 'firebase-admin';
 import { WebhookData } from '../../types/types';
 import { createRewardDocument, updateRewardSignature } from '../db';
@@ -11,12 +10,12 @@ const extractFormData = (data: WebhookData) => {
   const walletAddressField = data.fields.find(
     (field) => field.label === 'walletAddress'
   );
-  const surveyIdField = data.fields.find(
-    (field) => field.label === 'surveyId'
-  );
+  const surveyIdField = data.fields.find((field) => field.label === 'surveyId');
 
   return {
-    walletAddress: walletAddressField ? (walletAddressField.value as string) : null,
+    walletAddress: walletAddressField
+      ? (walletAddressField.value as string)
+      : null,
     surveyId: surveyIdField ? (surveyIdField.value as string) : null,
   };
 };
@@ -26,7 +25,7 @@ export const processWebhook = async (
   network: 'mainnet' | 'testnet'
 ) => {
   const { walletAddress, surveyId } = extractFormData(data);
-  
+
   if (!walletAddress || !surveyId) {
     throw new Error('Missing wallet address or survey ID in form submission.');
   }
@@ -36,7 +35,7 @@ export const processWebhook = async (
     .where('walletAddress', '==', walletAddress)
     .limit(1)
     .get();
-  
+
   if (participantSnapshot.empty) {
     throw new Error('Participant not found for the given wallet address.');
   }
@@ -53,26 +52,29 @@ export const processWebhook = async (
 
   const participantId = participantSnapshot.docs[0].id;
 
-  const rewardId = await createRewardDocument(data, participantId, walletAddress);
-  console.log('Reward document created:', rewardId);
+  const rewardCreationResult = await createRewardDocument({
+    data,
+    participantId,
+    walletAddress,
+  });
 
-  const signForRewardResult = await signForReward(
-  {
-    participantWalletAddress: walletAddress as Address,
-    rewardId: rewardId,
-    network: network
+  if (rewardCreationResult.signature && rewardCreationResult.alreadyExisted) {
+    return;
   }
-  );
+
+  const signForRewardResult = await signForReward({
+    participantWalletAddress: walletAddress as Address,
+    rewardId: rewardCreationResult.rewardId,
+    network: network,
+  });
 
   if (!signForRewardResult.success) {
-    throw new Error('[FATAL] Whitelisting failed.');
+    throw new Error('[FATAL] Signing failed.');
   }
 
   await updateRewardSignature({
     signature: signForRewardResult.signature,
-    rewardId: rewardId,
-    nonce: signForRewardResult.nonce
+    rewardId: rewardCreationResult.rewardId,
+    nonce: signForRewardResult.nonce,
   });
-
-  return signForRewardResult;
 };
