@@ -56,14 +56,6 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
 
         if (!survey.isAvailable) continue;
 
-        
-        const surveyIsFullyBooked = await checkIfSurveyIsFullyBooked({
-          _surveyContractAddress: survey.contractAddress as Address,
-          _chainId: chainId
-        });
-
-
-
         // Check if the participant's country matches the survey's target country
         const countryIsValid =
           survey.targetCountry === 'A' ||
@@ -81,30 +73,38 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
         if (!genderIsValid) continue;
         if (survey.isTest && !participant?.isAdmin) continue;
 
-        const surveyIsAlreadyBookedByUser = await checkIfParticipantIsScreenedForSurvey({
-          _participantId: participant?.id as string,
-          _participantWalletAddress: participant?.walletAddress as string,
-          _surveyContractAddress: survey.contractAddress as string,
-          _surveyId: survey.id,
-          _chainId: chainId
+        const surveyIsFullyBooked = await checkIfSurveyIsFullyBooked({
+          _surveyContractAddress: survey.contractAddress as Address,
+          _chainId: chainId,
         });
 
+        const surveyIsAlreadyBookedByUser =
+          await checkIfParticipantIsScreenedForSurvey({
+            _participantId: participant?.id as string,
+            _participantWalletAddress: participant?.walletAddress as string,
+            _surveyContractAddress: survey.contractAddress as string,
+            _surveyId: survey.id,
+            _chainId: chainId,
+          });
 
-        const participantHasCompletedSurvey = await checkIfParticipantHasCompletedSurvey({
-          _participantId: participant?.id as string,
-          _participantWalletAddress: participant?.walletAddress as string,
-          _surveyId: survey.id,
-        });
-
+        const participantHasCompletedSurvey =
+          await checkIfParticipantHasCompletedSurvey({
+            _participantId: participant?.id as string,
+            _participantWalletAddress: participant?.walletAddress as string,
+            _surveyId: survey.id,
+          });
 
         if (surveyIsAlreadyBookedByUser) {
           survey.isAlreadyBookedByUser = true;
         }
+        if (survey.isAlreadyBookedByUser && participantHasCompletedSurvey) {
+          continue;
+        }
 
-        if (surveyIsFullyBooked) continue;
+        if (surveyIsFullyBooked && participantHasCompletedSurvey) {
+          continue;
+        }
 
-        if (!participantHasCompletedSurvey) continue;
- 
         filteredSurveys.push(survey);
       }
 
