@@ -19,6 +19,8 @@ import { Address } from 'viem';
 import { Participant } from '@/entities/participant';
 import { checkIfSurveyIsFullyBooked } from '@/services/web3/checkIfSurveyIsFullyBooked';
 import { Toaster, toaster } from '@/components/ui/toaster';
+import { MaleAvatarC } from '@/components/avatar/male-avatar';
+import { FemaleAvatarC } from '@/components/avatar/female-avatar';
 
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -27,7 +29,7 @@ export default function Home() {
   }>({});
 
   const { address, isConnected } = useAccount();
-  const chainId = useChainId()
+  const chainId = useChainId();
   const {
     participant,
     loading: participantLoading,
@@ -114,7 +116,7 @@ export default function Home() {
       ...prevStatus,
       [survey.id]: false,
     }));
-  }
+  };
 
   const bookSurveyFn = async (survey: Survey) => {
     setIsBeingBooked((prevStatus) => ({
@@ -124,7 +126,7 @@ export default function Home() {
 
     const surveyIsFullyBooked = await checkIfSurveyIsFullyBooked({
       _surveyContractAddress: survey.contractAddress as Address,
-      _chainId: chainId
+      _chainId: chainId,
     });
 
     if (surveyIsFullyBooked) {
@@ -144,15 +146,13 @@ export default function Home() {
         [survey.id]: false,
       }));
 
-      window.location.replace("/");
+      window.location.replace('/');
       return;
     }
 
     try {
-
       toaster.create({
-        description:
-          'Booking in progress. Please wait...',
+        description: 'Booking in progress. Please wait...',
         duration: 9000,
         type: 'info',
       });
@@ -160,7 +160,7 @@ export default function Home() {
       const screenParticipantRslt = await screenParticipantInBC({
         _smartContractAddress: survey.contractAddress as Address,
         _participantWalletAddress: participant?.walletAddress as Address,
-        _chainId: chainId
+        _chainId: chainId,
       });
 
       if (screenParticipantRslt.success) {
@@ -171,14 +171,13 @@ export default function Home() {
         });
 
         if (participantIsScreenedInDB) {
-
           toaster.create({
             description:
               'Booking success. You are being redirected to the survey page... ',
             duration: 9000,
             type: 'success',
           });
-       
+
           router.push(`/survey/${survey.id}`);
 
           trackAmplitudeEvent('Survey booked', {
@@ -243,7 +242,13 @@ export default function Home() {
   }
 
   return (
-    <Flex flexDirection={'column'} w={'100%'} bgColor={'#ECECEC'} px={4} h={"full"}>
+    <Flex
+      flexDirection={'column'}
+      w={'100%'}
+      bgColor={'#ECECEC'}
+      px={4}
+      h={'full'}
+    >
       <Toaster />
 
       <Flex justify="flex-start">
@@ -268,7 +273,7 @@ export default function Home() {
       >
         <Flex flexDirection="row" alignItems="top" p={4}>
           <Box>
-            <Avatar variant="solid" size="lg" bgColor="white" color={'black'} />
+            {participant?.gender === 'M' ? <MaleAvatarC /> : <FemaleAvatarC />}
           </Box>
 
           <Box ml={4}>
@@ -296,8 +301,7 @@ export default function Home() {
         </Text>
       </Flex>
 
-      <Box w="full" h={"full"}>
-        
+      <Box w="full" h={'full'}>
         {surveys.length > 0 && !surveyLoading && (
           <Flex justify="flex-start">
             <Text
@@ -319,7 +323,11 @@ export default function Home() {
           surveys.map((survey) => (
             <Box
               key={survey.id}
-              bgColor={isBeingBooked[survey.id] || survey.isAlreadyBookedByUser ? '#CDFFD8' : 'white'}
+              bgColor={
+                isBeingBooked[survey.id] || survey.isAlreadyBookedByUser
+                  ? '#CDFFD8'
+                  : 'white'
+              }
               h="25"
               w="full"
               borderRadius={10}
@@ -379,14 +387,16 @@ export default function Home() {
                 </Flex>
 
                 <Button
-                  bgColor={survey.isAlreadyBookedByUser ? "green": "#363062"}
+                  bgColor={survey.isAlreadyBookedByUser ? 'green' : '#363062'}
                   borderRadius={20}
                   w={'1/6'}
                   mr={2}
                   loading={isBeingBooked[survey.id] as boolean}
-                  loadingText={<Box pr={4}>
-                    <SpinnerIconC />
-                  </Box>}
+                  loadingText={
+                    <Box pr={4}>
+                      <SpinnerIconC />
+                    </Box>
+                  }
                   disabled={Object.values(isBeingBooked).some(
                     (status) => status
                   )}
