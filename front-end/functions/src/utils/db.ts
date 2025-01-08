@@ -1,20 +1,24 @@
 import * as admin from 'firebase-admin';
 import {
+  CreateRewardProps,
+  CreateRewardResult,
   Reward,
   UpdateRewardSignatureProps,
-  WebhookData,
 } from '../types/types';
 
 admin.initializeApp();
 
 const firestore = admin.firestore();
 
-export const createRewardDocument = async (
-  data: WebhookData,
-  participantId: string,
-  walletAddress: string
-): Promise<string> => {
-  let rewardId: string | null = null;
+export const createRewardDocument = async ({
+  data,
+  participantId,
+  walletAddress,
+}: CreateRewardProps): Promise<CreateRewardResult> => {
+  let reward: Reward | null = null;
+  let signature: string | null = null;
+  let alreadyExisted: boolean = false;
+
 
   const surveyId = data.fields.find(
     (field) => field.label === 'surveyId'
@@ -44,17 +48,27 @@ export const createRewardDocument = async (
       timeUpdated: null,
       transactionHash: null,
       amountIncUSD: null,
+      signature: null,
+      nonce: null
     });
 
-    rewardId = rewardDoc.id;
-  } else {
-    let reward = existingReward.docs[0].data() as Reward;
-    rewardId = reward.id;
+    reward = (await rewardDoc.get()).data() as Reward;
+    signature = reward.signature;
+    alreadyExisted = false;
+    console.log('New reward created:', reward);
 
-    console.log('Existing reward, [id] being returned ...:', rewardId);
+  } else {
+    reward = existingReward.docs[0].data() as Reward;
+    signature = reward.signature;
+    alreadyExisted = true;
+    console.log('Existing reward found:', reward);
   }
 
-  return rewardId;
+  return {
+    rewardId: reward.id,
+    signature: signature,
+    alreadyExisted
+  };
 };
 
 export const updateRewardSignature = async ({
@@ -67,7 +81,7 @@ export const updateRewardSignature = async ({
   const reward = (await rewardDoc.get()).data() as Reward;
 
   if (reward.signature && reward.nonce) {
-    console.log('Reward doc already updated:', rewardId);
+    console.log('Reward already updated ...', rewardId);
     console.log('Signature:', reward.signature);
     console.log('Nonce:', reward.nonce);
   } else {
@@ -76,10 +90,9 @@ export const updateRewardSignature = async ({
       timeUpdated: admin.firestore.FieldValue.serverTimestamp(),
       nonce: nonce,
     });
-
+    console.log('Reward being updated ...');
     console.log('Signature:', signature);
     console.log('Nonce:', nonce);
-
     console.log('Reward doc updated:', rewardId);
   }
 };

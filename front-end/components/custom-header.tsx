@@ -18,27 +18,26 @@ import {
   DrawerTrigger,
 } from '@chakra-ui/react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { Avatar } from '@/components/ui/avatar';
 import { LogoC } from './logo';
 import { HamburgerIconC } from './hamburger-icon';
-import { DrawerLogoC } from './drawer-logo';
 import { DrawerCardC } from './drawer-card';
 import { HomeIconC } from './icons/home-icon';
 import { RewardHistoryIconC } from './icons/reward-history-icon';
-import { CloseIconC } from './icons/close-icon';
 import useParticipantStore from '@/stores/useParticipantStore';
 import { useState, useEffect } from 'react';
 import { injected } from 'wagmi/connectors';
 import { useAccount, useConnect } from 'wagmi';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 import { MoreIconC } from './icons/more-icon';
+import { MaleAvatarC } from './avatars/male-avatar';
+import { FemaleAvatarC } from './avatars/female-avatar';
 
 const CustomHeader = () => {
   const { participant } = useParticipantStore();
   const [isMiniPay, setIsMiniPay] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { connect } = useConnect();
-  const { address, isConnected } = useAccount();
+  const { isConnected } = useAccount();
   const { trackAmplitudeEvent } = useAmplitudeContext();
 
   useEffect(() => {
@@ -98,7 +97,7 @@ const CustomHeader = () => {
         </Flex>
       </Box>
 
-      <DrawerContent w={'60vw'} bgColor={'#363062'}>
+      <DrawerContent w={'70vw'} bgColor={'#363062'}>
         <DrawerHeader>
           <Flex
             flexDirection={'row'}
@@ -106,13 +105,34 @@ const CustomHeader = () => {
             justify={'space-between'}
             pt={3}
           >
-            <DrawerLogoC />
-            <DrawerActionTrigger>
-              <CloseIconC />
-            </DrawerActionTrigger>
+            <Box className="flex flex-row items-left w-full">
+              {participant?.gender === 'M' ? (
+                <MaleAvatarC />
+              ) : (
+                <FemaleAvatarC />
+              )}
+
+              <Box className="flex flex-col items-left relative ml-4">
+                <Text fontSize={18} mb={2} color={'white'}>
+                  {participant?.username || 'Userxxxx'}
+                </Text>
+                <Text fontSize={14} mb={2} color={'white'}>
+                  Participant
+                </Text>
+              </Box>
+            </Box>
           </Flex>
         </DrawerHeader>
         <DrawerBody>
+          <hr
+            style={{
+              backgroundColor: 'D9D9D9',
+              height: 2,
+              borderRadius: 4,
+              borderWidth: 2,
+            }}
+          />
+
           <Flex flexDirection={'column'} alignItems={'start'}>
             <DrawerActionTrigger>
               <DrawerCardC
@@ -156,6 +176,16 @@ const CustomHeader = () => {
           </Flex>
         </DrawerBody>
         <DrawerFooter flexDirection={'column'} alignItems={'center'} pb={16}>
+          <hr
+            style={{
+              backgroundColor: 'D9D9D9',
+              height: 2,
+              borderRadius: 4,
+              borderWidth: 2,
+              width: '100%',
+            }}
+          />
+
           {!isMiniPay ? (
             <ConnectButton
               chainStatus="none"
@@ -170,15 +200,20 @@ const CustomHeader = () => {
               label="Connect Wallet"
             />
           ) : null}
-          <Box className="flex flex-row items-left w-full mt-8 mb-8">
-            <Avatar variant={'solid'} size="lg" bgColor={'white'} />
 
-            <Box className="flex flex-col items-left relative ml-4">
-              <Text fontSize={18} mb={2} color={'white'}>
-                {participant?.username || 'Userxxxx'}
-              </Text>
-              <Text fontSize={14} mb={2} color={'white'}>
-                Participant
+          <Box className="flex flex-row items-left w-full mb-4">
+            <Box className="flex flex-col items-left relative">
+              <Text
+                fontSize={12}
+                mb={2}
+                color={'#94B9FF'}
+                mt={8}
+                lineHeight={'short'}
+                textAlign={'center'}
+              >
+                This decentralized application (dApp) is independently operated
+                and maintained by Canvassing. It is not affiliated with,
+                endorsed by, or operated by Opera or MiniPay.
               </Text>
             </Box>
           </Box>

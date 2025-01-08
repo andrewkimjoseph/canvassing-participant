@@ -1,4 +1,10 @@
-import { createWalletClient, Address, http, keccak256, encodePacked } from 'viem';
+import {
+  createWalletClient,
+  Address,
+  http,
+  keccak256,
+  encodePacked,
+} from 'viem';
 import { mnemonicToAccount } from 'viem/accounts';
 import { CHAIN_CONFIGS } from '../config/config';
 import { SignForRewardProps, SignForRewardResult } from '../types/types';
@@ -6,9 +12,13 @@ import { randomBytes } from 'crypto';
 
 const SRP = process.env.SRP as Address;
 
-export const signForReward = async (
-{participantWalletAddress, rewardId, network}: SignForRewardProps
-): Promise<SignForRewardResult> => {
+export const signForReward = async ({
+  surveyContractAddress,
+  chainId,
+  participantWalletAddress,
+  rewardId,
+  network,
+}: SignForRewardProps): Promise<SignForRewardResult> => {
   try {
     const config = CHAIN_CONFIGS[network];
     const account = mnemonicToAccount(SRP);
@@ -22,8 +32,14 @@ export const signForReward = async (
     const nonce = BigInt('0x' + randomBytes(32).toString('hex'));
 
     const [types, data] = [
-      ['address', 'string', 'uint256'],
-      [participantWalletAddress, rewardId, nonce],
+      ['address', 'uint256', 'address', 'string', 'uint256'],
+      [
+        surveyContractAddress,
+        chainId,
+        participantWalletAddress,
+        rewardId,
+        nonce,
+      ],
     ];
 
     const messageHash = keccak256(encodePacked(types, data), 'bytes');
@@ -35,15 +51,12 @@ export const signForReward = async (
     });
 
     const stringifiedNonce = nonce.toString();
-    
+
     console.log('Signing successful:', signature);
 
-    return { success: true, signature: signature, nonce: stringifiedNonce }
+    return { success: true, signature: signature, nonce: stringifiedNonce };
   } catch (err) {
     console.error(err);
     return { success: false, signature: null, nonce: '' };
   }
-}
-
-
-
+};

@@ -40,7 +40,22 @@ export interface Survey {
   isTest: boolean | null;
 }
 
+
+export interface CreateRewardProps {
+  data: WebhookData,
+  participantId: string,
+  walletAddress: string
+}
+
+export interface CreateRewardResult {
+  rewardId: string,
+  signature: string | null,
+  alreadyExisted: boolean
+}
+
 export interface SignForRewardProps {
+  surveyContractAddress: Address,
+  chainId: number,
   participantWalletAddress: Address;
   rewardId: string;
   network: 'mainnet' | 'testnet';
