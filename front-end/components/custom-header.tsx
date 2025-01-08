@@ -29,8 +29,8 @@ import { injected } from 'wagmi/connectors';
 import { useAccount, useConnect } from 'wagmi';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 import { MoreIconC } from './icons/more-icon';
-import { MaleAvatarC } from './avatar/male-avatar';
-import { FemaleAvatarC } from './avatar/female-avatar';
+import { MaleAvatarC } from './avatars/male-avatar';
+import { FemaleAvatarC } from './avatars/female-avatar';
 
 const CustomHeader = () => {
   const { participant } = useParticipantStore();

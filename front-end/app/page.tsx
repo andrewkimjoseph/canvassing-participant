@@ -19,8 +19,8 @@ import { Address } from 'viem';
 import { Participant } from '@/entities/participant';
 import { checkIfSurveyIsFullyBooked } from '@/services/web3/checkIfSurveyIsFullyBooked';
 import { Toaster, toaster } from '@/components/ui/toaster';
-import { MaleAvatarC } from '@/components/avatar/male-avatar';
-import { FemaleAvatarC } from '@/components/avatar/female-avatar';
+import { MaleAvatarC } from '@/components/avatars/male-avatar';
+import { FemaleAvatarC } from '@/components/avatars/female-avatar';
 
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
