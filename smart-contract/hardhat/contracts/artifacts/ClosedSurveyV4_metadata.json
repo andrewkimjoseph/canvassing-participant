@@ -275,6 +275,19 @@
 				"type": "function"
 			},
 			{
+				"inputs": [],
+				"name": "checkIfContractIsPaused",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "address",
@@ -359,6 +372,19 @@
 						"internalType": "uint256",
 						"name": "",
 						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getOwner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
 					}
 				],
 				"stateMutability": "view",
@@ -671,6 +697,11 @@
 			},
 			"kind": "dev",
 			"methods": {
+				"checkIfContractIsPaused()": {
+					"returns": {
+						"_0": "bool True if address(this) is paused"
+					}
+				},
 				"checkIfParticipantIsScreened(address)": {
 					"params": {
 						"participant": "- Address of the participant to check"
@@ -714,6 +745,11 @@
 				"getNumberOfUsedSignatures()": {
 					"returns": {
 						"_0": "uint256 The number of used signatures"
+					}
+				},
+				"getOwner()": {
+					"returns": {
+						"_0": "address The owner"
 					}
 				},
 				"getRewardAmountPerParticipantInWei()": {
@@ -803,6 +839,9 @@
 				"cUSD()": {
 					"notice": "Reference to the cUSD token contract"
 				},
+				"checkIfContractIsPaused()": {
+					"notice": "Checks if address(this) is paused"
+				},
 				"checkIfParticipantIsScreened(address)": {
 					"notice": "Checks if a given participant has been screened"
 				},
@@ -823,6 +862,9 @@
 				},
 				"getNumberOfUsedSignatures()": {
 					"notice": "Gets the number of signatures that have been used"
+				},
+				"getOwner()": {
+					"notice": "Gets the address set as owner() in the constructor during deployment"
 				},
 				"getRewardAmountPerParticipantInWei()": {
 					"notice": "Gets the current reward amount per participant"
@@ -986,11 +1028,11 @@
 			]
 		},
 		"smart-contract/hardhat/contracts/ClosedSurveyV4.sol": {
-			"keccak256": "0x334f6319303c3c7a33957c008c3367e1388264d48597f4ed9d15054d960dfb1d",
+			"keccak256": "0xd88fd2d353208c7f4e3f5f14c4a7c59b4ec98ddcc32d577be528ee7bdd35d892",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://a03b5e92c34aae41b6637aaa9733a299644dde12f8d8202f70fdf93f21b41b5d",
-				"dweb:/ipfs/Qmf63enT6YtJdx7eqqNxM1ax6UR3bES4auFDZ1VojuF35c"
+				"bzz-raw://95f9d6ca5937ed7b4afb83878f36c909f5bb398cb3e15ed86058f2a89f5453c8",
+				"dweb:/ipfs/QmNRjZzuVgQPWYmhVN4sG5S2PD8PrLPbWBw3LgrUW3HK2u"
 			]
 		}
 	},

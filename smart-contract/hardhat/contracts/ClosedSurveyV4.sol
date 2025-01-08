@@ -280,18 +280,31 @@ contract ClosedSurveyV4 is Ownable, ReentrancyGuard, Pausable {
      * @return bytes32 The keccak256 hash of the packed parameters
      *
      * The hash is created by tightly packing the parameters in order:
-     * 1. participant Address
-     * 2. rewardId String
-     * 3. nonce Unique number to prevent relay attacks
+     * 1. Contract address (this contract's address)
+     * 2. Chain ID (current blockchain network ID)
+     * 3. participant Address
+     * 4. rewardId String
+     * 5. nonce Unique number to prevent relay attacks
      *
      * This hash must match exactly what is signed off-chain by the contract owner
+     * The inclusion of contract address and chain ID prevents replay attacks across
+     * different contract deployments and blockchain networks
      */
     function getMessageHash(
         address participant,
         string memory rewardId,
         uint256 nonce
-    ) private pure returns (bytes32) {
-        return keccak256(abi.encodePacked(participant, rewardId, nonce));
+    ) private view returns (bytes32) {
+        return
+            keccak256(
+                abi.encodePacked(
+                    address(this),
+                    block.chainid,
+                    participant,
+                    rewardId,
+                    nonce
+                )
+            );
     }
 
     /**
@@ -509,7 +522,15 @@ contract ClosedSurveyV4 is Ownable, ReentrancyGuard, Pausable {
         returns (bool)
     {
         return signaturesUsedForClaiming[signature];
-    }    
+    }
+
+    /**
+     * @notice Checks if address(this) is paused
+     * @return bool True if address(this) is paused
+     */
+    function checkIfContractIsPaused() external view returns (bool) {
+        return paused();
+    }
 
     /**
      * @notice Gets the current reward amount per participant
@@ -561,5 +582,13 @@ contract ClosedSurveyV4 is Ownable, ReentrancyGuard, Pausable {
      */
     function getNumberOfClaimedRewards() external view returns (uint256) {
         return numberOfClaimedRewards;
+    }
+
+    /**
+     * @notice Gets the address set as owner() in the constructor during deployment
+     * @return address The owner
+     */
+    function getOwner() external view returns (address) {
+        return owner();
     }
 }
