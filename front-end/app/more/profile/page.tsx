@@ -33,7 +33,7 @@ export default function Profile() {
       toaster.create({
         description: 'Username must be between 7 and 15 characters',
         duration: 3000,
-        type: 'error',
+        type: 'warning',
       });
 
       setIsUpdatingUsername(false);
@@ -51,7 +51,7 @@ export default function Profile() {
           description:
             'You can only update your username once every half an hour.',
           duration: 3000,
-          type: 'error',
+          type: 'warning',
         });
 
         setIsUpdatingUsername(false);
