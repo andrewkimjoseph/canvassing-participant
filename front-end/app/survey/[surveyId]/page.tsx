@@ -212,7 +212,7 @@ export default function SurveyPage() {
             toaster.create({
               description: 'Redirecting you to survey page, please wait ...',
               duration: 6000,
-              type: 'warning',
+              type: 'info',
             });
 
             router.push(
