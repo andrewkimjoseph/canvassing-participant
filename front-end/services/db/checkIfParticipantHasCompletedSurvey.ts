@@ -6,7 +6,7 @@ export const checkIfParticipantHasCompletedSurvey = async ({
   _participantWalletAddress,
   _surveyId,
 }: CheckIfParticipantHasCompletedSurveyProps): Promise<boolean> => {
-  let participantHasCompletedSurvey: boolean = false;
+  let participantHasCompletedSurvey: boolean = true;
 
   const rewardsQuery = query(
     collection(db, 'rewards'),
@@ -16,7 +16,7 @@ export const checkIfParticipantHasCompletedSurvey = async ({
   );
   const snapshot = await getDocs(rewardsQuery);
 
-  return snapshot.empty ? participantHasCompletedSurvey : !participantHasCompletedSurvey;
+  return snapshot.empty ? !participantHasCompletedSurvey : participantHasCompletedSurvey;
 };
 
 export type CheckIfParticipantHasCompletedSurveyProps = {
