@@ -52,6 +52,10 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
       const filteredSurveys: Survey[] = [];
       for (let survey of surveys) {
         // Check if the survey is fully booked
+
+        if (!survey.isAvailable) continue;
+
+        
         const surveyIsFullyBooked = await checkIfSurveyIsFullyBooked({
           _surveyContractAddress: survey.contractAddress as Address,
           _chainId: chainId
@@ -69,11 +73,8 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
           survey.targetGender === 'A' ||
           survey.targetGender === participant?.gender;
 
-
-        
-
         // Apply all filters
-        if (!survey.isAvailable) continue;
+
         if (!survey.contractAddress) continue;
         if (!countryIsValid) continue;
         if (!genderIsValid) continue;
@@ -91,7 +92,10 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
           survey.isAlreadyBookedByUser = true;
         }
 
-        if (surveyIsFullyBooked && !survey.isAlreadyBookedByUser) continue;
+
+        if (surveyIsFullyBooked) continue;
+
+        if (!survey.isAlreadyBookedByUser) continue;
  
         filteredSurveys.push(survey);
       }
