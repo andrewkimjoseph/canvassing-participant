@@ -95,7 +95,7 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
 
         if (surveyIsFullyBooked) continue;
 
-        if (!survey.isAlreadyBookedByUser) continue;
+        if (survey.isAlreadyBookedByUser) continue;
  
         filteredSurveys.push(survey);
       }
