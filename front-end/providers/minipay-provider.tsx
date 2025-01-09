@@ -15,7 +15,7 @@ export const MiniPayProvider: React.FC<{
         window.location.hostname === 'localhost';
 
       const miniPayExists: boolean =
-        !isDevelopment ||
+        isDevelopment ||
         (typeof window !== 'undefined' &&
           (window as any).ethereum &&
           ((window as any).ethereum.isMiniPay !== undefined ||
