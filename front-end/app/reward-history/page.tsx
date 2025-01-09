@@ -1,18 +1,17 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 import { Box, Text, Flex } from '@chakra-ui/react';
 import useRewardStore from '@/stores/useRewardStore';
 import { useRouter } from 'next/navigation';
 import useParticipantStore from '@/stores/useParticipantStore';
 
-import {
-  ClipboardIconButton,
-  ClipboardRoot,
-} from '@/components/ui/clipboard';
+import { ClipboardIconButton, ClipboardRoot } from '@/components/ui/clipboard';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 import { SpinnerIconC } from '@/components/icons/spinner-icon';
+import { MainnetCheckmarkC } from '@/components/icons/checkmarks/mainnet';
+import { TestnetCheckmarkC } from '@/components/icons/checkmarks/testnet';
 
 export default function RewardHistory() {
   const [isMounted, setIsMounted] = useState(false);
@@ -21,11 +20,12 @@ export default function RewardHistory() {
   const router = useRouter();
   const { participant, getParticipant } = useParticipantStore();
   const { trackAmplitudeEvent } = useAmplitudeContext();
+  const chainId = useChainId();
 
   const checkParticipantStatus = useCallback(() => {
     if (isConnected && address) {
       getParticipant(address);
-      fetchRewards(address);
+      fetchRewards(address, chainId);
     }
   }, [isConnected, address, getParticipant]);
 
@@ -46,7 +46,7 @@ export default function RewardHistory() {
   if (!isMounted) {
     return (
       <Flex justify="center" align="center" h="100vh">
-         <SpinnerIconC />
+        <SpinnerIconC />
       </Flex>
     );
   }
@@ -79,11 +79,21 @@ export default function RewardHistory() {
               p={4}
               mb={4}
             >
-              <Text fontSize="lg" color="#363062">
-                {reward.timeCreated
-                  ? new Date(reward.timeCreated.seconds * 1000).toLocaleString()
-                  : null}
-              </Text>
+              <Flex justify="space-between" align="left" mt={2}>
+                <Text fontSize="lg" color="#363062">
+                  {reward.timeCreated
+                    ? new Date(
+                        reward.timeCreated.seconds * 1000
+                      ).toLocaleString()
+                    : null}
+                </Text>
+
+                {reward.isForTestnet ? (
+                  <TestnetCheckmarkC />
+                ) : (
+                  <MainnetCheckmarkC />
+                )}
+              </Flex>
 
               <Flex justify="space-between" align="center" mt={2}>
                 <Text fontSize="lg" color={reward.isClaimed ? 'green' : 'red'}>
@@ -119,15 +129,15 @@ export default function RewardHistory() {
                   textDecoration={'underline'}
                   onClick={() => {
                     if (reward.isClaimed) {
-                      // router.push(
-                      //   `https://celo-alfajores.blockscout.com/tx/${reward.transactionHash}`
-                      // );
-
-                      router.push(
-                        `https://celoscan.io/tx/${reward.transactionHash}`
-                      );
-
-
+                      if (reward.isForTestnet) {
+                        router.push(
+                          `https://celo-alfajores.blockscout.com/tx/${reward.transactionHash}`
+                        );
+                      } else {
+                        router.push(
+                          `https://celoscan.io/tx/${reward.transactionHash}`
+                        );
+                      }
                       trackAmplitudeEvent('View on block explorer clicked', {
                         participantWalletAddress: participant?.walletAddress,
                         participantId: participant?.id,
