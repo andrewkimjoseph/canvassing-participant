@@ -76,16 +76,7 @@ export default function Home() {
         identifyUser(identifyEvent);
       }
     }
-  }, [
-    isConnected,
-    address,
-    getParticipant,
-    chainId,
-    fetchSurveys,
-    identifyUser,
-    participant,
-    surveys,
-  ]);
+  }, [isConnected, address, getParticipant]);
 
   // Initial setup effect
   useEffect(() => {
