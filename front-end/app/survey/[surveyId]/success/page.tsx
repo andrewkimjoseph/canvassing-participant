@@ -115,16 +115,16 @@ export default function SuccessPage() {
     toaster.create({
       description:
         'Reward record found. You will now be prompted to approve the claim request.',
-      duration: 6000,
+      duration: 12000,
       type: 'info',
     });
 
     const rewardRef = rewardQueryDocs.docs[0].ref;
 
-    const reward = (await getDocs(rewardsQuery)).docs[0].data() as Reward;
-
     try {
-      await new Promise((resolve) => setTimeout(resolve, 5000));
+      await new Promise((resolve) => setTimeout(resolve, 3750));
+
+      const reward = (await getDocs(rewardsQuery)).docs[0].data() as Reward;
 
       const claimIsProcessed = await processRewardClaimByParticipant(address, {
         _participantWalletAddress: address as Address,
