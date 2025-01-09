@@ -10,7 +10,9 @@ export const MiniPayProvider: React.FC<{
 
   useEffect(() => {
     const checkMiniPay = () => {
-      const isDevelopment = window.location.hostname === 'localhost';
+      const isDevelopment =
+        typeof window !== 'undefined' &&
+        window.location.hostname === 'localhost';
 
       const miniPayExists: boolean =
         isDevelopment ||
