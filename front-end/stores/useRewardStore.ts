@@ -8,7 +8,7 @@ import { checkIfRewardIsForTestnet } from '@/services/web3/checkIfRewardIsForTes
 interface RewardStoreState {
   rewards: Reward[];
   loading: boolean;
-  fetchRewards: (walletAddress: string, chainId: number) => Promise<void>;
+  fetchRewards: (walletAddress: string) => Promise<void>;
 }
 
 const useRewardStore = create<RewardStoreState>()(
@@ -17,7 +17,7 @@ const useRewardStore = create<RewardStoreState>()(
       rewards: [],
       loading: false,
 
-      fetchRewards: async (walletAddress, chainId) => {
+      fetchRewards: async (walletAddress) => {
         set({ loading: true });
         try {
           const q = query(
@@ -35,7 +35,6 @@ const useRewardStore = create<RewardStoreState>()(
           for (let reward of fetchedRewards) {
             const rewardIsForTestnet = await checkIfRewardIsForTestnet({
               _transactionHash: reward.transactionHash as string,
-              _chainId: chainId,
             });
 
             if (rewardIsForTestnet) {
