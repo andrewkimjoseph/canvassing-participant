@@ -1,10 +1,8 @@
 import { cUSDContractABI } from '@/utils/abis/cUSDContractABI';
 import { cUSDAlfajoresContractAddress } from '@/utils/addresses/cUSDAlfajoresContractAddress';
-// import { cUSDAlfajoresContractAddress } from "@/utils/addresses/cUSDAlfajoresContractAddress";
 import { cUSDMainnetContractAddress } from '@/utils/addresses/cUSDMainnetContractAddress';
 import { Address, createPublicClient, custom } from 'viem';
 import { celoAlfajores, celo } from 'viem/chains';
-// import { celo } from "viem/chains";
 
 export const getContractBalance = async (
   _signerAddress: `0x${string}` | undefined,

@@ -3,11 +3,12 @@ import { persist } from 'zustand/middleware';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { Reward } from '@/entities/reward';
 import { db } from '@/firebase';
+import { checkIfRewardIsForTestnet } from '@/services/web3/checkIfRewardIsForTestnet';
 
 interface RewardStoreState {
   rewards: Reward[];
   loading: boolean;
-  fetchRewards: (walletAddress: string) => Promise<void>;
+  fetchRewards: (walletAddress: string, chainId: number) => Promise<void>;
 }
 
 const useRewardStore = create<RewardStoreState>()(
@@ -16,7 +17,7 @@ const useRewardStore = create<RewardStoreState>()(
       rewards: [],
       loading: false,
 
-      fetchRewards: async (walletAddress) => {
+      fetchRewards: async (walletAddress, chainId) => {
         set({ loading: true });
         try {
           const q = query(
@@ -24,12 +25,33 @@ const useRewardStore = create<RewardStoreState>()(
             where('participantWalletAddress', '==', walletAddress)
           );
           const snapshot = await getDocs(q);
-          const data = snapshot.docs.map((doc) => ({
+          const fetchedRewards = snapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
           })) as Reward[];
-          data.sort((a, b) => (b.timeCreated?.seconds ?? 0) - (a.timeCreated?.seconds ?? 0)); // Sort rewards from latest to earliest
-          set({ rewards: data, loading: false });
+
+          const improvedRewards: Reward[] = [];
+
+          for (let reward of fetchedRewards) {
+            const rewardIsForTestnet = await checkIfRewardIsForTestnet({
+              _transactionHash: reward.transactionHash as string,
+              _chainId: chainId,
+            });
+
+            if (rewardIsForTestnet) {
+              reward.isForTestnet = true;
+            } else {
+              reward.isForTestnet = false;
+            }
+
+            improvedRewards.push(reward);
+          }
+
+          improvedRewards.sort(
+            (a, b) =>
+              (b.timeCreated?.seconds ?? 0) - (a.timeCreated?.seconds ?? 0)
+          ); // Sort rewards from latest to earliest
+          set({ rewards: improvedRewards, loading: false });
         } catch (error) {
           set({ loading: false });
         }
