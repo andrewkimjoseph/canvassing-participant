@@ -122,7 +122,7 @@ export default function SuccessPage() {
     const rewardRef = rewardQueryDocs.docs[0].ref;
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 5000));
+      await new Promise((resolve) => setTimeout(resolve, 3750));
 
       const reward = (await getDocs(rewardsQuery)).docs[0].data() as Reward;
 
