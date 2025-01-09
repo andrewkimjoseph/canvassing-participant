@@ -90,9 +90,10 @@ export const updateRewardSignature = async ({
       timeUpdated: admin.firestore.FieldValue.serverTimestamp(),
       nonce: nonce,
     });
-    console.log('Reward being updated ...');
-    console.log('Signature:', signature);
-    console.log('Nonce:', nonce);
-    console.log('Reward doc updated:', rewardId);
+
+    const updatedReward = (await rewardDoc.get()).data() as Reward;
+
+    console.log('Old reward being updated ...');
+    console.log('Old reward updated:', updatedReward);
   }
 };
