@@ -12,50 +12,89 @@ const extractFormData = (data: WebhookData) => {
     (field) => field.label === 'walletAddress'
   );
   const surveyIdField = data.fields.find((field) => field.label === 'surveyId');
+  const participantIdField = data.fields.find(
+    (field) => field.label === 'participantId'
+  );
+  const genderField = data.fields.find((field) => field.label === 'gender');
+  const countryField = data.fields.find((field) => field.label === 'country');
+  const researcherIdField = data.fields.find(
+    (field) => field.label === 'researcherId'
+  );
+  const contractAddressField = data.fields.find(
+    (field) => field.label === 'contractAddress'
+  );
 
-  return {
+  const returnData = {
     walletAddress: walletAddressField
       ? (walletAddressField.value as string)
       : null,
     surveyId: surveyIdField ? (surveyIdField.value as string) : null,
+    participantId: participantIdField
+      ? (participantIdField.value as string)
+      : null,
+    gender: genderField ? (genderField.value as string) : null,
+    country: countryField ? (countryField.value as string) : null,
+    researcherId: researcherIdField
+      ? (researcherIdField.value as string)
+      : null,
+    contractAddress: contractAddressField
+      ? (contractAddressField.value as string)
+      : null,
   };
+
+  console.log('Extracted data:', returnData);
+
+  return returnData;
 };
 
 export const processWebhook = async (
   data: WebhookData,
   network: 'mainnet' | 'testnet'
 ) => {
-  const { walletAddress, surveyId } = extractFormData(data);
-
+  const {
+    walletAddress,
+    surveyId,
+    participantId,
+    gender,
+    country,
+    researcherId,
+    contractAddress,
+  } = extractFormData(data);
   const chainConfig = CHAIN_CONFIGS[network];
 
-  if (!walletAddress || !surveyId) {
-    throw new Error('Missing wallet address or survey ID in form submission.');
+  if (
+    !walletAddress ||
+    !surveyId ||
+    !participantId ||
+    !gender ||
+    !country ||
+    !researcherId ||
+    !contractAddress
+  ) {
+    throw new Error(
+      'Missing required fields in form submission: wallet address, survey ID, participant ID, gender, country, researcher ID, or contract address.'
+    );
   }
 
-  const participantSnapshot = await firestore
+  const participant = await firestore
     .collection('participants')
-    .where('walletAddress', '==', walletAddress)
-    .limit(1)
+    .doc(participantId as string)
     .get();
 
-  if (participantSnapshot.empty) {
-    throw new Error('Participant not found for the given wallet address.');
+  if (!participant.exists) {
+    throw new Error('Participant not found.');
   }
 
   const surveySnapshot = await firestore
     .collection('surveys')
-    .where('id', '==', surveyId)
-    .limit(1)
+    .doc(surveyId as string)
     .get();
 
-  if (surveySnapshot.empty) {
+  if (surveySnapshot.exists) {
     throw new Error('Survey not found.');
   }
 
-  const survey =  surveySnapshot.docs[0].data() as Survey;
-
-  const participantId = participantSnapshot.docs[0].id;
+  const survey = surveySnapshot.data() as Survey;
 
   const rewardCreationResult = await createRewardDocument({
     data,
