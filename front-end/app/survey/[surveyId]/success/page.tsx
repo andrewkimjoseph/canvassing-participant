@@ -50,9 +50,19 @@ export default function SuccessPage() {
     }
   }, [address, isConnected]);
 
-
   const processRewardClaimByParticipantFn = async () => {
     setIsProcessingRewardClaim(true);
+
+    if (!isConnected) {
+      toaster.create({
+        description:
+          'Connection lost. Refresh this page and try claiming again.',
+        duration: 6000,
+        type: 'warning',
+      });
+      setIsProcessingRewardClaim(false);
+      return;
+    }
 
     if (!survey?.contractAddress || !survey?.rewardAmountIncUSD) {
       toaster.create({
@@ -93,7 +103,6 @@ export default function SuccessPage() {
     }
 
     try {
-      
       toaster.create({
         description: 'Claim process initiated. Please wait ...',
         duration: 9000,
@@ -109,7 +118,7 @@ export default function SuccessPage() {
       await new Promise((resolve) => setTimeout(resolve, 4500));
 
       const reward = (await getDocs(rewardsQuery)).docs[0].data() as Reward;
-      
+
       const claimIsProcessed = await processRewardClaimByParticipant(address, {
         _participantWalletAddress: address as Address,
         _smartContractAddress: survey.contractAddress as Address,
