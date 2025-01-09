@@ -15,7 +15,7 @@ export const checkIfRewardIsForTestnet = async ({
       hash: _transactionHash as Address,
     });
 
-    return txnReceipt.status == 'success';
+    return txnReceipt.status === 'success';
   } catch (error) {
     return false;
   }
