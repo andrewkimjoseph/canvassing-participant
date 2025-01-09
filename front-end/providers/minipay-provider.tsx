@@ -9,17 +9,17 @@ export const MiniPayProvider: React.FC<{
   const [isMiniPay, setIsMiniPay] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const checkMiniPay = () => {
-      const isDevelopment = window.location.hostname === 'localhost';
+    const checkMiniPay = (): void => {
+      const isDevelopment =
+        typeof window !== 'undefined' &&
+        window.location.hostname === 'localhost';
 
       const miniPayExists: boolean =
         isDevelopment ||
         (typeof window !== 'undefined' &&
           (window as any).ethereum &&
           ((window as any).ethereum.isMiniPay !== undefined ||
-            (window as any).ethereum.isMinipay !== undefined));
-
-      console.log('miniPayExists', miniPayExists);
+            (window as any).ethereum.isMiniPay === true));
 
       setIsMiniPay(miniPayExists);
     };
@@ -35,7 +35,7 @@ export const MiniPayProvider: React.FC<{
     );
   }
 
-  if (isMiniPay === false) {
+  if (isMiniPay === false || isMiniPay === undefined) {
     return (
       <Flex justify="center" align="center" minH="100vh">
         <Text fontSize={'md'} color="#363062" textAlign={'center'}>
