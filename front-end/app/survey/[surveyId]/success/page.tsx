@@ -37,18 +37,25 @@ export default function SuccessPage() {
 
   const { participant } = useParticipantStore.getState();
   const params = useParams();
-  const searchParams = useSearchParams();
   const { trackAmplitudeEvent } = useAmplitudeContext();
 
   const surveyId = params.surveyId;
-  const submissionId = searchParams.get('submissionId');
-  const respondentId = searchParams.get('respondentId');
 
   useEffect(() => {
     if (isConnected && address) {
       setUserAddress(address);
     }
   }, [address, isConnected]);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (surveyId) {
+      fetchSurvey(surveyId as string);
+    }
+  }, [surveyId, fetchSurvey]);
 
   const processRewardClaimByParticipantFn = async () => {
     setIsProcessingRewardClaim(true);
@@ -64,37 +71,15 @@ export default function SuccessPage() {
       return;
     }
 
-    if (!survey?.contractAddress || !survey?.rewardAmountIncUSD) {
-      toaster.create({
-        description:
-          'Invalid survey claim request. Kindly reach out to support via the "More" tab.',
-        duration: 6000,
-        type: 'warning',
-      });
-      setIsProcessingRewardClaim(false);
-      return;
-    }
-
-    if (!submissionId || !respondentId || !address || !participant?.id) {
-      toaster.create({
-        description:
-          'Invalid form submission/participant. Kindly reach out to support via the "More" tab.',
-        duration: 6000,
-        type: 'warning',
-      });
-      setIsProcessingRewardClaim(false);
-      return;
-    }
-
     const contractBalance = await getContractBalance(address, {
-      _contractAddress: survey.contractAddress as Address,
+      _contractAddress: survey?.contractAddress as Address,
       _chainId: chainId,
     });
 
-    if (contractBalance < survey.rewardAmountIncUSD) {
+    if (contractBalance < (survey?.rewardAmountIncUSD as number)) {
       toaster.create({
         description:
-          'Not enough balance to pay you out. Kindly reach out to support via the "More" tab.',
+          'Not enough balance to pay you out. Please contact support via the "More" tab.',
         duration: 6000,
         type: 'warning',
       });
@@ -102,26 +87,48 @@ export default function SuccessPage() {
       return;
     }
 
-    try {
+    toaster.create({
+      description: 'Claim process initiated. Please wait ...',
+      duration: 6000,
+      type: 'loading',
+    });
+
+    const rewardsQuery = query(
+      collection(db, 'rewards'),
+      where('surveyId', '==', surveyId),
+      where('participantId', '==', participant?.id)
+    );
+
+    const rewardQueryDocs = await getDocs(rewardsQuery);
+
+    if (rewardQueryDocs.empty) {
       toaster.create({
-        description: 'Claim process initiated. Please wait ...',
-        duration: 9000,
-        type: 'info',
+        description:
+          'Reward record not found. Please contact support via the "More" tab.',
+        duration: 6000,
+        type: 'warning',
       });
+      setIsProcessingRewardClaim(false);
+      return;
+    }
 
-      const rewardsQuery = query(
-        collection(db, 'rewards'),
-        where('surveyId', '==', surveyId),
-        where('participantId', '==', participant.id)
-      );
+    toaster.create({
+      description:
+        'Reward record found. You will now be prompted to approve the claim request.',
+      duration: 6000,
+      type: 'loading',
+    });
 
-      await new Promise((resolve) => setTimeout(resolve, 4500));
+    const rewardRef = rewardQueryDocs.docs[0].ref;
 
-      const reward = (await getDocs(rewardsQuery)).docs[0].data() as Reward;
+    const reward = (await getDocs(rewardsQuery)).docs[0].data() as Reward;
+
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 5000));
 
       const claimIsProcessed = await processRewardClaimByParticipant(address, {
         _participantWalletAddress: address as Address,
-        _smartContractAddress: survey.contractAddress as Address,
+        _smartContractAddress: survey?.contractAddress as Address,
         _rewardId: reward.id,
         _nonce: BigInt(reward.nonce as string),
         _signature: reward.signature as string,
@@ -132,55 +139,36 @@ export default function SuccessPage() {
         toaster.create({
           description: 'Waiting for your reward record to be updated ...',
           duration: 6000,
-          type: 'info',
+          type: 'loading',
         });
 
-        const rewardsCollection = collection(db, 'rewards');
-        const rewardsQuery = query(
-          rewardsCollection,
-          where('participantId', '==', participant.id),
-          where('surveyId', '==', surveyId)
-        );
+        await updateDoc(rewardRef, {
+          isClaimed: true,
+          transactionHash: claimIsProcessed.transactionHash,
+          amountIncUSD: survey?.rewardAmountIncUSD,
+          timeUpdated: Timestamp.now(),
+        });
 
-        const querySnapshot = await getDocs(rewardsQuery);
+        toaster.create({
+          description: 'Reward claimed successfully!',
+          duration: 6000,
+          type: 'success',
+        });
 
-        if (!querySnapshot.empty) {
-          const rewardDoc = querySnapshot.docs[0]; // Assuming there's only one matching document
-          await updateDoc(rewardDoc.ref, {
-            isClaimed: true,
-            transactionHash: claimIsProcessed.transactionHash,
-            amountIncUSD: survey.rewardAmountIncUSD,
-            timeUpdated: Timestamp.now(),
-          });
+        // Wait for user feedback before navigating
+        await new Promise((resolve) => setTimeout(resolve, 1500));
 
-          toaster.create({
-            description: 'Reward claimed successfully!',
-            duration: 6000,
-            type: 'success',
-          });
+        trackAmplitudeEvent('Reward claimed', {
+          participantWalletAddress: participant?.walletAddress,
+          participantId: participant?.id,
+          surveyId: survey?.id,
+        });
 
-          // Wait for user feedback before navigating
-          await new Promise((resolve) => setTimeout(resolve, 1500));
-
-          trackAmplitudeEvent('Reward claimed', {
-            participantWalletAddress: participant?.walletAddress,
-            participantId: participant?.id,
-            surveyId: survey?.id,
-          });
-
-          window.location.replace(`/survey/${surveyId}/transaction-successful`);
-        } else {
-          toaster.create({
-            description:
-              'Reward record not found. Kindly reach out to support via the "More" tab.',
-            duration: 6000,
-            type: 'warning',
-          });
-        }
+        window.location.replace(`/survey/${surveyId}/transaction-successful`);
       } else {
         toaster.create({
           description:
-            'Reward claim was unsuccessful. Kindly reach out to support via the "More" tab.',
+            'Reward claim was unsuccessful. Please contact support via the "More" tab.',
           duration: 6000,
           type: 'warning',
         });
@@ -188,7 +176,7 @@ export default function SuccessPage() {
     } catch (error) {
       toaster.create({
         description:
-          'An unexpected error occurred. Kindly reach out to support via the "More" tab.',
+          'An unexpected error occurred. Please contact support via the "More" tab.',
         duration: 6000,
         type: 'warning',
       });
@@ -196,16 +184,6 @@ export default function SuccessPage() {
 
     setIsProcessingRewardClaim(false);
   };
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (surveyId) {
-      fetchSurvey(surveyId as string);
-    }
-  }, [surveyId, fetchSurvey]);
 
   if (!isMounted)
     return (
@@ -283,7 +261,7 @@ export default function SuccessPage() {
           processRewardClaimByParticipantFn();
         }}
         loading={isProcessingRewardClaim}
-        // disabled={!isAbleToClaim}
+        disabled={isProcessingRewardClaim}
         loadingText={<SpinnerIconC />}
       >
         <Text fontSize="16" fontWeight="bold" color="white">

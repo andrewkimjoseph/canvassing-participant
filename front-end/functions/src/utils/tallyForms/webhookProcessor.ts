@@ -90,7 +90,7 @@ export const processWebhook = async (
     .doc(surveyId as string)
     .get();
 
-  if (surveySnapshot.exists) {
+  if (!surveySnapshot.exists) {
     throw new Error('Survey not found.');
   }
 
