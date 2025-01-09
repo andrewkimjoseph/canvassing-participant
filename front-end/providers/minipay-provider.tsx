@@ -19,7 +19,7 @@ export const MiniPayProvider: React.FC<{
         (typeof window !== 'undefined' &&
           (window as any).ethereum &&
           ((window as any).ethereum.isMiniPay !== undefined ||
-            (window as any).ethereum.isMiniPay !== undefined));
+            (window as any).ethereum.isMiniPay === true));
 
       console.log('miniPayExists', miniPayExists);
 
