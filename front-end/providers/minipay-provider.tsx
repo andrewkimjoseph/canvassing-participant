@@ -37,7 +37,7 @@ export const MiniPayProvider: React.FC<{
     );
   }
 
-  if (isMiniPay === false) {
+  if (isMiniPay === false || isMiniPay === undefined) {
     return (
       <Flex justify="center" align="center" minH="100vh">
         <Text fontSize={'md'} color="#363062" textAlign={'center'}>
