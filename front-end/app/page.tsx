@@ -76,7 +76,16 @@ export default function Home() {
         identifyUser(identifyEvent);
       }
     }
-  }, [isConnected, address, getParticipant]);
+  }, [
+    isConnected,
+    address,
+    getParticipant,
+    chainId,
+    fetchSurveys,
+    identifyUser,
+    participant,
+    surveys,
+  ]);
 
   // Initial setup effect
   useEffect(() => {
@@ -151,9 +160,9 @@ export default function Home() {
 
     try {
       toaster.create({
-        description: 'Booking in progress. Please wait...',
+        description: 'Booking in progress. You will now be prompted to approve the booking.',
         duration: 9000,
-        type: "warning",
+        type: 'warning',
       });
 
       const screenParticipantRslt = await screenParticipantInBC({
