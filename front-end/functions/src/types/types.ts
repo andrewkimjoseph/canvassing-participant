@@ -90,3 +90,16 @@ export interface Reward {
   signature: Address | null;
   nonce: string | null;
 }
+
+
+export interface Participant {
+    country: string;
+    id: string;
+    gender: string;
+    username: string;
+    walletAddress: string;
+    isAdmin: boolean;
+    timeCreated: admin.firestore.Timestamp;
+    timeUpdated: admin.firestore.Timestamp;
+  }
+  

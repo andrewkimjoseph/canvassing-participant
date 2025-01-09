@@ -208,7 +208,16 @@ export default function SurveyPage() {
         mt={16}
         alignSelf="center"
         onClick={() => {
-          if (survey.id && participant?.walletAddress) {
+          if (
+            survey.id &&
+            survey.formLink &&
+            survey.contractAddress &&
+            participant?.walletAddress &&
+            participant?.id &&
+            participant?.gender &&
+            participant?.country &&
+            survey?.researcherId
+          ) {
             toaster.create({
               description: 'Redirecting you to survey page, please wait ...',
               duration: 6000,
@@ -216,7 +225,7 @@ export default function SurveyPage() {
             });
 
             router.push(
-              `${survey.formLink}?walletAddress=${participant?.walletAddress}&surveyId=${survey.id}` ||
+              `${survey.formLink}?walletAddress=${participant?.walletAddress}&surveyId=${survey.id}&participantId=${participant?.id}&gender=${participant?.gender}&country=${participant?.country}&researcherId=${survey?.researcherId}&contractAddress=${survey?.contractAddress}` ||
                 '#'
             );
 
@@ -230,7 +239,7 @@ export default function SurveyPage() {
           } else {
             toaster.create({
               description:
-                'Survey loading delayed, refresh the page and try again.',
+                'Missing required information to start survey. Refresh the page and try again.',
               duration: 6000,
               type: 'warning',
             });

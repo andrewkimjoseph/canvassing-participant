@@ -52,7 +52,8 @@ export const signForReward = async ({
 
     const stringifiedNonce = nonce.toString();
 
-    console.log('Signing successful:', signature);
+    console.log('Signing successful, signature:', signature);
+    console.log('Nonce:', stringifiedNonce);
 
     return { success: true, signature: signature, nonce: stringifiedNonce };
   } catch (err) {
