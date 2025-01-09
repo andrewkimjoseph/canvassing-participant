@@ -115,7 +115,7 @@ export default function SuccessPage() {
     toaster.create({
       description:
         'Reward record found. You will now be prompted to approve the claim request.',
-      duration: 1200,
+      duration: 12000,
       type: 'info',
     });
 
