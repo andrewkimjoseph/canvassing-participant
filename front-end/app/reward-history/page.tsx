@@ -26,7 +26,7 @@ export default function RewardHistory() {
       getParticipant(address);
       fetchRewards(address);
     }
-  }, [isConnected, address, getParticipant]);
+  }, [isConnected, address, getParticipant, fetchRewards]);
 
   useEffect(() => {
     checkParticipantStatus();
