@@ -93,8 +93,6 @@ export default function SuccessPage() {
       type: 'loading',
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-
     const rewardsQuery = query(
       collection(db, 'rewards'),
       where('surveyId', '==', surveyId),
@@ -126,6 +124,8 @@ export default function SuccessPage() {
     const reward = (await getDocs(rewardsQuery)).docs[0].data() as Reward;
 
     try {
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+
       const claimIsProcessed = await processRewardClaimByParticipant(address, {
         _participantWalletAddress: address as Address,
         _smartContractAddress: survey?.contractAddress as Address,
