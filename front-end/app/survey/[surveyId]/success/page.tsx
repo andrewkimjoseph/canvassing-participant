@@ -89,10 +89,12 @@ export default function SuccessPage() {
 
     toaster.create({
       description: 'Claim process initiated. Please wait ...',
-      duration: 6000,
+      duration: 9000,
       type: 'info',
     });
 
+    await new Promise((resolve) => setTimeout(resolve, 5250));
+    
     const rewardsQuery = query(
       collection(db, 'rewards'),
       where('surveyId', '==', surveyId),
@@ -105,7 +107,7 @@ export default function SuccessPage() {
       toaster.create({
         description:
           'Reward record not found. Please contact support via the "More" tab.',
-        duration: 6000,
+        duration: 3000,
         type: 'warning',
       });
       setIsProcessingRewardClaim(false);
@@ -115,15 +117,13 @@ export default function SuccessPage() {
     toaster.create({
       description:
         'Reward record found. You will now be prompted to approve the claim request.',
-      duration: 12000,
-      type: 'info',
+      duration: 15000,
+      type: 'success',
     });
 
     const rewardRef = rewardQueryDocs.docs[0].ref;
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 3750));
-
       const reward = (await getDocs(rewardsQuery)).docs[0].data() as Reward;
 
       const claimIsProcessed = await processRewardClaimByParticipant(address, {
@@ -136,12 +136,6 @@ export default function SuccessPage() {
       });
 
       if (claimIsProcessed.success) {
-        toaster.create({
-          description: 'Waiting for your reward record to be updated ...',
-          duration: 6000,
-          type: 'info',
-        });
-
         await updateDoc(rewardRef, {
           isClaimed: true,
           transactionHash: claimIsProcessed.transactionHash,

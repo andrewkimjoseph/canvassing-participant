@@ -152,8 +152,8 @@ export default function Home() {
     try {
       toaster.create({
         description: 'Booking in progress. You will now be prompted to approve the booking.',
-        duration: 9000,
-        type: 'warning',
+        duration: 15000,
+        type: 'info',
       });
 
       const screenParticipantRslt = await screenParticipantInBC({
