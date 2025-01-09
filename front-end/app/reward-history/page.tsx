@@ -25,7 +25,7 @@ export default function RewardHistory() {
   const checkParticipantStatus = useCallback(() => {
     if (isConnected && address) {
       getParticipant(address);
-      fetchRewards(address, chainId);
+      fetchRewards(address);
     }
   }, [isConnected, address, getParticipant]);
 
