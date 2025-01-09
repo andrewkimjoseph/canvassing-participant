@@ -90,7 +90,7 @@ export default function SuccessPage() {
     toaster.create({
       description: 'Claim process initiated. Please wait ...',
       duration: 6000,
-      type: 'loading',
+      type: 'info',
     });
 
     const rewardsQuery = query(
@@ -116,7 +116,7 @@ export default function SuccessPage() {
       description:
         'Reward record found. You will now be prompted to approve the claim request.',
       duration: 6000,
-      type: 'loading',
+      type: 'info',
     });
 
     const rewardRef = rewardQueryDocs.docs[0].ref;
@@ -139,7 +139,7 @@ export default function SuccessPage() {
         toaster.create({
           description: 'Waiting for your reward record to be updated ...',
           duration: 6000,
-          type: 'loading',
+          type: 'info',
         });
 
         await updateDoc(rewardRef, {
