@@ -46,7 +46,7 @@ export default function Home() {
 
   useEffect(() => {
     if (address) {
-      fetchRewards(address);
+      fetchRewards(address, chainId);
     }
   }, [address, isConnected, fetchRewards]);
 
