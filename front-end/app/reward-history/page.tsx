@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount } from 'wagmi';
 import { Box, Text, Flex } from '@chakra-ui/react';
 import useRewardStore from '@/stores/useRewardStore';
 import { useRouter } from 'next/navigation';
@@ -20,7 +20,6 @@ export default function RewardHistory() {
   const router = useRouter();
   const { participant, getParticipant } = useParticipantStore();
   const { trackAmplitudeEvent } = useAmplitudeContext();
-  const chainId = useChainId();
 
   const checkParticipantStatus = useCallback(() => {
     if (isConnected && address) {
