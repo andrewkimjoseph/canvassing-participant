@@ -17,4 +17,5 @@ export interface Reward {
   amountIncUSD: number | null;
   signature: Address | null;
   nonce: string | null;
+  isForTestnet: boolean | null;
 }
