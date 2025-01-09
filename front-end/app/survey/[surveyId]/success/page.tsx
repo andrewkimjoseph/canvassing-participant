@@ -121,10 +121,10 @@ export default function SuccessPage() {
 
     const rewardRef = rewardQueryDocs.docs[0].ref;
 
-    const reward = (await getDocs(rewardsQuery)).docs[0].data() as Reward;
-
     try {
       await new Promise((resolve) => setTimeout(resolve, 5000));
+
+      const reward = (await getDocs(rewardsQuery)).docs[0].data() as Reward;
 
       const claimIsProcessed = await processRewardClaimByParticipant(address, {
         _participantWalletAddress: address as Address,
