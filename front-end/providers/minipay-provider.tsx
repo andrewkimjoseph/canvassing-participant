@@ -1,6 +1,7 @@
 import { SpinnerIconC } from '@/components/icons/spinner-icon';
 import { Flex, Text } from '@chakra-ui/react';
 import React, { useState, useEffect } from 'react';
+import { treasureTopaz } from 'viem/chains';
 
 export const MiniPayProvider: React.FC<{
   children: React.ReactNode;
@@ -9,12 +10,16 @@ export const MiniPayProvider: React.FC<{
 
   useEffect(() => {
     const checkMiniPay = () => {
-      const isDevelopment = process.env.NODE_ENV === 'development';
-      
-      const miniPayExists =
-        isDevelopment || 
-        (window.ethereum &&
-          (window.ethereum.isMiniPay || window.ethereum.isMinipay));
+      const isDevelopment = window.location.hostname === 'localhost';
+
+      const miniPayExists: boolean =
+        isDevelopment ||
+        (typeof window !== 'undefined' &&
+          (window as any).ethereum &&
+          ((window as any).ethereum.isMiniPay !== undefined ||
+            (window as any).ethereum.isMinipay !== undefined));
+
+      console.log('miniPayExists', miniPayExists);
 
       setIsMiniPay(miniPayExists);
     };
@@ -41,7 +46,9 @@ export const MiniPayProvider: React.FC<{
     );
   }
 
-  return <>{children}</>;
+  if (isMiniPay === true) {
+    return <>{children}</>;
+  }
 };
 
 export default MiniPayProvider;
