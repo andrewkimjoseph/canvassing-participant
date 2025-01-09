@@ -105,7 +105,7 @@ export default function SuccessPage() {
     try {
       toaster.create({
         description: 'Claim process initiated. Please wait ...',
-        duration: 9000,
+        duration: 15000,
         type: 'info',
       });
 
