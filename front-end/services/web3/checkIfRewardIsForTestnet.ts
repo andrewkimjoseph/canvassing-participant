@@ -3,11 +3,10 @@ import { celoAlfajores, celo } from 'viem/chains';
 
 export const checkIfRewardIsForTestnet = async ({
   _transactionHash,
-  _chainId,
 }: CheckIfRewardIsForTestnetProps): Promise<boolean> => {
   try {
     const publicClient = createPublicClient({
-      chain: _chainId === celo.id ? celo : celoAlfajores,
+      chain: celoAlfajores,
       transport: custom(window.ethereum),
     });
 
@@ -23,5 +22,4 @@ export const checkIfRewardIsForTestnet = async ({
 
 export type CheckIfRewardIsForTestnetProps = {
   _transactionHash: string;
-  _chainId: number;
 };
