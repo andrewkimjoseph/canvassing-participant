@@ -44,6 +44,14 @@ export default function Home() {
   const { rewards, fetchRewards } = useRewardStore();
   const { trackAmplitudeEvent, identifyUser } = useAmplitudeContext();
 
+  const toasterIds = {
+    surveyIsFullyBooked: '1',
+    bookingInProgress: '2',
+    bookingRecordCreationFailed: '3',
+    onchainBookingFailed: '4',
+    bookingSuccess: '5',
+  };
+
   useEffect(() => {
     if (address) {
       fetchRewards(address);
@@ -130,6 +138,7 @@ export default function Home() {
 
     if (surveyIsFullyBooked) {
       toaster.create({
+        id: toasterIds.surveyIsFullyBooked,
         description: 'Sorry, the survey is fully booked.',
         duration: 6000,
         type: 'error',
@@ -151,7 +160,9 @@ export default function Home() {
 
     try {
       toaster.create({
-        description: 'Booking in progress. You will now be prompted to approve the booking.',
+        id: toasterIds.bookingInProgress,
+        description:
+          'Booking in progress. You will now be prompted to approve the booking.',
         duration: 15000,
         type: 'info',
       });
@@ -170,7 +181,9 @@ export default function Home() {
         });
 
         if (participantIsScreenedInDB) {
+          toaster.dismiss(toasterIds.bookingInProgress);
           toaster.create({
+            id: toasterIds.bookingSuccess,
             description:
               'Booking success. You are being redirected to the survey page... ',
             duration: 9000,
@@ -184,7 +197,9 @@ export default function Home() {
             surveyId: survey.id,
           });
         } else {
+          toaster.dismiss(toasterIds.bookingInProgress);
           toaster.create({
+            id: toasterIds.bookingRecordCreationFailed,
             description:
               'Booking record creation failed.  Kindly reach out to support via the "More" tab. ',
             duration: 3000,
@@ -194,7 +209,9 @@ export default function Home() {
           router.refresh();
         }
       } else {
+        toaster.dismiss(toasterIds.bookingInProgress);
         toaster.create({
+          id: toasterIds.onchainBookingFailed,
           description:
             'On-chain booking failed. Kindly reach out to support via the "More" tab. ',
           duration: 6000,
@@ -204,6 +221,7 @@ export default function Home() {
         router.refresh();
       }
     } catch (error) {
+      toaster.dismiss(toasterIds.bookingInProgress);
       toaster.create({
         description: 'An error occured during booking. Try again later.',
         duration: 6000,
