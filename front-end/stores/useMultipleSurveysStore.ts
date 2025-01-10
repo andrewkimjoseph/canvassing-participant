@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where, or } from 'firebase/firestore';
 import { Survey } from '@/entities/survey';
 import { db } from '@/firebase';
 import { Reward } from '@/entities/reward';
@@ -14,6 +14,15 @@ interface SurveyStoreState {
   loading: boolean;
   fetchSurveys: (walletAddress: Address, chainId: number) => Promise<void>;
 }
+
+// Helper function to chunk array into smaller arrays
+const chunkArray = <T>(array: T[], size: number): T[][] => {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+  return chunks;
+};
 
 const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
   surveys: [],
@@ -35,38 +44,49 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
         (doc) => (doc.data() as Reward).surveyId
       );
 
-      // Query surveys excluding the ones already participated in
-      let surveyQuery;
+      // Get all surveys with chunked queries if needed
+      let allSurveys: Survey[] = [];
+      
       if (participatedSurveyIds.length > 0) {
-        surveyQuery = query(
-          collection(db, 'surveys'),
-          where('id', 'not-in', participatedSurveyIds)
-        );
+        // Split participated IDs into chunks of 10 (Firestore limit)
+        const chunks = chunkArray(participatedSurveyIds, 10);
+        
+        // Query for each chunk and combine results
+        for (let chunk of chunks) {
+          const chunkQuery = query(
+            collection(db, 'surveys'),
+            where('id', 'not-in', chunk)
+          );
+          const chunkSnapshot = await getDocs(chunkQuery);
+          const chunkSurveys = chunkSnapshot.docs.map(doc => ({
+            ...(doc.data() as Survey)
+          }));
+          allSurveys.push(...chunkSurveys);
+        }
+        
+        // Remove duplicates that might occur from chunked queries
+        allSurveys = Array.from(new Set(allSurveys.map(s => s.id)))
+          .map(id => allSurveys.find(s => s.id === id)!);
       } else {
-        surveyQuery = query(collection(db, 'surveys'));
+        // If no participated surveys, get all surveys
+        const surveyQuery = query(collection(db, 'surveys'));
+        const surveySnapshot = await getDocs(surveyQuery);
+        allSurveys = surveySnapshot.docs.map(doc => ({
+          ...(doc.data() as Survey)
+        }));
       }
-      const surveySnapshot = await getDocs(surveyQuery);
-      const surveys = surveySnapshot.docs.map((doc) => ({
-        ...(doc.data() as Survey),
-      }));
 
       const filteredSurveys: Survey[] = [];
-      for (let survey of surveys) {
-        // Check if the survey is fully booked
-
+      for (let survey of allSurveys) {
         if (!survey.isAvailable) continue;
 
-        // Check if the participant's country matches the survey's target country
         const countryIsValid =
           survey.targetCountry === 'A' ||
           survey.targetCountry === participant?.country;
 
-        // Check if the participant's gender matches the survey's target gender
         const genderIsValid =
           survey.targetGender === 'A' ||
           survey.targetGender === participant?.gender;
-
-        // Apply all filters
 
         if (!survey.contractAddress) continue;
         if (!countryIsValid) continue;
@@ -110,6 +130,7 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
 
       set({ surveys: filteredSurveys, loading: false });
     } catch (error) {
+      console.error('Error fetching surveys:', error);
       set({ loading: false });
     }
   },
