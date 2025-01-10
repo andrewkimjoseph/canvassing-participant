@@ -313,8 +313,8 @@ export default function SuccessPage() {
           });
           processRewardClaimByParticipantFn();
         }}
-        loading={isProcessingRewardClaim}
-        disabled={isProcessingRewardClaim}
+        loading={isProcessingRewardClaim || !survey}
+        disabled={isProcessingRewardClaim || !survey}
         loadingText={<SpinnerIconC />}
       >
         <Text fontSize="16" fontWeight="bold" color="white">
