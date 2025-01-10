@@ -21,12 +21,15 @@ import {
   updateDoc,
   Timestamp,
   getDocsFromServer,
+  getDoc,
+  doc,
 } from 'firebase/firestore';
 import { db } from '@/firebase';
 import useParticipantStore from '@/stores/useParticipantStore';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 import { SpinnerIconC } from '@/components/icons/spinner-icon';
 import { Reward } from '@/entities/reward';
+import { Survey } from '@/entities/survey';
 
 export default function SuccessPage() {
   const chainId = useChainId();
@@ -41,6 +44,17 @@ export default function SuccessPage() {
   const { trackAmplitudeEvent } = useAmplitudeContext();
 
   const surveyId = params.surveyId;
+
+  const toasterIds = {
+    invalidOrUndetectedSurveyId: '1',
+    surveyDoesNotExist: '2',
+    connectionLost: '3',
+    rewardRecordNotFound: '4',
+    notEnoughBalance: '5',
+    claimProcessInitiated: '6',
+    rewardRecordFound: '7',
+    rewardClaimedSuccessfully: '8',
+  };
 
   useEffect(() => {
     if (isConnected && address) {
@@ -61,26 +75,56 @@ export default function SuccessPage() {
   const processRewardClaimByParticipantFn = async () => {
     setIsProcessingRewardClaim(true);
 
+    if (!surveyId || typeof surveyId !== 'string') {
+      toaster.create({
+        id: toasterIds.invalidOrUndetectedSurveyId,
+        description:
+          'Survey id was not detected or is invalid. Please contact support via the "More" tab.',
+        duration: 4500,
+        type: 'error',
+      });
+      setIsProcessingRewardClaim(false);
+      return;
+    }
+
     if (!isConnected) {
       toaster.create({
+        id: toasterIds.connectionLost,
         description:
           'Connection lost. Refresh this page and try claiming again.',
-        duration: 6000,
+        duration: 4500,
         type: 'warning',
       });
       setIsProcessingRewardClaim(false);
       return;
     }
 
+    const surveySnapshot = await getDoc(doc(db, 'surveys', surveyId));
+
+    if (!surveySnapshot.exists()) {
+      toaster.create({
+        id: toasterIds.surveyDoesNotExist,
+        description:
+          'Survey does not exist. Please contact support via the "More" tab.',
+        duration: 4500,
+        type: 'error',
+      });
+      setIsProcessingRewardClaim(false);
+      return;
+    }
+
+    const fetchedSurvey = surveySnapshot.data() as Survey;
+
     const contractBalance = await getContractBalance(address, {
-      _contractAddress: survey?.contractAddress as Address,
+      _contractAddress: fetchedSurvey.contractAddress as Address,
       _chainId: chainId,
     });
 
-    if (contractBalance < (survey?.rewardAmountIncUSD as number)) {
+    if (contractBalance < (fetchedSurvey.rewardAmountIncUSD as number)) {
+      toaster.dismiss();
       toaster.create({
-        description:
-          'Not enough balance to pay you out. Please contact support via the "More" tab.',
+        id: toasterIds.notEnoughBalance,
+        description: 'Not enough balance to pay you out. Please contact support via the "More" tab.',
         duration: 6000,
         type: 'warning',
       });
@@ -89,13 +133,14 @@ export default function SuccessPage() {
     }
 
     toaster.create({
+      id: toasterIds.claimProcessInitiated,
       description: 'Claim process initiated. Please wait ...',
       duration: 9000,
       type: 'info',
     });
 
     await new Promise((resolve) => setTimeout(resolve, 5250));
-    
+
     const rewardsQuery = query(
       collection(db, 'rewards'),
       where('surveyId', '==', surveyId),
@@ -105,17 +150,22 @@ export default function SuccessPage() {
     const rewardQueryDocs = await getDocs(rewardsQuery);
 
     if (rewardQueryDocs.empty) {
+      toaster.dismiss(toasterIds.claimProcessInitiated);
       toaster.create({
+        id: toasterIds.rewardRecordNotFound,
         description:
           'Reward record not found. Please contact support via the "More" tab.',
-        duration: 3000,
+        duration: 4500,
         type: 'warning',
       });
       setIsProcessingRewardClaim(false);
       return;
+    } else {
+      toaster.dismiss(toasterIds.claimProcessInitiated);
     }
 
     toaster.create({
+      id: toasterIds.rewardRecordFound,
       description:
         'Reward record found. You will now be prompted to approve the claim request.',
       duration: 15000,
@@ -125,11 +175,13 @@ export default function SuccessPage() {
     const rewardRef = rewardQueryDocs.docs[0].ref;
 
     try {
-      const reward = (await getDocsFromServer(rewardsQuery)).docs[0].data() as Reward;
-      
+      const reward = (
+        await getDocsFromServer(rewardsQuery)
+      ).docs[0].data() as Reward;
+
       const claimIsProcessed = await processRewardClaimByParticipant(address, {
         _participantWalletAddress: address as Address,
-        _smartContractAddress: survey?.contractAddress as Address,
+        _smartContractAddress: fetchedSurvey.contractAddress as Address,
         _rewardId: reward.id,
         _nonce: BigInt(reward.nonce as string),
         _signature: reward.signature as string,
@@ -137,6 +189,9 @@ export default function SuccessPage() {
       });
 
       if (claimIsProcessed.success) {
+
+        toaster.dismiss(toasterIds.rewardRecordFound);
+
         await updateDoc(rewardRef, {
           isClaimed: true,
           transactionHash: claimIsProcessed.transactionHash,
@@ -145,6 +200,7 @@ export default function SuccessPage() {
         });
 
         toaster.create({
+          id: toasterIds.rewardClaimedSuccessfully,
           description: 'Reward claimed successfully!',
           duration: 6000,
           type: 'success',
@@ -161,6 +217,7 @@ export default function SuccessPage() {
 
         window.location.replace(`/survey/${surveyId}/transaction-successful`);
       } else {
+        toaster.dismiss(toasterIds.rewardRecordFound);
         toaster.create({
           description:
             'Reward claim was unsuccessful. Please contact support via the "More" tab.',
@@ -169,6 +226,7 @@ export default function SuccessPage() {
         });
       }
     } catch (error) {
+      toaster.dismiss(toasterIds.rewardRecordFound);
       toaster.create({
         description:
           'An unexpected error occurred. Please contact support via the "More" tab.',
