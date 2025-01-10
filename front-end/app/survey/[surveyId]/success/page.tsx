@@ -79,7 +79,7 @@ export default function SuccessPage() {
       toaster.create({
         id: toasterIds.invalidOrUndetectedSurveyId,
         description:
-          'Survey id was not detected or is invalid. Please contact support via the "More" tab.',
+          'Survey id was not detected or is invalid. Contact support via "More".',
         duration: 4500,
         type: 'error',
       });
@@ -105,7 +105,7 @@ export default function SuccessPage() {
       toaster.create({
         id: toasterIds.surveyDoesNotExist,
         description:
-          'Survey does not exist. Please contact support via the "More" tab.',
+          'Survey does not exist. Contact support via "More".',
         duration: 4500,
         type: 'error',
       });
@@ -124,7 +124,7 @@ export default function SuccessPage() {
       toaster.dismiss();
       toaster.create({
         id: toasterIds.notEnoughBalance,
-        description: 'Not enough balance to pay you out. Please contact support via the "More" tab.',
+        description: 'Not enough balance to pay you out. Contact support via "More".',
         duration: 6000,
         type: 'warning',
       });
@@ -154,7 +154,7 @@ export default function SuccessPage() {
       toaster.create({
         id: toasterIds.rewardRecordNotFound,
         description:
-          'Reward record not found. Please contact support via the "More" tab.',
+          'Reward record not found. Contact support via "More".',
         duration: 4500,
         type: 'warning',
       });
@@ -220,18 +220,18 @@ export default function SuccessPage() {
         toaster.dismiss(toasterIds.rewardRecordFound);
         toaster.create({
           description:
-            'Reward claim was unsuccessful. Please contact support via the "More" tab.',
+            'Reward claim was unsuccessful. Contact support via "More".',
           duration: 6000,
-          type: 'warning',
+          type: 'error',
         });
       }
     } catch (error) {
       toaster.dismiss(toasterIds.rewardRecordFound);
       toaster.create({
         description:
-          'An unexpected error occurred. Please contact support via the "More" tab.',
+          'An unexpected error occurred. Contact support via "More".',
         duration: 6000,
-        type: 'warning',
+        type: 'error',
       });
     }
 
