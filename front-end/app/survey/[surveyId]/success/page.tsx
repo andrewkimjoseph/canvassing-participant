@@ -20,6 +20,7 @@ import {
   getDocs,
   updateDoc,
   Timestamp,
+  getDocsFromServer,
 } from 'firebase/firestore';
 import { db } from '@/firebase';
 import useParticipantStore from '@/stores/useParticipantStore';
@@ -124,8 +125,8 @@ export default function SuccessPage() {
     const rewardRef = rewardQueryDocs.docs[0].ref;
 
     try {
-      const reward = (await getDocs(rewardsQuery)).docs[0].data() as Reward;
-
+      const reward = (await getDocsFromServer(rewardsQuery)).docs[0].data() as Reward;
+      
       const claimIsProcessed = await processRewardClaimByParticipant(address, {
         _participantWalletAddress: address as Address,
         _smartContractAddress: survey?.contractAddress as Address,
