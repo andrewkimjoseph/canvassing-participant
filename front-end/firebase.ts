@@ -1,6 +1,6 @@
 import { initializeApp, FirebaseApp } from 'firebase/app';
 import { getFirestore, Firestore } from 'firebase/firestore';
-import { Auth, getAuth, connectAuthEmulator } from 'firebase/auth';
+import { Auth, getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
@@ -17,12 +17,20 @@ let db: Firestore;
 
 let auth: Auth;
 
-if (!firebaseConfig.projectId) {
-  throw new Error('Missing Firebase configuration!');
+if (
+  !firebaseConfig.apiKey ||
+  !firebaseConfig.authDomain ||
+  !firebaseConfig.projectId ||
+  !firebaseConfig.storageBucket ||
+  !firebaseConfig.messagingSenderId ||
+  !firebaseConfig.appId ||
+  !firebaseConfig.measurementId
+) {
+  throw new Error('Missing one or more Firebase configuration values!');
 }
 
 app = initializeApp(firebaseConfig);
 db = getFirestore(app);
 auth = getAuth(app);
 
-export { db, auth};
+export { db, auth };
