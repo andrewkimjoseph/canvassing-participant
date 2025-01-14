@@ -20,6 +20,23 @@ import { checkIfSurveyIsFullyBooked } from '@/services/web3/checkIfSurveyIsFully
 import { Toaster, toaster } from '@/components/ui/toaster';
 import { MaleAvatarC } from '@/components/avatars/male-avatar';
 import { FemaleAvatarC } from '@/components/avatars/female-avatar';
+import { NeverMissOutPersonC } from '@/components/images/never-miss-out-person';
+import { EllipseRingsC } from '@/components/images/ellipse-rings';
+import { auth } from '@/firebase';
+import {
+  getRedirectResult,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithPopup,
+  signInWithRedirect,
+  User,
+} from 'firebase/auth';
+import { GoogleIcon } from '@/components/icons/google-icon';
+
+const googleAuthProvider = new GoogleAuthProvider();
+
+googleAuthProvider.addScope('email');
+googleAuthProvider.addScope('profile');
 
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -43,6 +60,9 @@ export default function Home() {
 
   const { rewards, fetchRewards } = useRewardStore();
   const { trackAmplitudeEvent, identifyUser } = useAmplitudeContext();
+
+  const [user, setUser] = useState<User | null>(null);
+  const [isSigningIn, setIsSigningIn] = useState(false);
 
   const toasterIds = {
     surveyIsFullyBooked: '1',
@@ -112,6 +132,111 @@ export default function Home() {
       setIsBeingBooked(initialStatus);
     }
   }, [surveys]);
+
+  // Modify the Google sign-in click handler
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsSigningIn(true);
+      console.log('Starting Google sign in process...');
+      
+      // Check if we're on localhost
+      if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+        console.log('Using popup sign-in for localhost');
+        const result = await signInWithPopup(auth, googleAuthProvider);
+        console.log('Popup sign-in successful:', result.user.email);
+        
+        toaster.create({
+          description: `Signed in as ${result.user.email}`,
+          duration: 3000,
+          type: 'success'
+        });
+      } else {
+        console.log('Using redirect sign-in for production');
+        await signInWithRedirect(auth, googleAuthProvider);
+      }
+    } catch (error: any) {
+      console.error('Error during sign in:', error);
+      let errorMessage = 'Failed to sign in with Google. Please try again.';
+      
+      if (error.code === 'auth/popup-closed-by-user') {
+        errorMessage = 'Sign-in was cancelled. Please try again.';
+      } else if (error.code === 'auth/cancelled-popup-request') {
+        errorMessage = 'Another sign-in attempt is in progress.';
+      }
+      
+      toaster.create({
+        description: errorMessage,
+        duration: 3000,
+        type: 'error'
+      });
+    } finally {
+      setIsSigningIn(false);
+    }
+  };
+
+  // Update auth state monitor
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+
+      if (firebaseUser) {
+        console.log('User signed in:', firebaseUser.email);
+        // You might want to update your participant data here
+        if (participant) {
+          // Add logic to update participant with Google auth info
+          // This would depend on your DB structure and requirements
+        }
+      } else {
+        console.log('User signed out');
+      }
+    });
+
+    return () => unsubscribe();
+  }, [address, participant]);
+
+// Update the redirect result handler
+useEffect(() => {
+  const handleRedirectResult = async () => {
+    console.log('Checking for redirect result...'); // Debug log 1
+    try {
+      console.log('Before getRedirectResult call'); // Debug log 2
+      const result = await getRedirectResult(auth);
+      console.log('After getRedirectResult call:', result); // Debug log 3
+      
+      if (result) {
+        const user = result.user;
+        console.log('Successfully signed in user:', user); // Debug log 4
+        
+        toaster.create({
+          description: `Signed in as ${user.email}`,
+          duration: 3000,
+          type: 'success'
+        });
+      } else {
+        console.log('No redirect result found - this is normal if not returning from a redirect'); // Debug log 5
+      }
+    } catch (error: any) {
+      console.error('Error handling redirect:', error); // Debug log 6
+      console.error('Error code:', error.code); // Debug log 7
+      console.error('Error message:', error.message); // Debug log 8
+      
+      let errorMessage = 'Failed to sign in with Google. Please try again.';
+      if (error.code === 'auth/popup-closed-by-user') {
+        errorMessage = 'Sign-in was cancelled. Please try again.';
+      } else if (error.code === 'auth/cancelled-popup-request') {
+        errorMessage = 'Another sign-in attempt is in progress.';
+      }
+      
+      toaster.create({
+        description: errorMessage,
+        duration: 3000,
+        type: 'error'
+      });
+    }
+  };
+
+  handleRedirectResult();
+}, []);
 
   const startSurveyFn = async (survey: Survey) => {
     setIsBeingBooked((prevStatus) => ({
@@ -268,6 +393,58 @@ export default function Home() {
     >
       <Toaster />
 
+      <Box position={'absolute'} top={4} right={0}>
+        <EllipseRingsC />
+      </Box>
+
+      <Box
+        h="200px"
+        w="6/6"
+        borderRadius={10}
+        my={4}
+        position="relative"
+        bgColor="rgba(148, 185, 255)"
+      >
+        <Flex flexDirection="column" alignItems="top" p={4}>
+          <Text
+            fontSize="2xl"
+            fontWeight="bold"
+            color="#363062"
+            textAlign="left"
+          >
+            Never Miss Out
+          </Text>
+          <Box position="absolute" top={2} right={2}>
+            <NeverMissOutPersonC />
+          </Box>
+          <Text fontSize="12" color="white" textAlign="left" w={'4/6'}>
+            Sign up with Google to ensure you are first to get survey
+            invitations
+          </Text>
+
+          <Button
+            bgColor={'#363062'}
+            borderRadius={10}
+            w={'6/6'}
+            mt={6}
+            mb={2}
+            onClick={handleGoogleSignIn}
+            loading={isSigningIn}
+            loadingText={
+              <Box pr={4}>
+                <SpinnerIconC />
+              </Box>
+            }
+            disabled={isSigningIn}
+          >
+            <GoogleIcon />
+            <Text fontSize="8" color="white" fontWeight={'bold'}>
+              Continue with Google
+            </Text>
+          </Button>
+        </Flex>
+      </Box>
+
       <Flex justify="flex-start">
         <Text
           fontSize="2xl"
@@ -279,6 +456,51 @@ export default function Home() {
           Hello!
         </Text>
       </Flex>
+
+      {/* <Box
+        h="200px"
+        w="6/6"
+        borderRadius={10}
+        mb={4}
+        position="relative"
+        bgColor="rgba(148, 185, 255, 0.75)"
+      >
+        <Flex flexDirection="column" alignItems="top" p={4}>
+          <Text
+            fontSize="2xl"
+            fontWeight="bold"
+            color="#363062"
+            textAlign="left"
+          >
+            Never Miss Out
+          </Text>
+          <Box position="absolute" top={2} right={2}>
+            <NeverMissOutPersonC />
+          </Box>
+          <Text fontSize="12" color="white" textAlign="left" w={'4/6'}>
+            Update your email to ensure you’re the first to get survey
+            invitations
+          </Text>
+
+          <Button
+            bgColor={'#363062'}
+            borderRadius={10}
+            w={'6/6'}
+            mt={6}
+            mb={2}
+            loadingText={
+              <Box pr={4}>
+                <SpinnerIconC />
+              </Box>
+            }
+            disabled={Object.values(isBeingBooked).some((status) => status)}
+          >
+            <Text fontSize="8" color="white" mx={4} fontWeight={'bold'}>
+              Update Now
+            </Text>
+          </Button>
+        </Flex>
+      </Box> */}
       <Box
         bgColor="#363062"
         h="25"
