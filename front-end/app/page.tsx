@@ -138,17 +138,20 @@ export default function Home() {
     try {
       setIsSigningIn(true);
       console.log('Starting Google sign in process...');
-      
+
       // Check if we're on localhost
-      if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+      if (
+        typeof window !== 'undefined' &&
+        window.location.hostname === 'localhost'
+      ) {
         console.log('Using popup sign-in for localhost');
         const result = await signInWithPopup(auth, googleAuthProvider);
         console.log('Popup sign-in successful:', result.user.email);
-        
+
         toaster.create({
           description: `Signed in as ${result.user.email}`,
           duration: 3000,
-          type: 'success'
+          type: 'success',
         });
       } else {
         console.log('Using redirect sign-in for production');
@@ -157,17 +160,17 @@ export default function Home() {
     } catch (error: any) {
       console.error('Error during sign in:', error);
       let errorMessage = 'Failed to sign in with Google. Please try again.';
-      
+
       if (error.code === 'auth/popup-closed-by-user') {
         errorMessage = 'Sign-in was cancelled. Please try again.';
       } else if (error.code === 'auth/cancelled-popup-request') {
         errorMessage = 'Another sign-in attempt is in progress.';
       }
-      
+
       toaster.create({
         description: errorMessage,
         duration: 3000,
-        type: 'error'
+        type: 'error',
       });
     } finally {
       setIsSigningIn(false);
@@ -194,49 +197,51 @@ export default function Home() {
     return () => unsubscribe();
   }, [address, participant]);
 
-// Update the redirect result handler
-useEffect(() => {
-  const handleRedirectResult = async () => {
-    console.log('Checking for redirect result...'); // Debug log 1
-    try {
-      console.log('Before getRedirectResult call'); // Debug log 2
-      const result = await getRedirectResult(auth);
-      console.log('After getRedirectResult call:', result); // Debug log 3
-      
-      if (result) {
-        const user = result.user;
-        console.log('Successfully signed in user:', user); // Debug log 4
-        
-        toaster.create({
-          description: `Signed in as ${user.email}`,
-          duration: 3000,
-          type: 'success'
-        });
-      } else {
-        console.log('No redirect result found - this is normal if not returning from a redirect'); // Debug log 5
-      }
-    } catch (error: any) {
-      console.error('Error handling redirect:', error); // Debug log 6
-      console.error('Error code:', error.code); // Debug log 7
-      console.error('Error message:', error.message); // Debug log 8
-      
-      let errorMessage = 'Failed to sign in with Google. Please try again.';
-      if (error.code === 'auth/popup-closed-by-user') {
-        errorMessage = 'Sign-in was cancelled. Please try again.';
-      } else if (error.code === 'auth/cancelled-popup-request') {
-        errorMessage = 'Another sign-in attempt is in progress.';
-      }
-      
-      toaster.create({
-        description: errorMessage,
-        duration: 3000,
-        type: 'error'
-      });
-    }
-  };
+  // Update the redirect result handler
+  useEffect(() => {
+    const handleRedirectResult = async () => {
+      console.log('Checking for redirect result...'); // Debug log 1
+      try {
+        console.log('Before getRedirectResult call'); // Debug log 2
+        const result = await getRedirectResult(auth);
+        console.log('After getRedirectResult call:', result); // Debug log 3
 
-  handleRedirectResult();
-}, []);
+        if (result) {
+          const user = result.user;
+          console.log('Successfully signed in user:', user); // Debug log 4
+
+          toaster.create({
+            description: `Signed in as ${user.email}`,
+            duration: 3000,
+            type: 'success',
+          });
+        } else {
+          console.log(
+            'No redirect result found - this is normal if not returning from a redirect'
+          ); // Debug log 5
+        }
+      } catch (error: any) {
+        console.error('Error handling redirect:', error); // Debug log 6
+        console.error('Error code:', error.code); // Debug log 7
+        console.error('Error message:', error.message); // Debug log 8
+
+        let errorMessage = 'Failed to sign in with Google. Please try again.';
+        if (error.code === 'auth/popup-closed-by-user') {
+          errorMessage = 'Sign-in was cancelled. Please try again.';
+        } else if (error.code === 'auth/cancelled-popup-request') {
+          errorMessage = 'Another sign-in attempt is in progress.';
+        }
+
+        toaster.create({
+          description: errorMessage,
+          duration: 3000,
+          type: 'error',
+        });
+      }
+    };
+
+    handleRedirectResult();
+  }, []);
 
   const startSurveyFn = async (survey: Survey) => {
     setIsBeingBooked((prevStatus) => ({
@@ -398,14 +403,20 @@ useEffect(() => {
       </Box>
 
       <Box
-        h="200px"
+        h="250px"
         w="6/6"
         borderRadius={10}
         my={4}
         position="relative"
         bgColor="rgba(148, 185, 255)"
       >
-        <Flex flexDirection="column" alignItems="top" p={4}>
+        <Flex
+          flexDirection="column"
+          alignItems="top"
+          p={4}
+          h="100%"
+          justifyContent="space-between"
+        >
           <Text
             fontSize="2xl"
             fontWeight="bold"
@@ -421,13 +432,10 @@ useEffect(() => {
             Sign up with Google to ensure you are first to get survey
             invitations
           </Text>
-
           <Button
             bgColor={'#363062'}
             borderRadius={10}
             w={'6/6'}
-            mt={6}
-            mb={2}
             onClick={handleGoogleSignIn}
             loading={isSigningIn}
             loadingText={
