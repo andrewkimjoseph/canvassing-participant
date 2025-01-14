@@ -67,6 +67,7 @@ export default function SignUpPage() {
         timeCreated: Timestamp.now(),
         timeUpdated: Timestamp.now(),
         isAdmin: false,
+        emailAddress: null
       });
 
       toaster.create({
