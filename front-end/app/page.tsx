@@ -403,7 +403,7 @@ export default function Home() {
       </Box>
 
       <Box
-        h="250px"
+        h="229px"
         w="6/6"
         borderRadius={10}
         my={4}
