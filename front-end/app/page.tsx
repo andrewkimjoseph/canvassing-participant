@@ -26,7 +26,7 @@ import YouAreSetCard from '@/components/you-are-set-card';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '@/firebase';
 import { AnonUserIconC } from '@/components/icons/checkmarks/anon-user';
-import { EmailUserIconC } from '@/components/icons/checkmarks/email-user';
+import { CanvassingUserIconC } from '@/components/icons/checkmarks/email-user';
 
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -88,10 +88,7 @@ export default function Home() {
       );
       identifyEvent.setOnce('[Canvassing] Gender', fetchedParticipant.gender);
       identifyEvent.setOnce('[Canvassing] Country', fetchedParticipant.country);
-      identifyEvent.set(
-        '[Canvassing] Username',
-        fetchedParticipant.username
-      );
+      identifyEvent.set('[Canvassing] Username', fetchedParticipant.username);
       identifyEvent.setOnce(
         '[Canvassing] Time Created',
         new Date(fetchedParticipant.timeCreated.seconds * 1000).toLocaleString()
@@ -429,7 +426,15 @@ export default function Home() {
                 {participant?.username || 'Userxxxx'}
               </Text>
 
-              {user?.isAnonymous ? <AnonUserIconC /> : <EmailUserIconC />}
+              {user && (
+                <>
+                  {user.isAnonymous ? (
+                    <AnonUserIconC />
+                  ) : user.email ? (
+                    <CanvassingUserIconC />
+                  ) : null}
+                </>
+              )}
             </Flex>
             <Text fontSize={14} mb={2} color="white">
               Surveys completed: {rewards.length}
