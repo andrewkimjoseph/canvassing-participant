@@ -1,10 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAccount, useChainId } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Box, Text, Flex } from '@chakra-ui/react';
+import { Box, Text, Flex, Circle } from '@chakra-ui/react';
 import useParticipantStore from '@/stores/useParticipantStore';
 import useMultipleSurveysStore from '@/stores/useMultipleSurveysStore';
 import useRewardStore from '@/stores/useRewardStore';
@@ -25,93 +25,152 @@ import { EllipseRingsC } from '@/components/images/ellipse-rings';
 import YouAreSetCard from '@/components/you-are-set-card';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '@/firebase';
-
+import { AnonUserIconC } from '@/components/icons/checkmarks/anon-user';
+import { EmailUserIconC } from '@/components/icons/checkmarks/email-user';
 
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
-  const [isBeingBooked, setIsBeingBooked] = useState<{
-    [key: string]: boolean;
-  }>({});
+  const [isBeingBooked, setIsBeingBooked] = useState<Record<string, boolean>>(
+    {}
+  );
   const [user, setUser] = useState<User | null>(null);
+  const [authInitialized, setAuthInitialized] = useState(false);
 
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
+  const router = useRouter();
+
   const {
     participant,
     loading: participantLoading,
     getParticipant,
-    ensureAnonymousAuth
+    ensureAnonymousAuth,
   } = useParticipantStore();
+
   const {
     surveys,
     fetchSurveys,
     loading: surveyLoading,
   } = useMultipleSurveysStore();
-  const router = useRouter();
 
   const { rewards, fetchRewards } = useRewardStore();
   const { trackAmplitudeEvent, identifyUser } = useAmplitudeContext();
 
-  const toasterIds = {
-    surveyIsFullyBooked: '1',
-    bookingInProgress: '2',
-    bookingRecordCreationFailed: '3',
-    onchainBookingFailed: '4',
-    bookingSuccess: '5',
-  };
+  const toasterIds = useMemo(
+    () => ({
+      surveyIsFullyBooked: '1',
+      bookingInProgress: '2',
+      bookingRecordCreationFailed: '3',
+      onchainBookingFailed: '4',
+      bookingSuccess: '5',
+    }),
+    []
+  );
 
+  // Initialize Firebase Auth listener
   useEffect(() => {
-    if (address) {
-      fetchRewards(address);
-    }
-  }, [address, isConnected, fetchRewards]);
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+      setAuthInitialized(true);
+    });
 
-  // Check participant status when wallet is connected
-  const checkParticipantStatus = useCallback(async () => {
-    if (isConnected && address) {
-      const fetchedParticipant = await getParticipant(address);
+    return () => unsubscribe();
+  }, []);
 
-      if (fetchedParticipant && !fetchedParticipant.authId) {
-        try {
-          await ensureAnonymousAuth(fetchedParticipant);
-        } catch (error) {
-          console.error('Error ensuring anonymous auth:', error);
-        }
-      }
+  // Handle Amplitude tracking
+  const handleAmplitudeTracking = useCallback(
+    (fetchedParticipant: Participant) => {
+      const identifyEvent = new Identify();
+      identifyEvent.set('[Canvassing] Surveys Taken', surveys.length);
+      identifyEvent.setOnce(
+        '[Canvassing] Wallet Address',
+        fetchedParticipant.walletAddress
+      );
+      identifyEvent.setOnce('[Canvassing] Gender', fetchedParticipant.gender);
+      identifyEvent.setOnce('[Canvassing] Country', fetchedParticipant.country);
+      identifyEvent.set(
+        '[Canvassing] Username',
+        fetchedParticipant.username
+      );
+      identifyEvent.setOnce(
+        '[Canvassing] Time Created',
+        new Date(fetchedParticipant.timeCreated.seconds * 1000).toLocaleString()
+      );
+      identifyEvent.setOnce('[Canvassing] Id', fetchedParticipant.id);
+      identifyEvent.setOnce('[Canvassing] AuthId', fetchedParticipant.authId);
+      identifyUser(identifyEvent);
+    },
+    [surveys.length, identifyUser]
+  );
 
-      await fetchSurveys(address, chainId);
-
-      if (surveys && participant) {
-        console.log('Participant', participant);
-        const identifyEvent = new Identify();
-        identifyEvent.set('[Canvassing] Surveys Taken', surveys.length);
-        identifyEvent.setOnce(
-          '[Canvassing] Wallet Address',
-          participant.walletAddress
-        );
-        identifyEvent.setOnce('[Canvassing] Gender', participant.gender);
-        identifyEvent.setOnce('[Canvassing] Country', participant.country);
-        identifyEvent.setOnce('[Canvassing] Username', participant.username);
-        identifyEvent.setOnce(
-          '[Canvassing] Time Created',
-          new Date(participant.timeCreated.seconds * 1000).toLocaleString()
-        );
-        identifyEvent.setOnce('[Canvassing] Id', participant.id);
-
-        identifyUser(identifyEvent);
-      }
-    }
-  }, [isConnected, address, getParticipant, ensureAnonymousAuth, fetchSurveys, surveys, participant, identifyUser]);
-
-  // Initial setup effect
+  // Initialize app state after auth is initialized
   useEffect(() => {
+    let isMounted = true;
+
     const initialize = async () => {
-      await checkParticipantStatus();
-      setIsInitialized(true);
+      if (!authInitialized || !isConnected || !address) {
+        if (isMounted) setIsInitialized(true);
+        return;
+      }
+
+      try {
+        const fetchedParticipant = await getParticipant(address);
+        if (!isMounted) return;
+
+        if (fetchedParticipant) {
+          // Only ensure auth if participant exists, doesn't have authId, and no current user
+          if (!fetchedParticipant.authId && !auth.currentUser) {
+            await ensureAnonymousAuth(fetchedParticipant);
+          }
+
+          // Fetch data in parallel
+          await Promise.all([
+            fetchRewards(address),
+            fetchSurveys(address, chainId),
+          ]);
+
+          if (!isMounted) return;
+
+          // Initialize booking status
+          if (surveys.length > 0) {
+            setIsBeingBooked(
+              surveys.reduce(
+                (acc, survey) => ({
+                  ...acc,
+                  [survey.id]: false,
+                }),
+                {}
+              )
+            );
+          }
+
+          // Handle amplitude tracking
+          handleAmplitudeTracking(fetchedParticipant);
+        }
+      } catch (error) {
+        console.error('Initialization error:', error);
+      } finally {
+        if (isMounted) setIsInitialized(true);
+      }
     };
 
     initialize();
-  }, [checkParticipantStatus, fetchSurveys, surveys.length]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [
+    authInitialized,
+    isConnected,
+    address,
+    chainId,
+    getParticipant,
+    ensureAnonymousAuth,
+    fetchRewards,
+    fetchSurveys,
+    handleAmplitudeTracking,
+    surveys.length,
+  ]);
 
   // Handle redirect after initialization
   useEffect(() => {
@@ -120,41 +179,24 @@ export default function Home() {
     }
   }, [isInitialized, participant, participantLoading, router]);
 
-  useEffect(() => {
-    if (surveys.length > 0) {
-      const initialStatus = surveys.reduce((acc, survey) => {
-        acc[survey.id] = false;
-        return acc;
-      }, {} as { [key: string]: boolean });
-      setIsBeingBooked(initialStatus);
-    }
-  }, [surveys]);
+  const startSurveyFn = useCallback(
+    async (survey: Survey) => {
+      setIsBeingBooked((prev) => ({
+        ...prev,
+        [survey.id]: true,
+      }));
 
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
-      if (firebaseUser) {
-        console.log('Anonymous user signed in');
-      } else {
-        console.log('User signed out');
+      try {
+        router.push(`/survey/${survey.id}`);
+      } finally {
+        setIsBeingBooked((prev) => ({
+          ...prev,
+          [survey.id]: false,
+        }));
       }
-    });
-  
-    return () => unsubscribe();
-  }, []);
-
-  const startSurveyFn = async (survey: Survey) => {
-    setIsBeingBooked((prevStatus) => ({
-      ...prevStatus,
-      [survey.id]: true,
-    }));
-    router.push(`/survey/${survey.id}`);
-    setIsBeingBooked((prevStatus) => ({
-      ...prevStatus,
-      [survey.id]: false,
-    }));
-  };
+    },
+    [router]
+  );
 
   const bookSurveyFn = async (survey: Survey) => {
     setIsBeingBooked((prevStatus) => ({
@@ -232,7 +274,7 @@ export default function Home() {
           toaster.create({
             id: toasterIds.bookingRecordCreationFailed,
             description:
-              'Booking record creation failed.  Kindly reach out to support via the "More" tab. ',
+              'Booking record creation failed. Kindly reach out to support via the "More" tab. ',
             duration: 3000,
             type: 'warning',
           });
@@ -254,7 +296,7 @@ export default function Home() {
     } catch (error) {
       toaster.dismiss(toasterIds.bookingInProgress);
       toaster.create({
-        description: 'An error occured during booking. Try again later.',
+        description: 'An error occurred during booking. Try again later.',
         duration: 6000,
         type: 'warning',
       });
@@ -266,8 +308,8 @@ export default function Home() {
     }
   };
 
-  // Show loading state while initializing or checking participant
-  if (!isInitialized || participantLoading) {
+  // Show loading state while initializing
+  if (!authInitialized || !isInitialized || participantLoading) {
     return (
       <Flex
         position="fixed"
@@ -303,53 +345,58 @@ export default function Home() {
         <EllipseRingsC />
       </Box>
 
-      <Box
-        h="229px"
-        w="6/6"
-        borderRadius={10}
-        my={4}
-        position="relative"
-        bgColor="rgba(148, 185, 255)"
-      >
-        <Flex
-          flexDirection="column"
-          alignItems="top"
-          p={4}
-          h="100%"
-          justifyContent="space-between"
+      {/* {!user?.email ? (
+        <Box
+          h="229px"
+          w="6/6"
+          borderRadius={10}
+          my={4}
+          position="relative"
+          bgColor="rgba(148, 185, 255)"
         >
-          <Text
-            fontSize="3xl"
-            fontWeight="bold"
-            color="#363062"
-            textAlign="left"
+          <Flex
+            flexDirection="column"
+            alignItems="top"
+            p={4}
+            h="100%"
+            justifyContent="space-between"
           >
-            Never Miss Out
-          </Text>
-          <Box position="absolute" top={2} right={2}>
-            <NeverMissOutPersonC />
-          </Box>
-          <Text fontSize="12" color="white" textAlign="left" w={'4/6'}>
-            Set your email to ensure you are first to get survey invitations
-          </Text>
-          <Button
-            bgColor={'#363062'}
-            borderRadius={10}
-            w={'6/6'}
-            loadingText={
-              <Box pr={4}>
-                <SpinnerIconC />
-              </Box>
-            }
-          >
-            <Text fontSize="8" color="white" fontWeight={'bold'}>
-              Update email
+            <Text
+              fontSize="3xl"
+              fontWeight="bold"
+              color="#363062"
+              textAlign="left"
+            >
+              Never Miss Out
             </Text>
-          </Button>
-        </Flex>
-      </Box>
 
-      <YouAreSetCard />
+            <Box position="absolute" top={2} right={2}>
+              <NeverMissOutPersonC />
+            </Box>
+
+            <Text fontSize="12" color="white" textAlign="left" w={'4/6'}>
+              Set your email to ensure you are first to get survey invitations
+            </Text>
+            <Button
+              bgColor={'#363062'}
+              borderRadius={10}
+              w={'6/6'}
+              loadingText={
+                <Box pr={4}>
+                  <SpinnerIconC />
+                </Box>
+              }
+            >
+              <Text fontSize="8" color="white" fontWeight={'bold'}>
+                Update email
+              </Text>
+            </Button>
+          </Flex>
+        </Box>
+      ) : (
+        <YouAreSetCard />
+      )} */}
+
       <Flex justify="flex-start">
         <Text
           fontSize="2xl"
@@ -381,6 +428,8 @@ export default function Home() {
               <Text fontSize={18} color="white" mr={2}>
                 {participant?.username || 'Userxxxx'}
               </Text>
+
+              {user?.isAnonymous ? <AnonUserIconC /> : <EmailUserIconC />}
             </Flex>
             <Text fontSize={14} mb={2} color="white">
               Surveys completed: {rewards.length}
