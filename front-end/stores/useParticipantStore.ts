@@ -8,7 +8,8 @@ import {
   addDoc, 
   doc, 
   updateDoc,
-  Timestamp
+  Timestamp,
+  getDoc
 } from 'firebase/firestore';
 import { Participant } from '@/entities/participant';
 import { db } from '@/firebase';
@@ -31,34 +32,73 @@ const useParticipantStore = create<ParticipantStoreState>()(
       loading: false,
 
       ensureAnonymousAuth: async (participant: Participant) => {
-        // If participant already has an authId, return it
-        if (participant.authId) {
-          return participant.authId;
-        }
-
         try {
-          // Sign in anonymously
+          // Get fresh participant data to ensure we have the latest authId
+          const participantRef = doc(db, 'participants', participant.id);
+          const participantDoc = await getDoc(participantRef);
+          
+          if (!participantDoc.exists()) {
+            throw new Error('Participant not found');
+          }
+          
+          const currentParticipant = {
+            ...participantDoc.data(),
+            id: participantDoc.id
+          } as Participant;
+
+          // If participant already has an authId, use it
+          if (currentParticipant.authId) {
+            // Update local state if needed
+            if (currentParticipant.authId !== get().participant?.authId) {
+              set({ participant: currentParticipant });
+            }
+            return currentParticipant.authId;
+          }
+
+          // Check for existing anonymous user
+          const currentUser = auth.currentUser;
+          
+          if (currentUser) {
+            // Use existing anonymous user
+            const authId = currentUser.uid;
+            
+            // Update participant with existing authId
+            await updateDoc(participantRef, {
+              authId,
+              timeUpdated: Timestamp.now()
+            });
+
+            // Update local state
+            const updatedParticipant = {
+              ...currentParticipant,
+              authId
+            };
+            
+            set({ participant: updatedParticipant });
+            return authId;
+          }
+
+          // Create new anonymous user only if no existing user
           const userCredential = await signInAnonymously(auth);
           const authId = userCredential.user.uid;
-
+          
           // Update participant with new authId
-          const participantRef = doc(db, 'participants', participant.id);
           await updateDoc(participantRef, {
             authId,
             timeUpdated: Timestamp.now()
           });
 
           // Update local state
-          set({ 
-            participant: {
-              ...participant,
-              authId
-            }
-          });
-
+          const updatedParticipant = {
+            ...currentParticipant,
+            authId
+          };
+          
+          set({ participant: updatedParticipant });
           return authId;
+          
         } catch (error) {
-          console.error('Error ensuring anonymous auth:', error);
+          console.error('Error in ensureAnonymousAuth:', error);
           throw error;
         }
       },
@@ -76,12 +116,6 @@ const useParticipantStore = create<ParticipantStoreState>()(
             const data = snapshot.docs[0].data() as Participant;
             const participant = { ...data, id: snapshot.docs[0].id };
             set({ participant, loading: false });
-            
-            // Ensure anonymous auth for existing participant
-            if (!participant.authId) {
-              await get().ensureAnonymousAuth(participant);
-            }
-            
             return participant;
           } else {
             set({ participant: null, loading: false });
@@ -143,7 +177,8 @@ const useParticipantStore = create<ParticipantStoreState>()(
           const data = {
             username: username,
             timeUpdated: Timestamp.now(),
-          }
+          };
+
           await updateDoc(participantRef, data);
 
           const updatedParticipant: Participant = {
