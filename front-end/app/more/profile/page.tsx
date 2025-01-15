@@ -49,7 +49,7 @@ export default function Profile() {
         // 1800 seconds in half an hour
         toaster.create({
           description:
-            'You can only update your username once every half an hour.',
+            'Wait half an hour before you update your username.',
           duration: 3000,
           type: 'warning',
         });
