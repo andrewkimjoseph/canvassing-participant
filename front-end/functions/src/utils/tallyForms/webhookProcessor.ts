@@ -66,7 +66,6 @@ export const processWebhook = async (
     country,
     researcherId,
     contractAddress,
-    authId
   } = extractFormData(data);
   const chainConfig = CHAIN_CONFIGS[network];
 
@@ -77,11 +76,19 @@ export const processWebhook = async (
     !gender ||
     !country ||
     !researcherId ||
-    !contractAddress ||
-    !authId
+    !contractAddress
   ) {
+    const missingFields = [];
+    if (!walletAddress) missingFields.push('wallet address');
+    if (!surveyId) missingFields.push('survey ID');
+    if (!participantId) missingFields.push('participant ID');
+    if (!gender) missingFields.push('gender');
+    if (!country) missingFields.push('country');
+    if (!researcherId) missingFields.push('researcher ID');
+    if (!contractAddress) missingFields.push('contract address');
+
     throw new Error(
-      'Missing required fields in form submission: wallet address, survey ID, participant ID, gender, country, researcher ID, or contract address.'
+      `Missing required fields in form submission: ${missingFields.join(', ')}.`
     );
   }
 
