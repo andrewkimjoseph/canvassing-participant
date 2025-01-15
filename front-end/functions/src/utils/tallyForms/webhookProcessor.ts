@@ -24,6 +24,10 @@ const extractFormData = (data: WebhookData) => {
     (field) => field.label === 'contractAddress'
   );
 
+  const authIdField = data.fields.find(
+    (field) => field.label === 'authId'
+  );
+
   const returnData = {
     walletAddress: walletAddressField
       ? (walletAddressField.value as string)
@@ -39,6 +43,9 @@ const extractFormData = (data: WebhookData) => {
       : null,
     contractAddress: contractAddressField
       ? (contractAddressField.value as string)
+      : null,
+      authId: authIdField
+      ? (authIdField.value as string)
       : null,
   };
 
@@ -71,8 +78,17 @@ export const processWebhook = async (
     !researcherId ||
     !contractAddress
   ) {
+    const missingFields = [];
+    if (!walletAddress) missingFields.push('wallet address');
+    if (!surveyId) missingFields.push('survey ID');
+    if (!participantId) missingFields.push('participant ID');
+    if (!gender) missingFields.push('gender');
+    if (!country) missingFields.push('country');
+    if (!researcherId) missingFields.push('researcher ID');
+    if (!contractAddress) missingFields.push('contract address');
+
     throw new Error(
-      'Missing required fields in form submission: wallet address, survey ID, participant ID, gender, country, researcher ID, or contract address.'
+      `Missing required fields in form submission: ${missingFields.join(', ')}.`
     );
   }
 
