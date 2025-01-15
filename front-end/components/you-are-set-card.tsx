@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Text, Flex } from '@chakra-ui/react';
+import { YouAreSetIconC } from './images/you-are-set-icon';
 
 const YouAreSetCard: React.FC = () => {
   return (
@@ -27,7 +28,7 @@ const YouAreSetCard: React.FC = () => {
           You are set!
         </Text>
         <Box position="absolute" top={12} right={2}>
-          <YouAreSetCard />
+          <YouAreSetIconC />
         </Box>
         <Text fontSize="12" color="#363062" textAlign="left" w={'4/6'}>
           Keep an eye out for surveys on Wednesday, Thursday, and Friday to
