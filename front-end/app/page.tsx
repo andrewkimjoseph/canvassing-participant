@@ -26,7 +26,7 @@ import YouAreSetCard from '@/components/you-are-set-card';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '@/firebase';
 import { AnonUserIconC } from '@/components/icons/checkmarks/anon-user';
-import { CanvassingUserIconC } from '@/components/icons/checkmarks/email-user';
+import { CanvassingUserIconC } from '@/components/icons/checkmarks/canvassing-user';
 
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -430,7 +430,7 @@ export default function Home() {
                 <>
                   {user.isAnonymous ? (
                     <AnonUserIconC />
-                  ) : user.email ? (
+                  ) : user.emailVerified ? (
                     <CanvassingUserIconC />
                   ) : null}
                 </>
