@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation';
 import useSingleResearcherStore from '@/stores/useResearcherStore';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 import { SpinnerIconC } from '@/components/icons/spinner-icon';
+import { auth } from '@/firebase';
 
 export default function SurveyPage() {
   const [isMounted, setIsMounted] = useState(false);
@@ -225,7 +226,7 @@ export default function SurveyPage() {
             });
 
             router.push(
-              `${survey.formLink}?walletAddress=${participant?.walletAddress}&surveyId=${survey.id}&participantId=${participant?.id}&gender=${participant?.gender}&country=${participant?.country}&researcherId=${survey?.researcherId}&contractAddress=${survey?.contractAddress}` ||
+              `${survey.formLink}?walletAddress=${participant?.walletAddress}&surveyId=${survey.id}&participantId=${participant?.id}&gender=${participant?.gender}&country=${participant?.country}&researcherId=${survey?.researcherId}&contractAddress=${survey?.contractAddress}&authId=${auth.currentUser?.uid}` ||
                 '#'
             );
 
