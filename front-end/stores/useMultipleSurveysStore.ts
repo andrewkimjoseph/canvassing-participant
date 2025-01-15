@@ -65,8 +65,8 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
         }
         
         // Remove duplicates that might occur from chunked queries
-        allSurveys = Array.from(new Set(allSurveys.map(s => s.id)))
-          .map(id => allSurveys.find(s => s.id === id)!);
+        allSurveys = Array.from(new Set(allSurveys.map(survey => survey.id)))
+          .map(id => allSurveys.find(survey => survey.id === id)!);
       } else {
         // If no participated surveys, get all surveys
         const surveyQuery = query(collection(db, 'surveys'));
