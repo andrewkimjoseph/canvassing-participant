@@ -226,7 +226,7 @@ export default function SurveyPage() {
             });
 
             router.push(
-              `${survey.formLink}?walletAddress=${participant?.walletAddress}&surveyId=${survey.id}&participantId=${participant?.id}&gender=${participant?.gender}&country=${participant?.country}&researcherId=${survey?.researcherId}&contractAddress=${survey?.contractAddress}&authId=${auth.currentUser?.uid}` ||
+              `${survey.formLink}?walletAddress=${participant?.walletAddress}&surveyId=${survey.id}&participantId=${participant?.id}&authId=${auth.currentUser?.uid}&gender=${participant?.gender}&country=${participant?.country}&researcherId=${survey?.researcherId}&contractAddress=${survey?.contractAddress}` ||
                 '#'
             );
 
