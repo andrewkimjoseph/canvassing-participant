@@ -28,6 +28,8 @@ import { SignUpPageIconC } from '@/components/icons/signup-page-icon';
 import useParticipantStore from '@/stores/useParticipantStore';
 import { Timestamp } from 'firebase/firestore';
 import { SpinnerIconC } from '@/components/icons/spinner-icon';
+import { signInAnonymously } from 'firebase/auth';
+import { auth } from '@/firebase';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -59,7 +61,12 @@ export default function SignUpPage() {
     }
 
     try {
+      const anonUserCredentials = await signInAnonymously(auth);
+
+      const authId = anonUserCredentials.user.uid;
+
       await setParticipant({
+        authId,
         gender,
         country,
         walletAddress: address,
@@ -67,7 +74,8 @@ export default function SignUpPage() {
         timeCreated: Timestamp.now(),
         timeUpdated: Timestamp.now(),
         isAdmin: false,
-      });
+        emailAddress: null
+      }, authId);
 
       toaster.create({
         description: 'Account created successfully!',

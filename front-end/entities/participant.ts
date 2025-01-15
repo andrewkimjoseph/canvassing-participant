@@ -10,5 +10,7 @@ export interface Participant {
     isAdmin: boolean;
     timeCreated: admin.firestore.Timestamp;
     timeUpdated: admin.firestore.Timestamp;
+    emailAddress: string | null;
+    authId: string
   }
   

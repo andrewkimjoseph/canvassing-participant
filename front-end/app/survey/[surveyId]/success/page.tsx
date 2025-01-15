@@ -72,7 +72,30 @@ export default function SuccessPage() {
     }
   }, [surveyId, fetchSurvey]);
 
-  const processRewardClaimByParticipantFn = async () => {
+  /**
+   * Processes the reward claim by a participant.
+   * 
+   * This function performs several checks and operations to ensure that the reward claim process is valid and successful.
+   * It includes validation of the survey ID, connection status, survey existence, contract balance, and reward record.
+   * If all checks pass, it initiates the reward claim process and updates the reward record in the database.
+   * 
+   * @async
+   * @function processRewardClaimByParticipantFn
+   * @returns {Promise<void>} A promise that resolves when the reward claim process is complete.
+   * 
+   * @throws Will display a toaster notification for various error conditions:
+   * - Invalid or undetected survey ID
+   * - Connection lost
+   * - Survey does not exist
+   * - Not enough balance to pay out
+   * - Reward record not found
+   * - Unexpected error during the reward claim process
+   * 
+   * @example
+   * // Example usage:
+   * await processRewardClaimByParticipantFn();
+   */
+  const processRewardClaimByParticipantFn = async (): Promise<void> => {
     setIsProcessingRewardClaim(true);
 
     if (!surveyId || typeof surveyId !== 'string') {
