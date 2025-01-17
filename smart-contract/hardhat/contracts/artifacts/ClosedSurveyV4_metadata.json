@@ -917,7 +917,7 @@
 			"bytecodeHash": "ipfs"
 		},
 		"optimizer": {
-			"enabled": true,
+			"enabled": false,
 			"runs": 200
 		},
 		"remappings": []
@@ -980,11 +980,11 @@
 			]
 		},
 		"@openzeppelin/contracts/utils/Strings.sol": {
-			"keccak256": "0x725209b582291bb83058e3078624b53d15a133f7401c30295e7f3704181d2aed",
+			"keccak256": "0x44f87e91783e88415bde66f1a63f6c7f0076f2d511548820407d5c95643ac56c",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://0564ddb19c6d870e27b789d8f985283d815267ad7224883c2d5243c8bacc7dc0",
-				"dweb:/ipfs/QmeC953H4sj88ZRFdJNFdmpf7J9SksP1wK4jyMHLo66z49"
+				"bzz-raw://13a51bc2b23827744dcf5bad10c69e72528cf015a6fe48c93632cdb2c0eb1251",
+				"dweb:/ipfs/QmZwPA47Yqgje1qtkdEFEja8ntTahMStYzKf5q3JRnaR7d"
 			]
 		},
 		"@openzeppelin/contracts/utils/cryptography/ECDSA.sol": {
@@ -1028,11 +1028,11 @@
 			]
 		},
 		"smart-contract/hardhat/contracts/ClosedSurveyV4.sol": {
-			"keccak256": "0xd88fd2d353208c7f4e3f5f14c4a7c59b4ec98ddcc32d577be528ee7bdd35d892",
+			"keccak256": "0x1bfabff2c858d0b18b6fdb0a21153b9dfdd0a7c25e3ada3c4ceb88b1353d09c9",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://95f9d6ca5937ed7b4afb83878f36c909f5bb398cb3e15ed86058f2a89f5453c8",
-				"dweb:/ipfs/QmNRjZzuVgQPWYmhVN4sG5S2PD8PrLPbWBw3LgrUW3HK2u"
+				"bzz-raw://aba578fe6028767e01ba95129fde5eea74087fced55b1781ec48221d06df0abb",
+				"dweb:/ipfs/QmVs1hQ1WqkbJQ4QY8uDan84ffYq74bCr2oE5nef5hTkmm"
 			]
 		}
 	},
