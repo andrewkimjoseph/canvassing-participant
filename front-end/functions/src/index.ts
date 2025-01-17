@@ -29,6 +29,79 @@ export const createUnclaimedRewardUponSubmissionV2Mainnet = functions.https.onRe
 );
 
 /**
+ * HTTP Cloud Function that processes a webhook request to create an unclaimed reward upon submission for the mainnet (1).
+ *
+ * @function
+ * @name createUnclaimedRewardUponSubmissionV2Mainnet1
+ * @param {functions.https.Request} request - The HTTP request object.
+ * @param {functions.Response} response - The HTTP response object.
+ * @returns {Promise<void>} - A promise that resolves when the processing is complete.
+ * @throws {Error} - Throws an error if the processing fails.
+ *
+ */
+export const createUnclaimedRewardUponSubmissionV2Mainnet1 = functions.https.onRequest(
+  async (request, response) => {
+    try {
+      await processWebhook(request.body.data, 'mainnet');
+      console.log('Process completed successfully.');
+      response.status(200).send('Process completed successfully.');
+    } catch (error) {
+      console.error('Error processing webhook:', error);
+      response.status(500).send('Internal server error');
+    }
+  }
+);
+
+
+/**
+ * HTTP Cloud Function that processes a webhook request to create an unclaimed reward upon submission for the mainnet (2).
+ *
+ * @function
+ * @name createUnclaimedRewardUponSubmissionV2Mainnet2
+ * @param {functions.https.Request} request - The HTTP request object.
+ * @param {functions.Response} response - The HTTP response object.
+ * @returns {Promise<void>} - A promise that resolves when the processing is complete.
+ * @throws {Error} - Throws an error if the processing fails.
+ *
+ */
+export const createUnclaimedRewardUponSubmissionV2Mainnet2 = functions.https.onRequest(
+  async (request, response) => {
+    try {
+      await processWebhook(request.body.data, 'mainnet');
+      console.log('Process completed successfully.');
+      response.status(200).send('Process completed successfully.');
+    } catch (error) {
+      console.error('Error processing webhook:', error);
+      response.status(500).send('Internal server error');
+    }
+  }
+);
+
+/**
+ * HTTP Cloud Function that processes a webhook request to create an unclaimed reward upon submission for the mainnet (3).
+ *
+ * @function
+ * @name createUnclaimedRewardUponSubmissionV2Mainnet3
+ * @param {functions.https.Request} request - The HTTP request object.
+ * @param {functions.Response} response - The HTTP response object.
+ * @returns {Promise<void>} - A promise that resolves when the processing is complete.
+ * @throws {Error} - Throws an error if the processing fails.
+ *
+ */
+export const createUnclaimedRewardUponSubmissionV2Mainnet3 = functions.https.onRequest(
+  async (request, response) => {
+    try {
+      await processWebhook(request.body.data, 'mainnet');
+      console.log('Process completed successfully.');
+      response.status(200).send('Process completed successfully.');
+    } catch (error) {
+      console.error('Error processing webhook:', error);
+      response.status(500).send('Internal server error');
+    }
+  }
+);
+
+/**
  * HTTP Cloud Function that processes a webhook request to create an unclaimed reward upon submission for the testnet.
  *
  * @function
@@ -51,6 +124,8 @@ export const createUnclaimedRewardUponSubmissionV2Testnet = functions.https.onRe
     }
   }
 );
+
+
 
 // LEGACY FUNCTION - Consider moving to separate file if needed
 export const createUnclaimedRewardUponFormSubmission = functions.https.onRequest(
