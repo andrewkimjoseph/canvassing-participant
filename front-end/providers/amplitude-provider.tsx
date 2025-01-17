@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, createContext } from 'react';
-import { init, track, identify, Identify} from '@amplitude/analytics-browser';
+import { init, track, identify, Identify } from '@amplitude/analytics-browser';
 
 const NEXT_PUBLIC_AMPLITUDE_API_KEY = process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY;
 
@@ -20,7 +20,16 @@ const AmplitudeContextProvider = ({
   children: React.ReactNode;
 }) => {
   useEffect(() => {
-    init(NEXT_PUBLIC_AMPLITUDE_API_KEY as string, { autocapture: true });
+    init(NEXT_PUBLIC_AMPLITUDE_API_KEY as string, {
+      autocapture: {
+        elementInteractions: false,
+        fileDownloads: false,
+        formInteractions: false,
+        attribution: true,
+        pageViews: true,
+        sessions: true,
+      },
+    });
   }, []);
 
   const trackAmplitudeEvent = (eventName: string, eventProperties: {}) => {

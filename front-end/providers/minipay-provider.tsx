@@ -10,20 +10,21 @@ export const MiniPayProvider: React.FC<{
 
   useEffect(() => {
     const checkMiniPay = (): void => {
-      const isDevelopment =
+      const isPreviewOrDev =
         typeof window !== 'undefined' &&
-        window.location.hostname === 'localhost';
-
+        (window.location.hostname === 'localhost' ||
+         process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview');
+  
       const miniPayExists: boolean =
-        isDevelopment ||
+        isPreviewOrDev ||
         (typeof window !== 'undefined' &&
           (window as any).ethereum &&
           ((window as any).ethereum.isMiniPay !== undefined ||
             (window as any).ethereum.isMiniPay === true));
-
+  
       setIsMiniPay(miniPayExists);
     };
-
+  
     checkMiniPay();
   }, []);
 
