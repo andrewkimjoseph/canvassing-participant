@@ -262,6 +262,8 @@ contract ClosedSurveyV4 is Ownable, ReentrancyGuard, Pausable {
         external
         onlyIfSenderIsGivenParticipant(participant)
         onlyUnscreenedParticipant(participant)
+        onlyUnrewardedParticipant(participant)
+        onlyWhenAllParticipantsHaveNotBeenRewarded
     {
         require(participant != address(0), "Zero address passed");
 
@@ -468,6 +470,11 @@ contract ClosedSurveyV4 is Ownable, ReentrancyGuard, Pausable {
         require(
             _newTargetNumberOfParticipants != 0,
             "Zero number of target participants given"
+        );
+
+        require(
+            _newTargetNumberOfParticipants >= targetNumberOfParticipants,
+            "New number of target participants given is less than current number (of target participants)"
         );
 
         uint256 oldTargetNumberOfParticipants = targetNumberOfParticipants;
