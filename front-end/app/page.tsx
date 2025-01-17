@@ -195,6 +195,18 @@ export default function Home() {
     [router]
   );
 
+  /**
+   * Books a survey for the participant.
+   *
+   * This function handles the booking process for a survey, including checking if the survey is fully booked,
+   * prompting the user to approve the booking, and updating the booking status in both the blockchain and the database.
+   * It also provides feedback to the user through toasters and tracks events using Amplitude.
+   *
+   * @param {Survey} survey - The survey to be booked.
+   * @returns {Promise<void>} - A promise that resolves when the booking process is complete.
+   *
+   * @throws {Error} - Throws an error if the booking process fails.
+   */
   const bookSurveyFn = async (survey: Survey) => {
     setIsBeingBooked((prevStatus) => ({
       ...prevStatus,
