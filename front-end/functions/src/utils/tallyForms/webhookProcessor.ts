@@ -7,6 +7,20 @@ import { CHAIN_CONFIGS } from '../../config/config';
 
 const firestore = admin.firestore();
 
+/**
+ * Extracts specific form data from a given WebhookData object.
+ *
+ * @param {WebhookData} data - The data object containing form fields.
+ * @returns {Object} An object containing the extracted form data:
+ * - `walletAddress` (string | null): The wallet address from the form, or null if not found.
+ * - `surveyId` (string | null): The survey ID from the form, or null if not found.
+ * - `participantId` (string | null): The participant ID from the form, or null if not found.
+ * - `gender` (string | null): The gender from the form, or null if not found.
+ * - `country` (string | null): The country from the form, or null if not found.
+ * - `researcherId` (string | null): The researcher ID from the form, or null if not found.
+ * - `contractAddress` (string | null): The contract address from the form, or null if not found.
+ * - `authId` (string | null): The auth ID from the form, or null if not found.
+ */
 const extractFormData = (data: WebhookData) => {
   const walletAddressField = data.fields.find(
     (field) => field.label === 'walletAddress'
@@ -54,6 +68,15 @@ const extractFormData = (data: WebhookData) => {
   return returnData;
 };
 
+/**
+ * Processes a webhook by extracting form data, validating required fields,
+ * checking participant and survey existence, creating a reward document,
+ * signing for the reward, and updating the reward signature.
+ *
+ * @param data - The webhook data to process.
+ * @param network - The network to use, either 'mainnet' or 'testnet'.
+ * @throws Will throw an error if any required fields are missing, if the participant or survey is not found, or if signing fails.
+ */
 export const processWebhook = async (
   data: WebhookData,
   network: 'mainnet' | 'testnet'

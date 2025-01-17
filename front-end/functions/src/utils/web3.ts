@@ -12,6 +12,29 @@ import { randomBytes } from 'crypto';
 
 const SRP = process.env.SRP as Address;
 
+/**
+ * Signs a reward for a participant in a survey.
+ *
+ * @param {Object} params - The parameters for signing the reward.
+ * @param {string} params.surveyContractAddress - The address of the survey contract.
+ * @param {number} params.chainId - The ID of the blockchain network.
+ * @param {string} params.participantWalletAddress - The wallet address of the participant.
+ * @param {string} params.rewardId - The ID of the reward.
+ * @param {string} params.network - The network name.
+ * @returns {Promise<SignForRewardResult>} A promise that resolves to the result of the signing operation.
+ *
+ * @typedef {Object} SignForRewardProps
+ * @property {string} surveyContractAddress - The address of the survey contract.
+ * @property {number} chainId - The ID of the blockchain network.
+ * @property {string} participantWalletAddress - The wallet address of the participant.
+ * @property {string} rewardId - The ID of the reward.
+ * @property {string} network - The network name.
+ *
+ * @typedef {Object} SignForRewardResult
+ * @property {boolean} success - Indicates if the signing was successful.
+ * @property {string | null} signature - The signature of the message, or null if unsuccessful.
+ * @property {string} nonce - The nonce used in the signing process.
+ */
 export const signForReward = async ({
   surveyContractAddress,
   chainId,
