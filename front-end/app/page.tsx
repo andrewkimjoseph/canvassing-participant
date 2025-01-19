@@ -207,7 +207,7 @@ export default function Home() {
    *
    * @throws {Error} - Throws an error if the booking process fails.
    */
-  const bookSurveyFn = async (survey: Survey) => {
+  const bookSurveyFn = async (survey: Survey): Promise<void> => {
     trackAmplitudeEvent('Book clicked', {
       walletAddress: address,
       surveyId: survey.id,
