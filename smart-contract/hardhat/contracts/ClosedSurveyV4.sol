@@ -98,7 +98,15 @@ contract ClosedSurveyV4 is Ownable, ReentrancyGuard, Pausable {
      * @param researcher The address of the researcher who withdrew the funds
      * @param rewardAmount The amount of cUSD withdrawn in wei
      */
-    event RewardFundsWithdrawn(address researcher, uint256 rewardAmount);
+    event CUSDWithdrawn(address researcher, uint256 rewardAmount);
+
+    /**
+     * @notice Emitted when a given token is withdrawn by the researcher
+     * @param researcher The address of the researcher who withdrew the funds
+     * @param tokenAddress The address of the given token withdrawn in wei
+     * @param rewardAmount The amount of the given token withdrawn in wei
+     */
+    event GivenTokenWithdrawn(address researcher, IERC20Metadata tokenAddress, uint256 rewardAmount);
 
     /**
      * @notice Emitted when the reward amount per participant is updated
@@ -209,6 +217,18 @@ contract ClosedSurveyV4 is Ownable, ReentrancyGuard, Pausable {
         require(
             cUSD.balanceOf(address(this)) > 0,
             "Contract does not have any cUSD"
+        );
+        _;
+    }
+
+
+    /**
+     * @dev Throws if called when [token.balanceOf(address(this))] is == 0.
+     */
+    modifier onlyIfContractHasAnyGivenToken(IERC20Metadata token) {
+        require(
+            token.balanceOf(address(this)) > 0,
+            "Contract does not have any of the given token"
         );
         _;
     }
@@ -421,7 +441,7 @@ contract ClosedSurveyV4 is Ownable, ReentrancyGuard, Pausable {
      * @notice Allows the researcher to withdraw all remaining cUSD from the contract
      * @dev Can only be called by the contract owner when the contract is not paused
      */
-    function withdrawAllRewardFundsToResearcher()
+    function withdrawAllcUSDToResearcher()
         external
         onlyOwner
         whenNotPaused
@@ -431,9 +451,27 @@ contract ClosedSurveyV4 is Ownable, ReentrancyGuard, Pausable {
         bool transferIsSuccessful = cUSD.transfer(owner(), balance);
 
         if (transferIsSuccessful) {
-            emit RewardFundsWithdrawn(owner(), balance);
+            emit CUSDWithdrawn(owner(), balance);
         }
     }
+
+    /**
+     * @notice Allows the researcher to withdraw all remaining [token] from the contract
+     * @dev Can only be called by the contract owner when the contract is not paused
+     */
+    function withdrawAllGivenTokenToResearcher(IERC20Metadata token)
+        external
+        onlyOwner
+        whenNotPaused
+        onlyIfContractHasAnyGivenToken(token)
+    {
+        uint256 balance = token.balanceOf(address(this));
+        bool transferIsSuccessful = token.transfer(owner(), balance);
+
+        if (transferIsSuccessful) {
+            emit GivenTokenWithdrawn(owner(), token, balance);
+        }
+    }    
 
     /**
      * @notice Updates the reward amount per participant
@@ -538,6 +576,18 @@ contract ClosedSurveyV4 is Ownable, ReentrancyGuard, Pausable {
     function checkIfContractIsPaused() external view returns (bool) {
         return paused();
     }
+
+    /**
+     * @notice Gets the current cUSD contract balance amount
+     * @return uint256 The current cUSD contract balance amount in wei
+     */
+    function getCUSDContractBalanceAmount()
+        external
+        view
+        returns (uint256)
+    {
+        return cUSD.balanceOf(address(this));
+    }    
 
     /**
      * @notice Gets the current reward amount per participant

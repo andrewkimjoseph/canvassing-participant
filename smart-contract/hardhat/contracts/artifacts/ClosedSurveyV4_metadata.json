@@ -99,6 +99,50 @@
 				"anonymous": false,
 				"inputs": [
 					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "researcher",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "rewardAmount",
+						"type": "uint256"
+					}
+				],
+				"name": "CUSDWithdrawn",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "researcher",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "contract IERC20Metadata",
+						"name": "tokenAddress",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "rewardAmount",
+						"type": "uint256"
+					}
+				],
+				"name": "GivenTokenWithdrawn",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
 						"indexed": true,
 						"internalType": "address",
 						"name": "previousOwner",
@@ -189,25 +233,6 @@
 					}
 				],
 				"name": "RewardAmountUpdated",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "address",
-						"name": "researcher",
-						"type": "address"
-					},
-					{
-						"indexed": false,
-						"internalType": "uint256",
-						"name": "rewardAmount",
-						"type": "uint256"
-					}
-				],
-				"name": "RewardFundsWithdrawn",
 				"type": "event"
 			},
 			{
@@ -320,6 +345,19 @@
 						"internalType": "bool",
 						"name": "",
 						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getCUSDContractBalanceAmount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
 					}
 				],
 				"stateMutability": "view",
@@ -596,8 +634,21 @@
 				"type": "function"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "contract IERC20Metadata",
+						"name": "token",
+						"type": "address"
+					}
+				],
+				"name": "withdrawAllGivenTokenToResearcher",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
 				"inputs": [],
-				"name": "withdrawAllRewardFundsToResearcher",
+				"name": "withdrawAllcUSDToResearcher",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -648,6 +699,19 @@
 				]
 			},
 			"events": {
+				"CUSDWithdrawn(address,uint256)": {
+					"params": {
+						"researcher": "The address of the researcher who withdrew the funds",
+						"rewardAmount": "The amount of cUSD withdrawn in wei"
+					}
+				},
+				"GivenTokenWithdrawn(address,address,uint256)": {
+					"params": {
+						"researcher": "The address of the researcher who withdrew the funds",
+						"rewardAmount": "The amount of the given token withdrawn in wei",
+						"tokenAddress": "The address of the given token withdrawn in wei"
+					}
+				},
 				"ParticipantMarkedAsRewarded(address)": {
 					"params": {
 						"participant": "The address of the participant marked as rewarded"
@@ -671,12 +735,6 @@
 					"params": {
 						"newcUSDRewardAmountPerParticipantInWei": "The new reward amount",
 						"oldcUSDRewardAmountPerParticipantInWei": "The previous reward amount"
-					}
-				},
-				"RewardFundsWithdrawn(address,uint256)": {
-					"params": {
-						"researcher": "The address of the researcher who withdrew the funds",
-						"rewardAmount": "The amount of cUSD withdrawn in wei"
 					}
 				},
 				"SignatureUsed(bytes,address)": {
@@ -725,6 +783,11 @@
 						"_targetNumberOfParticipants": "Maximum number of participants for the survey",
 						"cUSDToken": "Address of the cUSD token contract",
 						"researcher": "Address of the researcher who will own and manage the contract"
+					}
+				},
+				"getCUSDContractBalanceAmount()": {
+					"returns": {
+						"_0": "uint256 The current cUSD contract balance amount in wei"
 					}
 				},
 				"getNumberOfClaimedRewards()": {
@@ -804,7 +867,10 @@
 						"_newTargetNumberOfParticipants": "- New target number of participants"
 					}
 				},
-				"withdrawAllRewardFundsToResearcher()": {
+				"withdrawAllGivenTokenToResearcher(address)": {
+					"details": "Can only be called by the contract owner when the contract is not paused"
+				},
+				"withdrawAllcUSDToResearcher()": {
 					"details": "Can only be called by the contract owner when the contract is not paused"
 				}
 			},
@@ -812,6 +878,12 @@
 		},
 		"userdoc": {
 			"events": {
+				"CUSDWithdrawn(address,uint256)": {
+					"notice": "Emitted when reward funds are withdrawn by the researcher"
+				},
+				"GivenTokenWithdrawn(address,address,uint256)": {
+					"notice": "Emitted when a given token is withdrawn by the researcher"
+				},
 				"ParticipantMarkedAsRewarded(address)": {
 					"notice": "Emitted when a participant is marked as having received their reward"
 				},
@@ -823,9 +895,6 @@
 				},
 				"RewardAmountUpdated(uint256,uint256)": {
 					"notice": "Emitted when the reward amount per participant is updated"
-				},
-				"RewardFundsWithdrawn(address,uint256)": {
-					"notice": "Emitted when reward funds are withdrawn by the researcher"
 				},
 				"SignatureUsed(bytes,address)": {
 					"notice": "Emitted when a signature is used to claim a reward"
@@ -850,6 +919,9 @@
 				},
 				"constructor": {
 					"notice": "Initializes the survey contract with initial parameters"
+				},
+				"getCUSDContractBalanceAmount()": {
+					"notice": "Gets the current cUSD contract balance amount"
 				},
 				"getNumberOfClaimedRewards()": {
 					"notice": "Gets the number of rewards that have been claimed"
@@ -899,7 +971,10 @@
 				"updateTargetNumberOfParticipants(uint256)": {
 					"notice": "Updates the target number of participants for the survey"
 				},
-				"withdrawAllRewardFundsToResearcher()": {
+				"withdrawAllGivenTokenToResearcher(address)": {
+					"notice": "Allows the researcher to withdraw all remaining [token] from the contract"
+				},
+				"withdrawAllcUSDToResearcher()": {
 					"notice": "Allows the researcher to withdraw all remaining cUSD from the contract"
 				}
 			},
@@ -1028,11 +1103,11 @@
 			]
 		},
 		"smart-contract/hardhat/contracts/ClosedSurveyV4.sol": {
-			"keccak256": "0x1bfabff2c858d0b18b6fdb0a21153b9dfdd0a7c25e3ada3c4ceb88b1353d09c9",
+			"keccak256": "0x99d03410ba93712776740b6c552ab78533e51fbaceb0dbb79d8b108b9d706cd0",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://aba578fe6028767e01ba95129fde5eea74087fced55b1781ec48221d06df0abb",
-				"dweb:/ipfs/QmVs1hQ1WqkbJQ4QY8uDan84ffYq74bCr2oE5nef5hTkmm"
+				"bzz-raw://584d4ec325474cb0e3716198de33ec6650bf3cb8d29b72b0f1c2e086dcd76e32",
+				"dweb:/ipfs/QmabbgfUU6aSnVuXRv7GD4aBYbZtfquKGWhS3ASHqA48n9"
 			]
 		}
 	},
