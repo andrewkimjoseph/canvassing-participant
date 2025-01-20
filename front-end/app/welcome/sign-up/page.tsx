@@ -230,6 +230,6 @@ const countries = createListCollection({
   items: [
     { label: '🇳🇬 Nigeria', value: 'NIG' },
     { label: '🇰🇪 Kenya', value: 'KEN' },
-    // { label: '🇺🇬 Uganda', value: 'UGN' },
+    { label: '🏳️ Other', value: 'OTH' },
   ],
 });
