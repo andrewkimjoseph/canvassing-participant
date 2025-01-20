@@ -578,6 +578,18 @@ contract ClosedSurveyV4 is Ownable, ReentrancyGuard, Pausable {
     }
 
     /**
+     * @notice Gets the current cUSD contract balance amount
+     * @return uint256 The current cUSD contract balance amount in wei
+     */
+    function getCUSDContractBalanceAmount()
+        external
+        view
+        returns (uint256)
+    {
+        return cUSD.balanceOf(address(this));
+    }    
+
+    /**
      * @notice Gets the current reward amount per participant
      * @return uint256 The reward amount in wei
      */

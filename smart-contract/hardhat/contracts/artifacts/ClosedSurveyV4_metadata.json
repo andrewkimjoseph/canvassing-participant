@@ -352,6 +352,19 @@
 			},
 			{
 				"inputs": [],
+				"name": "getCUSDContractBalanceAmount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
 				"name": "getNumberOfClaimedRewards",
 				"outputs": [
 					{
@@ -772,6 +785,11 @@
 						"researcher": "Address of the researcher who will own and manage the contract"
 					}
 				},
+				"getCUSDContractBalanceAmount()": {
+					"returns": {
+						"_0": "uint256 The current cUSD contract balance amount in wei"
+					}
+				},
 				"getNumberOfClaimedRewards()": {
 					"returns": {
 						"_0": "uint256 The number of claimed rewards"
@@ -901,6 +919,9 @@
 				},
 				"constructor": {
 					"notice": "Initializes the survey contract with initial parameters"
+				},
+				"getCUSDContractBalanceAmount()": {
+					"notice": "Gets the current cUSD contract balance amount"
 				},
 				"getNumberOfClaimedRewards()": {
 					"notice": "Gets the number of rewards that have been claimed"
@@ -1082,11 +1103,11 @@
 			]
 		},
 		"smart-contract/hardhat/contracts/ClosedSurveyV4.sol": {
-			"keccak256": "0x4005ec2db1e571aab9b15b076aca877c77be81bef011d7b476d9c1e9c066b6a7",
+			"keccak256": "0x99d03410ba93712776740b6c552ab78533e51fbaceb0dbb79d8b108b9d706cd0",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://498c810b20eae58f1f1e2956560d9f34bf35d8c5481a792b0233b3533bacaf4e",
-				"dweb:/ipfs/QmUDbww7gx3Y1hKWH7MhRZVmsmdNnpqugRKaViSoh2Kyq9"
+				"bzz-raw://584d4ec325474cb0e3716198de33ec6650bf3cb8d29b72b0f1c2e086dcd76e32",
+				"dweb:/ipfs/QmabbgfUU6aSnVuXRv7GD4aBYbZtfquKGWhS3ASHqA48n9"
 			]
 		}
 	},
