@@ -100,6 +100,8 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
 
         if (survey.isTest && participant?.isAdmin && surveyIsFullyBooked) continue;
 
+        if (!survey.isTest && !participant?.isAdmin && surveyIsFullyBooked) continue;
+
         const surveyIsAlreadyBookedByUser =
           await checkIfParticipantIsScreenedForSurvey({
             _participantId: participant?.id as string,
