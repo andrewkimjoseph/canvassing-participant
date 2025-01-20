@@ -17,7 +17,7 @@ export const faqs = [
     {
       id: 4,
       title: "How many questions are there for a single survey?",
-      content: "5 - 10 questions that require little to no typing input."
+      content: "10 - 15 questions that require little to no typing input."
     },
 
     {
