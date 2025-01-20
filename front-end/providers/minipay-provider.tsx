@@ -1,7 +1,6 @@
 import { SpinnerIconC } from '@/components/icons/spinner-icon';
 import { Flex, Text } from '@chakra-ui/react';
 import React, { useState, useEffect } from 'react';
-import { treasureTopaz } from 'viem/chains';
 
 export const MiniPayProvider: React.FC<{
   children: React.ReactNode;
