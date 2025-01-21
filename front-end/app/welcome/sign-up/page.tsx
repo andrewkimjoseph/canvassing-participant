@@ -91,7 +91,7 @@ export default function SignUpPage() {
       // Wait a bit more before navigation to ensure the user sees the success message
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      router.push('/');
+      router.replace('/');
     } catch (error) {
       toaster.create({
         description: 'Failed to create account. Please try again.',

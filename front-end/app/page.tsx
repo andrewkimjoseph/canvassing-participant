@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAccount, useChainId } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Box, Text, Flex, Circle } from '@chakra-ui/react';
+import { Box, Text, Flex } from '@chakra-ui/react';
 import useParticipantStore from '@/stores/useParticipantStore';
 import useMultipleSurveysStore from '@/stores/useMultipleSurveysStore';
 import useRewardStore from '@/stores/useRewardStore';
@@ -78,7 +78,7 @@ export default function Home() {
   }, []);
 
   // Handle Amplitude tracking
-  const handleAmplitudeTracking = useCallback(
+  const handleAmplitudeTracking =
     (fetchedParticipant: Participant) => {
       const identifyEvent = new Identify();
       identifyEvent.set('[Canvassing] Surveys Taken', surveys.length);
@@ -96,9 +96,7 @@ export default function Home() {
       identifyEvent.setOnce('[Canvassing] Id', fetchedParticipant.id);
       identifyEvent.setOnce('[Canvassing] AuthId', fetchedParticipant.authId);
       identifyUser(identifyEvent);
-    },
-    [surveys.length, identifyUser]
-  );
+    };
 
   // Initialize app state after auth is initialized
   useEffect(() => {
@@ -159,14 +157,7 @@ export default function Home() {
   }, [
     authInitialized,
     isConnected,
-    address,
-    chainId,
-    getParticipant,
-    ensureAnonymousAuth,
-    fetchRewards,
-    fetchSurveys,
-    handleAmplitudeTracking,
-    surveys.length,
+    address
   ]);
 
   // Handle redirect after initialization
