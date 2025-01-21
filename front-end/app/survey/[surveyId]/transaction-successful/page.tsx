@@ -50,7 +50,7 @@ export default function TransactionSuccessfulPage() {
         textAlign={'center'}
         mt={4}
       >
-        Your transaction was successful!
+        Your claim was successful!
       </Text>
 
       <Button
