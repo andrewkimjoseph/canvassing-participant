@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAccount, useChainId } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Box, Text, Flex, Circle } from '@chakra-ui/react';
+import { Box, Text, Flex } from '@chakra-ui/react';
 import useParticipantStore from '@/stores/useParticipantStore';
 import useMultipleSurveysStore from '@/stores/useMultipleSurveysStore';
 import useRewardStore from '@/stores/useRewardStore';
@@ -78,24 +78,25 @@ export default function Home() {
   }, []);
 
   // Handle Amplitude tracking
-  const handleAmplitudeTracking = (fetchedParticipant: Participant) => {
-    const identifyEvent = new Identify();
-    identifyEvent.set('[Canvassing] Surveys Taken', surveys.length);
-    identifyEvent.setOnce(
-      '[Canvassing] Wallet Address',
-      fetchedParticipant.walletAddress
-    );
-    identifyEvent.setOnce('[Canvassing] Gender', fetchedParticipant.gender);
-    identifyEvent.setOnce('[Canvassing] Country', fetchedParticipant.country);
-    identifyEvent.set('[Canvassing] Username', fetchedParticipant.username);
-    identifyEvent.setOnce(
-      '[Canvassing] Time Created',
-      new Date(fetchedParticipant.timeCreated.seconds * 1000).toLocaleString()
-    );
-    identifyEvent.setOnce('[Canvassing] Id', fetchedParticipant.id);
-    identifyEvent.setOnce('[Canvassing] AuthId', fetchedParticipant.authId);
-    identifyUser(identifyEvent);
-  };
+  const handleAmplitudeTracking =
+    (fetchedParticipant: Participant) => {
+      const identifyEvent = new Identify();
+      identifyEvent.set('[Canvassing] Surveys Taken', surveys.length);
+      identifyEvent.setOnce(
+        '[Canvassing] Wallet Address',
+        fetchedParticipant.walletAddress
+      );
+      identifyEvent.setOnce('[Canvassing] Gender', fetchedParticipant.gender);
+      identifyEvent.setOnce('[Canvassing] Country', fetchedParticipant.country);
+      identifyEvent.set('[Canvassing] Username', fetchedParticipant.username);
+      identifyEvent.setOnce(
+        '[Canvassing] Time Created',
+        new Date(fetchedParticipant.timeCreated.seconds * 1000).toLocaleString()
+      );
+      identifyEvent.setOnce('[Canvassing] Id', fetchedParticipant.id);
+      identifyEvent.setOnce('[Canvassing] AuthId', fetchedParticipant.authId);
+      identifyUser(identifyEvent);
+    };
 
   // Initialize app state after auth is initialized
   useEffect(() => {
@@ -156,14 +157,7 @@ export default function Home() {
   }, [
     authInitialized,
     isConnected,
-    address,
-    chainId,
-    getParticipant,
-    ensureAnonymousAuth,
-    fetchRewards,
-    fetchSurveys,
-    handleAmplitudeTracking,
-    surveys.length,
+    address
   ]);
 
   // Handle redirect after initialization
