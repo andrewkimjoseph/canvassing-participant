@@ -54,13 +54,12 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
         // Query for each chunk and combine results
         for (let chunk of chunks) {
           const chunkQuery = query(
-        collection(db, 'surveys'),
-        where('id', 'not-in', chunk),
-        where('isAvailable', '==', true)
+            collection(db, 'surveys'),
+            where('id', 'not-in', chunk)
           );
           const chunkSnapshot = await getDocs(chunkQuery);
           const chunkSurveys = chunkSnapshot.docs.map(doc => ({
-        ...(doc.data() as Survey)
+            ...(doc.data() as Survey)
           }));
           allSurveys.push(...chunkSurveys);
         }
@@ -70,10 +69,7 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
           .map(id => allSurveys.find(survey => survey.id === id)!);
       } else {
         // If no participated surveys, get all surveys
-        const surveyQuery = query(
-          collection(db, 'surveys'),
-          where('isAvailable', '==', true)
-        );
+        const surveyQuery = query(collection(db, 'surveys'));
         const surveySnapshot = await getDocs(surveyQuery);
         allSurveys = surveySnapshot.docs.map(doc => ({
           ...(doc.data() as Survey)
@@ -82,6 +78,7 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
 
       const filteredSurveys: Survey[] = [];
       for (let survey of allSurveys) {
+        if (!survey.isAvailable) continue;
 
         const countryIsValid =
           survey.targetCountry === 'A' ||
