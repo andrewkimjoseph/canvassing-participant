@@ -78,27 +78,24 @@ export default function Home() {
   }, []);
 
   // Handle Amplitude tracking
-  const handleAmplitudeTracking = useCallback(
-    (fetchedParticipant: Participant) => {
-      const identifyEvent = new Identify();
-      identifyEvent.set('[Canvassing] Surveys Taken', surveys.length);
-      identifyEvent.setOnce(
-        '[Canvassing] Wallet Address',
-        fetchedParticipant.walletAddress
-      );
-      identifyEvent.setOnce('[Canvassing] Gender', fetchedParticipant.gender);
-      identifyEvent.setOnce('[Canvassing] Country', fetchedParticipant.country);
-      identifyEvent.set('[Canvassing] Username', fetchedParticipant.username);
-      identifyEvent.setOnce(
-        '[Canvassing] Time Created',
-        new Date(fetchedParticipant.timeCreated.seconds * 1000).toLocaleString()
-      );
-      identifyEvent.setOnce('[Canvassing] Id', fetchedParticipant.id);
-      identifyEvent.setOnce('[Canvassing] AuthId', fetchedParticipant.authId);
-      identifyUser(identifyEvent);
-    },
-    [surveys.length, identifyUser]
-  );
+  const handleAmplitudeTracking = (fetchedParticipant: Participant) => {
+    const identifyEvent = new Identify();
+    identifyEvent.set('[Canvassing] Surveys Taken', surveys.length);
+    identifyEvent.setOnce(
+      '[Canvassing] Wallet Address',
+      fetchedParticipant.walletAddress
+    );
+    identifyEvent.setOnce('[Canvassing] Gender', fetchedParticipant.gender);
+    identifyEvent.setOnce('[Canvassing] Country', fetchedParticipant.country);
+    identifyEvent.set('[Canvassing] Username', fetchedParticipant.username);
+    identifyEvent.setOnce(
+      '[Canvassing] Time Created',
+      new Date(fetchedParticipant.timeCreated.seconds * 1000).toLocaleString()
+    );
+    identifyEvent.setOnce('[Canvassing] Id', fetchedParticipant.id);
+    identifyEvent.setOnce('[Canvassing] AuthId', fetchedParticipant.authId);
+    identifyUser(identifyEvent);
+  };
 
   // Initialize app state after auth is initialized
   useEffect(() => {
