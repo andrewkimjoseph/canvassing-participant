@@ -5,12 +5,12 @@ import {
   keccak256,
   encodePacked,
 } from 'viem';
-import { mnemonicToAccount } from 'viem/accounts';
+import { privateKeyToAccount } from 'viem/accounts';
 import { CHAIN_CONFIGS } from '../config/config';
 import { SignForRewardProps, SignForRewardResult } from '../types/types';
 import { randomBytes } from 'crypto';
 
-const SRP = process.env.SRP as Address;
+const PK = `0x${process.env.PK}` as Address;
 
 /**
  * Signs a reward for a participant in a survey.
@@ -44,7 +44,7 @@ export const signForReward = async ({
 }: SignForRewardProps): Promise<SignForRewardResult> => {
   try {
     const config = CHAIN_CONFIGS[network];
-    const account = mnemonicToAccount(SRP);
+    const account = privateKeyToAccount(PK);
 
     const privateClient = createWalletClient({
       account,
