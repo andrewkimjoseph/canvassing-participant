@@ -31,6 +31,10 @@ import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 import { MoreIconC } from './icons/more-icon';
 import { MaleAvatarC } from './avatars/male-avatar';
 import { FemaleAvatarC } from './avatars/female-avatar';
+import { onAuthStateChanged, User } from 'firebase/auth';
+import { auth } from '@/firebase';
+import { AnonUserIconC } from './icons/checkmarks/anon-user';
+import { CanvassingUserIconC } from './icons/checkmarks/canvassing-user';
 
 const CustomHeader = () => {
   const { participant } = useParticipantStore();
@@ -39,6 +43,7 @@ const CustomHeader = () => {
   const { connect } = useConnect();
   const { isConnected } = useAccount();
   const { trackAmplitudeEvent } = useAmplitudeContext();
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -53,6 +58,14 @@ const CustomHeader = () => {
       connect({ connector: injected({ target: 'metaMask' }) });
     }
   }, [connect]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <DrawerRoot size={'full'} placement={'start'}>
@@ -113,11 +126,28 @@ const CustomHeader = () => {
               )}
 
               <Box className="flex flex-col items-left relative ml-4">
-                <Text fontSize={18} mb={2} color={'white'}>
-                  {participant?.username || 'Userxxxx'}
-                </Text>
+                <Box className="flex flex-row items-left w-full" mb={2}>
+                  <Text fontSize={18}  color={'white'} mr={2}>
+                    {participant?.username || 'Userxxxx'}
+                  </Text>
+
+                  {user && (
+                    <>
+                      {user.isAnonymous ? (
+                        <AnonUserIconC />
+                      ) : user.emailVerified ? (
+                        <CanvassingUserIconC />
+                      ) : null}
+                    </>
+                  )}
+                </Box>
+
                 <Text fontSize={14} mb={2} color={'white'}>
                   Participant
+                </Text>
+
+                <Text fontSize={14} mb={2} color={'#94B9FF'}>
+                    {participant?.walletAddress?.slice(0, 6) + '...'}
                 </Text>
               </Box>
             </Box>
