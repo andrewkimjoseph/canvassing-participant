@@ -46,34 +46,34 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
 
       // Get all surveys with chunked queries if needed
       let allSurveys: Survey[] = [];
-      
+
       if (participatedSurveyIds.length > 0) {
         // Split participated IDs into chunks of 10 (Firestore limit)
         const chunks = chunkArray(participatedSurveyIds, 10);
-        
+
         // Query for each chunk and combine results
         for (let chunk of chunks) {
-            const chunkQuery = query(
+          const chunkQuery = query(
             collection(db, 'surveys'),
-            where('id', 'not-in', chunk),
-            ...(participant?.isAdmin === false ? [where('isTest', '==', false)] : [])
-            );
+            where('id', 'not-in', chunk)
+          );
           const chunkSnapshot = await getDocs(chunkQuery);
-          const chunkSurveys = chunkSnapshot.docs.map(doc => ({
-            ...(doc.data() as Survey)
+          const chunkSurveys = chunkSnapshot.docs.map((doc) => ({
+            ...(doc.data() as Survey),
           }));
           allSurveys.push(...chunkSurveys);
         }
-        
+
         // Remove duplicates that might occur from chunked queries
-        allSurveys = Array.from(new Set(allSurveys.map(survey => survey.id)))
-          .map(id => allSurveys.find(survey => survey.id === id)!);
+        allSurveys = Array.from(
+          new Set(allSurveys.map((survey) => survey.id))
+        ).map((id) => allSurveys.find((survey) => survey.id === id)!);
       } else {
         // If no participated surveys, get all surveys
         const surveyQuery = query(collection(db, 'surveys'));
         const surveySnapshot = await getDocs(surveyQuery);
-        allSurveys = surveySnapshot.docs.map(doc => ({
-          ...(doc.data() as Survey)
+        allSurveys = surveySnapshot.docs.map((doc) => ({
+          ...(doc.data() as Survey),
         }));
       }
 
@@ -99,9 +99,11 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
           _chainId: chainId,
         });
 
-        if (survey.isTest && participant?.isAdmin && surveyIsFullyBooked) continue;
+        if (survey.isTest && participant?.isAdmin && surveyIsFullyBooked)
+          continue;
 
-        if (!survey.isTest && !participant?.isAdmin && surveyIsFullyBooked) continue;
+        if (!survey.isTest && !participant?.isAdmin && surveyIsFullyBooked)
+          continue;
 
         const surveyIsAlreadyBookedByUser =
           await checkIfParticipantIsScreenedForSurvey({
@@ -125,7 +127,6 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
         if (survey.isAlreadyBookedByUser && participantHasCompletedSurvey) {
           continue;
         }
-
 
         if (surveyIsFullyBooked && participantHasCompletedSurvey) {
           continue;
