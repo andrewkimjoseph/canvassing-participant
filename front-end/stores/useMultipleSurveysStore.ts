@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { collection, getDocs, query, where, or } from 'firebase/firestore';
+import { collection, getDocs, query, where, or, and } from 'firebase/firestore';
 import { Survey } from '@/entities/survey';
 import { db } from '@/firebase';
 import { Reward } from '@/entities/reward';
@@ -15,7 +15,6 @@ interface SurveyStoreState {
   fetchSurveys: (walletAddress: Address, chainId: number) => Promise<void>;
 }
 
-// Helper function to chunk array into smaller arrays
 const chunkArray = <T>(array: T[], size: number): T[][] => {
   const chunks: T[][] = [];
   for (let i = 0; i < array.length; i += size) {
@@ -44,18 +43,30 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
         (doc) => (doc.data() as Reward).surveyId
       );
 
-      // Get all surveys with chunked queries if needed
       let allSurveys: Survey[] = [];
       
       if (participatedSurveyIds.length > 0) {
-        // Split participated IDs into chunks of 10 (Firestore limit)
         const chunks = chunkArray(participatedSurveyIds, 10);
         
-        // Query for each chunk and combine results
         for (let chunk of chunks) {
           const chunkQuery = query(
             collection(db, 'surveys'),
-            where('id', 'not-in', chunk)
+            and(
+              where('id', 'not-in', chunk),
+              where('isAvailable', '==', true),
+              where('contractAddress', '!=', null),
+              or(
+                where('targetCountry', '==', 'A'),
+                where('targetCountry', '==', participant?.country)
+              ),
+              or(
+                where('targetGender', '==', 'A'),
+                where('targetGender', '==', participant?.gender)
+              ),
+              participant?.isAdmin 
+                ? where('isTest', 'in', [true, false])
+                : where('isTest', '==', false)
+            )
           );
           const chunkSnapshot = await getDocs(chunkQuery);
           const chunkSurveys = chunkSnapshot.docs.map(doc => ({
@@ -64,12 +75,27 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
           allSurveys.push(...chunkSurveys);
         }
         
-        // Remove duplicates that might occur from chunked queries
         allSurveys = Array.from(new Set(allSurveys.map(survey => survey.id)))
           .map(id => allSurveys.find(survey => survey.id === id)!);
       } else {
-        // If no participated surveys, get all surveys
-        const surveyQuery = query(collection(db, 'surveys'));
+        const surveyQuery = query(
+          collection(db, 'surveys'),
+          and(
+            where('isAvailable', '==', true),
+            where('contractAddress', '!=', null),
+            or(
+              where('targetCountry', '==', 'A'),
+              where('targetCountry', '==', participant?.country)
+            ),
+            or(
+              where('targetGender', '==', 'A'),
+              where('targetGender', '==', participant?.gender)
+            ),
+            participant?.isAdmin 
+              ? where('isTest', 'in', [true, false])
+              : where('isTest', '==', false)
+          )
+        );
         const surveySnapshot = await getDocs(surveyQuery);
         allSurveys = surveySnapshot.docs.map(doc => ({
           ...(doc.data() as Survey)
@@ -78,57 +104,33 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
 
       const filteredSurveys: Survey[] = [];
       for (let survey of allSurveys) {
-        if (!survey.isAvailable) continue;
-
-        const countryIsValid =
-          survey.targetCountry === 'A' ||
-          survey.targetCountry === participant?.country;
-
-        const genderIsValid =
-          survey.targetGender === 'A' ||
-          survey.targetGender === participant?.gender;
-
-        if (!survey.contractAddress) continue;
-        if (!countryIsValid) continue;
-        if (!genderIsValid) continue;
-        if (survey.isTest && !participant?.isAdmin) continue;
-
         const surveyIsFullyBooked = await checkIfSurveyIsFullyBooked({
           _surveyContractAddress: survey.contractAddress as Address,
           _chainId: chainId,
         });
 
         if (survey.isTest && participant?.isAdmin && surveyIsFullyBooked) continue;
-
         if (!survey.isTest && !participant?.isAdmin && surveyIsFullyBooked) continue;
 
-        const surveyIsAlreadyBookedByUser =
-          await checkIfParticipantIsScreenedForSurvey({
-            _participantId: participant?.id as string,
-            _participantWalletAddress: participant?.walletAddress as string,
-            _surveyContractAddress: survey.contractAddress as string,
-            _surveyId: survey.id,
-            _chainId: chainId,
-          });
+        const surveyIsAlreadyBookedByUser = await checkIfParticipantIsScreenedForSurvey({
+          _participantId: participant?.id as string,
+          _participantWalletAddress: participant?.walletAddress as string,
+          _surveyContractAddress: survey.contractAddress as string,
+          _surveyId: survey.id,
+          _chainId: chainId,
+        });
 
-        const participantHasCompletedSurvey =
-          await checkIfParticipantHasCompletedSurvey({
-            _participantId: participant?.id as string,
-            _participantWalletAddress: participant?.walletAddress as string,
-            _surveyId: survey.id,
-          });
+        const participantHasCompletedSurvey = await checkIfParticipantHasCompletedSurvey({
+          _participantId: participant?.id as string,
+          _participantWalletAddress: participant?.walletAddress as string,
+          _surveyId: survey.id,
+        });
 
         if (surveyIsAlreadyBookedByUser) {
           survey.isAlreadyBookedByUser = true;
         }
-        if (survey.isAlreadyBookedByUser && participantHasCompletedSurvey) {
-          continue;
-        }
-
-
-        if (surveyIsFullyBooked && participantHasCompletedSurvey) {
-          continue;
-        }
+        if (survey.isAlreadyBookedByUser && participantHasCompletedSurvey) continue;
+        if (surveyIsFullyBooked && participantHasCompletedSurvey) continue;
 
         filteredSurveys.push(survey);
       }

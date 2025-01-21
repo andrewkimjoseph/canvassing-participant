@@ -81,7 +81,7 @@ export default function Home() {
   const handleAmplitudeTracking =
     (fetchedParticipant: Participant) => {
       const identifyEvent = new Identify();
-      identifyEvent.set('[Canvassing] Surveys Taken', surveys.length);
+      identifyEvent.set('[Canvassing] Surveys Taken', rewards.length);
       identifyEvent.setOnce(
         '[Canvassing] Wallet Address',
         fetchedParticipant.walletAddress
