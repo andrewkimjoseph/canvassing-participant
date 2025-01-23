@@ -133,7 +133,7 @@ export default function RewardHistory() {
                         );
                       } else {
                         router.push(
-                          `https://celoscan.io/tx/${reward.transactionHash}`
+                          `https://celo.blockscout.com/tx/${reward.transactionHash}`
                         );
                       }
                       trackAmplitudeEvent('View on block explorer clicked', {
