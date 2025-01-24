@@ -82,11 +82,11 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
         if (!survey.isAvailable) continue;
 
         const countryIsValid =
-          survey.targetCountry === 'A' ||
+          survey.targetCountry === 'ALL' ||
           survey.targetCountry === participant?.country;
 
         const genderIsValid =
-          survey.targetGender === 'A' ||
+          survey.targetGender === 'ALL' ||
           survey.targetGender === participant?.gender;
 
         if (!survey.contractAddress) continue;
