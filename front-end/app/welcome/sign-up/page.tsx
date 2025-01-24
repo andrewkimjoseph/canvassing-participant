@@ -233,6 +233,8 @@ const countries = createListCollection({
     { label: '🇬🇭 Ghana', value: 'GHN' },
     { label: '🇺🇬 Uganda', value: 'UGN' },
     { label: '🇿🇦 South Africa', value: 'RSA' },
+    { label: '🇹🇿 Tanzania', value: 'TZA' },
+    { label: '🇲🇼 Malawi', value: 'MWI' },
     { label: '🏳️ Other', value: 'OTH' },
   ],
 });
