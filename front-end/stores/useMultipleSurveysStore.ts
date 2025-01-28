@@ -17,9 +17,11 @@ interface SurveyStoreState {
 
 // Helper function to chunk array into smaller arrays
 const chunkArray = <T>(array: T[], size: number): T[][] => {
-  return Array.from({ length: Math.ceil(array.length / size) }, (_, i) =>
-    array.slice(i * size, i * size + size)
-  );
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+  return chunks;
 };
 
 const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
