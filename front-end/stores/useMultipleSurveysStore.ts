@@ -17,11 +17,9 @@ interface SurveyStoreState {
 
 // Helper function to chunk array into smaller arrays
 const chunkArray = <T>(array: T[], size: number): T[][] => {
-  const chunks: T[][] = [];
-  for (let i = 0; i < array.length; i += size) {
-    chunks.push(array.slice(i, i + size));
-  }
-  return chunks;
+  return Array.from({ length: Math.ceil(array.length / size) }, (_, i) =>
+    array.slice(i * size, i * size + size)
+  );
 };
 
 const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
@@ -34,27 +32,22 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
     const { participant } = useParticipantStore.getState();
 
     try {
-      const participatedSurveyIds = rewards.map(
-        (reward) => reward.surveyId
-      );
-
-      // Get all surveys with chunked queries if needed
+      const participatedSurveyIds = rewards.map((reward) => reward.surveyId);
       let allSurveys: Survey[] = [];
 
       if (participatedSurveyIds.length > 0) {
-        // Split participated IDs into chunks of 10 (Firestore limit)
         const chunks = chunkArray(participatedSurveyIds, 10);
 
-        // Query for each chunk and combine results
         const chunkPromises = chunks.map(async (chunk) => {
           const chunkQuery = query(
             collection(db, 'surveys'),
-            where('id', 'not-in', chunk),
             where('isAvailable', '==', true)
           );
-          const chunkSnapshot = await getDocs(chunkQuery);
-          return chunkSnapshot.docs.map((doc) => ({
-            ...(doc.data() as Survey),
+          const availableSurveys = await getDocs(chunkQuery);
+          const availableSurveysNotDoneByParticipant =
+            availableSurveys.docs.filter((doc) => !chunk.includes(doc.id));
+          return availableSurveysNotDoneByParticipant.map((surveySnapshot) => ({
+            ...(surveySnapshot.data() as Survey),
           }));
         });
 
@@ -74,7 +67,6 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
         }));
       }
 
-      const filteredSurveys: Survey[] = [];
       const surveyPromises = allSurveys.map(async (survey) => {
         if (!survey.isAvailable) return null;
 
