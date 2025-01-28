@@ -30,6 +30,7 @@ import { Timestamp } from 'firebase/firestore';
 import { SpinnerIconC } from '@/components/icons/spinner-icon';
 import { signInAnonymously } from 'firebase/auth';
 import { auth } from '@/firebase';
+import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -38,6 +39,7 @@ export default function SignUpPage() {
   const { setParticipant } = useParticipantStore();
   const [country, setCountry] = useState<string | null>(null);
   const [gender, setGender] = useState<string | null>(null);
+  const { trackAmplitudeEvent } = useAmplitudeContext();
 
   const [isCreatingParticipant, setIsCreatingParticipant] = useState(false);
 
@@ -46,6 +48,10 @@ export default function SignUpPage() {
   }, []);
 
   const handleSubmit = async () => {
+    trackAmplitudeEvent('Create account clicked', {
+      walletAddress: address,
+    });
+
     setIsCreatingParticipant(true);
 
     if (!gender || !country || !address) {
@@ -65,17 +71,27 @@ export default function SignUpPage() {
 
       const authId = anonUserCredentials.user.uid;
 
-      await setParticipant({
+      await setParticipant(
+        {
+          authId,
+          gender,
+          country,
+          walletAddress: address,
+          username: `user_${address.slice(2, 7)}`,
+          timeCreated: Timestamp.now(),
+          timeUpdated: Timestamp.now(),
+          isAdmin: false,
+          emailAddress: null,
+        },
+        authId
+      );
+
+      trackAmplitudeEvent('Account created', {
+        walletAddress: address,
         authId,
         gender,
         country,
-        walletAddress: address,
-        username: `user_${address.slice(2, 7)}`,
-        timeCreated: Timestamp.now(),
-        timeUpdated: Timestamp.now(),
-        isAdmin: false,
-        emailAddress: null
-      }, authId);
+      });
 
       toaster.create({
         description: 'Account created successfully!',
@@ -84,7 +100,7 @@ export default function SignUpPage() {
       });
 
       // Wait for 1 second to show the success message
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       setIsCreatingParticipant(false);
 

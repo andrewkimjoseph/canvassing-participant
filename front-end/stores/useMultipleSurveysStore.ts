@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { collection, getDocs, query, where, or } from 'firebase/firestore';
+import { collection, getDocs, query, where, or, limit } from 'firebase/firestore';
 import { Survey } from '@/entities/survey';
 import { db } from '@/firebase';
 import { Reward } from '@/entities/reward';
@@ -12,130 +12,127 @@ import { checkIfParticipantHasCompletedSurvey } from '@/services/db/checkIfParti
 interface SurveyStoreState {
   surveys: Survey[];
   loading: boolean;
-  fetchSurveys: (walletAddress: Address, chainId: number) => Promise<void>;
+  fetchSurveys: (chainId: number, rewards: Reward[]) => Promise<void>;
 }
 
 // Helper function to chunk array into smaller arrays
 const chunkArray = <T>(array: T[], size: number): T[][] => {
-  const chunks: T[][] = [];
-  for (let i = 0; i < array.length; i += size) {
-    chunks.push(array.slice(i, i + size));
-  }
-  return chunks;
+  return Array.from({ length: Math.ceil(array.length / size) }, (_, i) =>
+    array.slice(i * size, i * size + size)
+  );
 };
 
 const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
   surveys: [],
   loading: false,
 
-  fetchSurveys: async (walletAddress, chainId) => {
+  fetchSurveys: async (chainId, rewards) => {
     set({ loading: true });
 
     const { participant } = useParticipantStore.getState();
 
     try {
-      // Fetch the rewards for the user's wallet
-      const rewardQuery = query(
-        collection(db, 'rewards'),
-        where('participantWalletAddress', '==', walletAddress)
-      );
-      const rewardSnapshot = await getDocs(rewardQuery);
-      const participatedSurveyIds = rewardSnapshot.docs.map(
-        (doc) => (doc.data() as Reward).surveyId
-      );
-
-      // Get all surveys with chunked queries if needed
+      const participatedSurveyIds = rewards.map((reward) => reward.surveyId);
       let allSurveys: Survey[] = [];
 
+      const surveyQuery = query(
+        collection(db, 'surveys'),
+        where('isAvailable', '==', true),
+        limit(5)
+      );
+
       if (participatedSurveyIds.length > 0) {
-        // Split participated IDs into chunks of 10 (Firestore limit)
         const chunks = chunkArray(participatedSurveyIds, 10);
 
-        // Query for each chunk and combine results
-        for (let chunk of chunks) {
-          const chunkQuery = query(
-            collection(db, 'surveys'),
-            where('id', 'not-in', chunk)
-          );
-          const chunkSnapshot = await getDocs(chunkQuery);
-          const chunkSurveys = chunkSnapshot.docs.map((doc) => ({
-            ...(doc.data() as Survey),
+        const chunkPromises = chunks.map(async (chunk) => {
+          const availableSurveys = await getDocs(surveyQuery);
+          const availableSurveysNotDoneByParticipant =
+            availableSurveys.docs.filter((doc) => !chunk.includes(doc.id));
+          return availableSurveysNotDoneByParticipant.map((surveySnapshot) => ({
+            ...(surveySnapshot.data() as Survey),
           }));
-          allSurveys.push(...chunkSurveys);
-        }
+        });
 
-        // Remove duplicates that might occur from chunked queries
-        allSurveys = Array.from(
-          new Set(allSurveys.map((survey) => survey.id))
-        ).map((id) => allSurveys.find((survey) => survey.id === id)!);
+        const chunkResults = await Promise.all(chunkPromises);
+        allSurveys = chunkResults.flat();
+
+        const surveyMap = new Map<string, Survey>();
+        allSurveys.forEach((survey) => surveyMap.set(survey.id, survey));
+        allSurveys = Array.from(surveyMap.values());
       } else {
-        // If no participated surveys, get all surveys
-        const surveyQuery = query(collection(db, 'surveys'));
         const surveySnapshot = await getDocs(surveyQuery);
         allSurveys = surveySnapshot.docs.map((doc) => ({
           ...(doc.data() as Survey),
         }));
       }
 
-      const filteredSurveys: Survey[] = [];
-      for (let survey of allSurveys) {
-        if (!survey.isAvailable) continue;
+      const surveyPromises = allSurveys.map(async (survey) => {
+        if (!survey.isAvailable) return null;
 
         const countryIsValid =
           survey.targetCountry === 'ALL' ||
-          survey.targetCountry === participant?.country;
+          survey.targetCountry
+            ?.split(', ')
+            .includes(participant?.country || '');
 
         const genderIsValid =
           survey.targetGender === 'ALL' ||
           survey.targetGender === participant?.gender;
 
-        if (!survey.contractAddress) continue;
-        if (!countryIsValid) continue;
-        if (!genderIsValid) continue;
-        if (survey.isTest && !participant?.isAdmin) continue;
+        if (!survey.contractAddress) return null;
+        if (!countryIsValid) return null;
+        if (!genderIsValid) return null;
+        if (survey.isTest && !participant?.isAdmin) return null;
 
-        const surveyIsFullyBooked = await checkIfSurveyIsFullyBooked({
-          _surveyContractAddress: survey.contractAddress as Address,
-          _chainId: chainId,
-        });
-
-        if (survey.isTest && participant?.isAdmin && surveyIsFullyBooked)
-          continue;
-
-        if (!survey.isTest && !participant?.isAdmin && surveyIsFullyBooked)
-          continue;
-
-        const surveyIsAlreadyBookedByUser =
-          await checkIfParticipantIsScreenedForSurvey({
+        const [
+          surveyIsFullyBooked,
+          surveyIsAlreadyBookedByUser,
+          participantHasCompletedSurvey,
+        ] = await Promise.all([
+          checkIfSurveyIsFullyBooked({
+            _surveyContractAddress: survey.contractAddress as Address,
+            _chainId: chainId,
+          }),
+          checkIfParticipantIsScreenedForSurvey({
             _participantId: participant?.id as string,
             _participantWalletAddress: participant?.walletAddress as string,
             _surveyContractAddress: survey.contractAddress as string,
             _surveyId: survey.id,
             _chainId: chainId,
-          });
-
-        const participantHasCompletedSurvey =
-          await checkIfParticipantHasCompletedSurvey({
+          }),
+          checkIfParticipantHasCompletedSurvey({
             _participantId: participant?.id as string,
             _participantWalletAddress: participant?.walletAddress as string,
             _surveyId: survey.id,
-          });
+          }),
+        ]);
+
+        if (survey.isTest && participant?.isAdmin && surveyIsFullyBooked)
+          return null;
+
+        if (!survey.isTest && !participant?.isAdmin && surveyIsFullyBooked)
+          return null;
 
         if (surveyIsAlreadyBookedByUser) {
           survey.isAlreadyBookedByUser = true;
         }
         if (survey.isAlreadyBookedByUser && participantHasCompletedSurvey) {
-          continue;
+          return null;
         }
 
         if (surveyIsFullyBooked && participantHasCompletedSurvey) {
-          continue;
+          return null;
         }
 
-        filteredSurveys.push(survey);
-      }
+        return survey;
+      });
 
-      set({ surveys: filteredSurveys, loading: false });
+      const surveyResults = await Promise.all(surveyPromises);
+      const validSurveys = surveyResults.filter(
+        (survey) => survey !== null
+      ) as Survey[];
+
+      set({ surveys: validSurveys, loading: false });
     } catch (error) {
       console.error('Error fetching surveys:', error);
       set({ loading: false });
