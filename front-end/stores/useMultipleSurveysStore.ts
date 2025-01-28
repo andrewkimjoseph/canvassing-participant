@@ -79,11 +79,13 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
 
       const filteredSurveys: Survey[] = [];
       for (let survey of allSurveys) {
+
+
         if (!survey.isAvailable) continue;
 
         const countryIsValid =
           survey.targetCountry === 'ALL' ||
-          survey.targetCountry === participant?.country;
+          survey.targetCountry?.split(', ').includes(participant?.country || '');
 
         const genderIsValid =
           survey.targetGender === 'ALL' ||
