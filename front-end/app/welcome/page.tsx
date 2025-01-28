@@ -6,12 +6,14 @@ import { useAccount } from 'wagmi';
 import { Box, Image, Button, VStack, Text } from '@chakra-ui/react';
 import useParticipantStore from '@/stores/useParticipantStore';
 import { WelcomePageIconC } from '@/components/icons/welcome-page-icon';
+import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 
 export default function WelcomePage() {
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
   const { participant, getParticipant } = useParticipantStore();
   const router = useRouter();
+  const { trackAmplitudeEvent } = useAmplitudeContext();
 
   useEffect(() => {
     setIsMounted(true);
@@ -38,9 +40,12 @@ export default function WelcomePage() {
   }, []);
 
   const handleGetStarted = () => {
+    trackAmplitudeEvent('Get started clicked', {
+      walletAddress: address,
+    });
+
     router.push('/welcome/sign-up');
   };
-
 
   return (
     <VStack width="100vw" h="100vh">
@@ -60,7 +65,13 @@ export default function WelcomePage() {
           objectFit="cover"
         />
 
-        <Box position="absolute" top="10%" width="100%" display="flex" justifyContent="center">
+        <Box
+          position="absolute"
+          top="10%"
+          width="100%"
+          display="flex"
+          justifyContent="center"
+        >
           <WelcomePageIconC />
         </Box>
       </Box>
@@ -71,11 +82,11 @@ export default function WelcomePage() {
       <Text fontSize="3xl" fontWeight="bold" color="#363062">
         Canvassing
       </Text>
-      <Button 
-        bgColor="#363062" 
-        borderRadius={15} 
-        px={6} 
-        w="3/6" 
+      <Button
+        bgColor="#363062"
+        borderRadius={15}
+        px={6}
+        w="3/6"
         mt={5}
         onClick={handleGetStarted}
       >
