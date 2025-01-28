@@ -121,7 +121,7 @@ export default function Home() {
           // Fetch data in parallel
           await Promise.all([
             fetchRewards(address),
-            fetchSurveys(address, chainId),
+            fetchSurveys(chainId, rewards),
           ]);
 
           if (!isMounted) return;
