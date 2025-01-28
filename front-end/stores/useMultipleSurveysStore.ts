@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { collection, getDocs, query, where, or } from 'firebase/firestore';
+import { collection, getDocs, query, where, or, limit } from 'firebase/firestore';
 import { Survey } from '@/entities/survey';
 import { db } from '@/firebase';
 import { Reward } from '@/entities/reward';
@@ -35,15 +35,17 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
       const participatedSurveyIds = rewards.map((reward) => reward.surveyId);
       let allSurveys: Survey[] = [];
 
+      const surveyQuery = query(
+        collection(db, 'surveys'),
+        where('isAvailable', '==', true),
+        limit(5)
+      );
+
       if (participatedSurveyIds.length > 0) {
         const chunks = chunkArray(participatedSurveyIds, 10);
 
         const chunkPromises = chunks.map(async (chunk) => {
-          const chunkQuery = query(
-            collection(db, 'surveys'),
-            where('isAvailable', '==', true)
-          );
-          const availableSurveys = await getDocs(chunkQuery);
+          const availableSurveys = await getDocs(surveyQuery);
           const availableSurveysNotDoneByParticipant =
             availableSurveys.docs.filter((doc) => !chunk.includes(doc.id));
           return availableSurveysNotDoneByParticipant.map((surveySnapshot) => ({
@@ -54,13 +56,10 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
         const chunkResults = await Promise.all(chunkPromises);
         allSurveys = chunkResults.flat();
 
-        // Remove duplicates that might occur from chunked queries
-        allSurveys = Array.from(
-          new Set(allSurveys.map((survey) => survey.id))
-        ).map((id) => allSurveys.find((survey) => survey.id === id)!);
+        const surveyMap = new Map<string, Survey>();
+        allSurveys.forEach((survey) => surveyMap.set(survey.id, survey));
+        allSurveys = Array.from(surveyMap.values());
       } else {
-        // If no participated surveys, get all surveys
-        const surveyQuery = query(collection(db, 'surveys'));
         const surveySnapshot = await getDocs(surveyQuery);
         allSurveys = surveySnapshot.docs.map((doc) => ({
           ...(doc.data() as Survey),
