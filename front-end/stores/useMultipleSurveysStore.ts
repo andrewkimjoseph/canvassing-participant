@@ -12,36 +12,28 @@ import { checkIfParticipantHasCompletedSurvey } from '@/services/db/checkIfParti
 interface SurveyStoreState {
   surveys: Survey[];
   loading: boolean;
-  fetchSurveys: (walletAddress: Address, chainId: number) => Promise<void>;
+  fetchSurveys: (chainId: number, rewards: Reward[]) => Promise<void>;
 }
 
 // Helper function to chunk array into smaller arrays
 const chunkArray = <T>(array: T[], size: number): T[][] => {
-  const chunks: T[][] = [];
-  for (let i = 0; i < array.length; i += size) {
-    chunks.push(array.slice(i, i + size));
-  }
-  return chunks;
+  return Array.from({ length: Math.ceil(array.length / size) }, (_, i) =>
+    array.slice(i * size, i * size + size)
+  );
 };
 
 const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
   surveys: [],
   loading: false,
 
-  fetchSurveys: async (walletAddress, chainId) => {
+  fetchSurveys: async (chainId, rewards) => {
     set({ loading: true });
 
     const { participant } = useParticipantStore.getState();
 
     try {
-      // Fetch the rewards for the user's wallet
-      const rewardQuery = query(
-        collection(db, 'rewards'),
-        where('participantWalletAddress', '==', walletAddress)
-      );
-      const rewardSnapshot = await getDocs(rewardQuery);
-      const participatedSurveyIds = rewardSnapshot.docs.map(
-        (doc) => (doc.data() as Reward).surveyId
+      const participatedSurveyIds = rewards.map(
+        (reward) => reward.surveyId
       );
 
       // Get all surveys with chunked queries if needed
@@ -52,17 +44,20 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
         const chunks = chunkArray(participatedSurveyIds, 10);
 
         // Query for each chunk and combine results
-        for (let chunk of chunks) {
+        const chunkPromises = chunks.map(async (chunk) => {
           const chunkQuery = query(
             collection(db, 'surveys'),
-            where('id', 'not-in', chunk)
+            where('id', 'not-in', chunk),
+            where('isAvailable', '==', true)
           );
           const chunkSnapshot = await getDocs(chunkQuery);
-          const chunkSurveys = chunkSnapshot.docs.map((doc) => ({
+          return chunkSnapshot.docs.map((doc) => ({
             ...(doc.data() as Survey),
           }));
-          allSurveys.push(...chunkSurveys);
-        }
+        });
+
+        const chunkResults = await Promise.all(chunkPromises);
+        allSurveys = chunkResults.flat();
 
         // Remove duplicates that might occur from chunked queries
         allSurveys = Array.from(
@@ -78,66 +73,73 @@ const useMultipleSurveysStore = create<SurveyStoreState>((set) => ({
       }
 
       const filteredSurveys: Survey[] = [];
-      for (let survey of allSurveys) {
-
-
-        if (!survey.isAvailable) continue;
+      const surveyPromises = allSurveys.map(async (survey) => {
+        if (!survey.isAvailable) return null;
 
         const countryIsValid =
           survey.targetCountry === 'ALL' ||
-          survey.targetCountry?.split(', ').includes(participant?.country || '');
+          survey.targetCountry
+            ?.split(', ')
+            .includes(participant?.country || '');
 
         const genderIsValid =
           survey.targetGender === 'ALL' ||
           survey.targetGender === participant?.gender;
 
-        if (!survey.contractAddress) continue;
-        if (!countryIsValid) continue;
-        if (!genderIsValid) continue;
-        if (survey.isTest && !participant?.isAdmin) continue;
+        if (!survey.contractAddress) return null;
+        if (!countryIsValid) return null;
+        if (!genderIsValid) return null;
+        if (survey.isTest && !participant?.isAdmin) return null;
 
-        const surveyIsFullyBooked = await checkIfSurveyIsFullyBooked({
-          _surveyContractAddress: survey.contractAddress as Address,
-          _chainId: chainId,
-        });
-
-        if (survey.isTest && participant?.isAdmin && surveyIsFullyBooked)
-          continue;
-
-        if (!survey.isTest && !participant?.isAdmin && surveyIsFullyBooked)
-          continue;
-
-        const surveyIsAlreadyBookedByUser =
-          await checkIfParticipantIsScreenedForSurvey({
+        const [
+          surveyIsFullyBooked,
+          surveyIsAlreadyBookedByUser,
+          participantHasCompletedSurvey,
+        ] = await Promise.all([
+          checkIfSurveyIsFullyBooked({
+            _surveyContractAddress: survey.contractAddress as Address,
+            _chainId: chainId,
+          }),
+          checkIfParticipantIsScreenedForSurvey({
             _participantId: participant?.id as string,
             _participantWalletAddress: participant?.walletAddress as string,
             _surveyContractAddress: survey.contractAddress as string,
             _surveyId: survey.id,
             _chainId: chainId,
-          });
-
-        const participantHasCompletedSurvey =
-          await checkIfParticipantHasCompletedSurvey({
+          }),
+          checkIfParticipantHasCompletedSurvey({
             _participantId: participant?.id as string,
             _participantWalletAddress: participant?.walletAddress as string,
             _surveyId: survey.id,
-          });
+          }),
+        ]);
+
+        if (survey.isTest && participant?.isAdmin && surveyIsFullyBooked)
+          return null;
+
+        if (!survey.isTest && !participant?.isAdmin && surveyIsFullyBooked)
+          return null;
 
         if (surveyIsAlreadyBookedByUser) {
           survey.isAlreadyBookedByUser = true;
         }
         if (survey.isAlreadyBookedByUser && participantHasCompletedSurvey) {
-          continue;
+          return null;
         }
 
         if (surveyIsFullyBooked && participantHasCompletedSurvey) {
-          continue;
+          return null;
         }
 
-        filteredSurveys.push(survey);
-      }
+        return survey;
+      });
 
-      set({ surveys: filteredSurveys, loading: false });
+      const surveyResults = await Promise.all(surveyPromises);
+      const validSurveys = surveyResults.filter(
+        (survey) => survey !== null
+      ) as Survey[];
+
+      set({ surveys: validSurveys, loading: false });
     } catch (error) {
       console.error('Error fetching surveys:', error);
       set({ loading: false });
