@@ -84,7 +84,7 @@ export default function SignUpPage() {
       });
 
       // Wait for 1 second to show the success message
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       setIsCreatingParticipant(false);
 
