@@ -23,7 +23,7 @@ export const checkIfParticipantIsScreenedForSurvey = async ({
 
   const participantIsScreenedForSurvey = participantIsScreenedBC || participantIsScreenedDB;
 
-  return participantIsScreenedForSurvey;
+  return participantIsScreenedBC;
 };
 
 export type CheckIfParticipantIsScreenedForSurveyProps = {
