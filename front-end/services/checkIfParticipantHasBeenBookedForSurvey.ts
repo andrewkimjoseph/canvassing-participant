@@ -21,10 +21,9 @@ export const checkIfParticipantIsScreenedForSurvey = async ({
     _surveyId: _surveyId,
   });
 
-  if (participantIsScreenedBC) {
-    return true;
-  }
-  return participantIsScreenedDB;
+  const participantIsScreenedForSurvey = participantIsScreenedBC || participantIsScreenedDB;
+
+  return participantIsScreenedForSurvey;
 };
 
 export type CheckIfParticipantIsScreenedForSurveyProps = {
