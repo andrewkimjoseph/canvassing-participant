@@ -222,7 +222,7 @@ export default function SignUpPage() {
           w={'3/6'}
           mt={20}
           onClick={handleSubmit}
-          disabled={!gender || !country}
+          disabled={!gender || !country || isCreatingParticipant}
           loading={isCreatingParticipant}
           loadingText={<SpinnerIconC />}
         >
