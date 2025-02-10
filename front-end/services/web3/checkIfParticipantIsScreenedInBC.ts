@@ -16,14 +16,14 @@ export const checkIfParticipantIsScreenedInBC = async (
         transport: custom(window.ethereum),
       });
       try {
-        const userIsWhitelisted =
+        const userIsScreened =
           await publicClient.readContract({
             address: _surveyContractAddress,
             abi: closedSurveyV4ContractABI,
             functionName: "checkIfParticipantIsScreened",
             args: [_participantWalletAddress],
           });
-        return userIsWhitelisted as boolean;
+        return userIsScreened as boolean;
       } catch (err) {
         return false;
       }

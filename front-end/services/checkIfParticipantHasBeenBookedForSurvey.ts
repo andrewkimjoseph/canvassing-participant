@@ -15,13 +15,17 @@ export const checkIfParticipantIsScreenedForSurvey = async ({
     _chainId: _chainId,
   });
 
-  const participantIsScreenedDB = await checkIfParticipantIsScreenedInDB({
-    _participantId: _participantId,
-    _participantWalletAddress: _participantWalletAddress,
-    _surveyId: _surveyId,
-  });
+  // const participantIsScreenedDB = await checkIfParticipantIsScreenedInDB({
+  //   _participantId: _participantId,
+  //   _participantWalletAddress: _participantWalletAddress,
+  //   _surveyId: _surveyId,
+  // });
 
-  return participantIsScreenedBC && participantIsScreenedDB;
+  // if (participantIsScreenedBC) {
+  //   return true;
+  // }
+  
+  return participantIsScreenedBC;
 };
 
 export type CheckIfParticipantIsScreenedForSurveyProps = {
