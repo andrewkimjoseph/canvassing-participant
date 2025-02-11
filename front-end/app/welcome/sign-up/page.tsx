@@ -44,12 +44,16 @@ export default function SignUpPage() {
   const [isCreatingParticipant, setIsCreatingParticipant] = useState(false);
 
   useEffect(() => {
-    if (auth.currentUser) {
-      router.replace('/');
-      return;
-    }
-  }, []);
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        router.replace('/');
+      }
+    });
+  
+    return () => unsubscribe();
+  }, [router]);
 
+  
   useEffect(() => {
     setIsMounted(true);
   }, []);
