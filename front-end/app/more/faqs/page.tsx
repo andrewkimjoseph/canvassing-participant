@@ -18,7 +18,7 @@ export default function FAQs() {
 
   const checkParticipantStatus = useCallback(() => {
     if (isConnected && address) {
-      getParticipant(address);
+      getParticipant(address,  participant?.authId!);
     }
   }, [isConnected, address, getParticipant]);
 

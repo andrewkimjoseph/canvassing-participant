@@ -21,7 +21,7 @@ export default function WelcomePage() {
 
   const checkParticipantStatus = useCallback(() => {
     if (isConnected && address) {
-      getParticipant(address);
+      getParticipant(address, participant?.authId!);
     }
   }, [isConnected, address, getParticipant]);
 

@@ -109,7 +109,7 @@ export default function Home() {
       }
 
       try {
-        const fetchedParticipant = await getParticipant(address);
+        const fetchedParticipant = await getParticipant(address, auth.currentUser?.uid!);
         if (!isMounted) return;
 
         if (fetchedParticipant) {
