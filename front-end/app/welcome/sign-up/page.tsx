@@ -44,6 +44,13 @@ export default function SignUpPage() {
   const [isCreatingParticipant, setIsCreatingParticipant] = useState(false);
 
   useEffect(() => {
+    if (auth.currentUser) {
+      router.replace('/');
+      return;
+    }
+  }, []);
+
+  useEffect(() => {
     setIsMounted(true);
   }, []);
 
