@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import {
@@ -35,28 +35,40 @@ import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 export default function SignUpPage() {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
-  const { address } = useAccount();
   const { setParticipant } = useParticipantStore();
   const [country, setCountry] = useState<string | null>(null);
   const [gender, setGender] = useState<string | null>(null);
   const { trackAmplitudeEvent } = useAmplitudeContext();
-
+  const { participant, getParticipant } = useParticipantStore();
+  const { address, isConnected } = useAccount();
   const [isCreatingParticipant, setIsCreatingParticipant] = useState(false);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        router.replace('/');
-      }
-    });
-  
-    return () => unsubscribe();
-  }, [router]);
 
   
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+ 
+    const checkParticipantStatus = useCallback(() => {
+      if (isConnected && address) {
+        getParticipant(address);
+      }
+    }, [isConnected, address, getParticipant]);
+  
+    useEffect(() => {
+      checkParticipantStatus();
+    }, [checkParticipantStatus]);
+  
+    useEffect(() => {
+      if (isMounted && participant) {
+        router.replace('/');
+      }
+    }, [isMounted, participant, router]);
+  
+    useEffect(() => {
+      setIsMounted(true);
+    }, []);
+  
 
   const handleSubmit = async () => {
     trackAmplitudeEvent('Create account clicked', {
