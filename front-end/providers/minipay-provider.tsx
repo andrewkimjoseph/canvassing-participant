@@ -21,7 +21,7 @@ export const MiniPayProvider: React.FC<{
           ((window as any).ethereum.isMiniPay !== undefined ||
             (window as any).ethereum.isMiniPay === true));
   
-      setIsMiniPay(miniPayExists);
+      setIsMiniPay(false);
     };
   
     checkMiniPay();
