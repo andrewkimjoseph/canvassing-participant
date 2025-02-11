@@ -40,7 +40,7 @@ export default function SurveyPage() {
   useEffect(() => {
     if (isConnected && address) {
       setUserAddress(address);
-      getParticipant(address, participant?.authId!);
+      getParticipant(address, participant?.authId);
     }
   }, [address, isConnected]);
 

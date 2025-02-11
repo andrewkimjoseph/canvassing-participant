@@ -21,11 +21,11 @@ interface ParticipantStoreState {
   loading: boolean;
   getParticipant: (
     walletAddress: string,
-    authId: string
+    authId: string | null | undefined
   ) => Promise<Participant | null>;
   setParticipant: (
     participant: Omit<Participant, 'id'>,
-    authId: string
+    authId: string | null | undefined
   ) => Promise<void>;
   updateParticipantUsername: (username: string) => Promise<void>;
   ensureAnonymousAuth: (participant: Participant) => Promise<string>;
@@ -110,6 +110,12 @@ const useParticipantStore = create<ParticipantStoreState>()(
 
       getParticipant: async (walletAddress, authId) => {
         set({ loading: true });
+
+        if (!authId) {
+          set({ participant: null, loading: false });
+          return null;
+        }
+
         try {
           const q = query(
             collection(db, 'participants'),
@@ -136,6 +142,12 @@ const useParticipantStore = create<ParticipantStoreState>()(
 
       setParticipant: async (participant, authId) => {
         set({ loading: true });
+
+        if (!authId) {
+          set({ participant: null, loading: false });
+          return;
+        }
+
         try {
           const existingParticipant = await get().getParticipant(
             participant.walletAddress,

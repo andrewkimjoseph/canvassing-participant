@@ -86,7 +86,7 @@ export default function Profile() {
   };
   const checkParticipantStatus = useCallback(() => {
     if (isConnected && address) {
-      getParticipant(address,  participant?.authId!);
+      getParticipant(address,  participant?.authId);
     }
   }, [isConnected, address, getParticipant]);
 
