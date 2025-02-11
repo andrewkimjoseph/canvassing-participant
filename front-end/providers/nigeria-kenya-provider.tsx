@@ -15,7 +15,9 @@ export const NigeriaKenyaProvider: React.FC<{
         const response = await fetch('https://ipapi.co/json/');
         const data = await response.json();
 
-        const allowedCountries = ['NG', 'KE'];
+        // const allowedCountries = ['NG', 'KE'];
+        const allowedCountries = ['KE'];
+
         setIsAllowedCountry(allowedCountries.includes(data.country_code));
       } catch (error) {
         setIsAllowedCountry(false);
