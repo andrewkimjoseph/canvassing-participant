@@ -58,9 +58,9 @@ export function Web3Provider({ children }: { children: React.ReactNode }) {
         >
           <MiniPayProvider>
             <MobileOnlyProvider>
-              <NigeriaKenyaProvider>
+              {/* <NigeriaKenyaProvider> */}
                 <CustomLayout>{children}</CustomLayout>
-              </NigeriaKenyaProvider>
+              {/* </NigeriaKenyaProvider> */}
             </MobileOnlyProvider>
           </MiniPayProvider>
         </RainbowKitProvider>

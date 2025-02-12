@@ -15,6 +15,7 @@ import { PrivacyIconC } from '@/components/icons/more-options-icons/privacy-icon
 import { FAQsIconC } from '@/components/icons/more-options-icons/faqs-icons';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 import { ProfileIconC } from '@/components/icons/more-options-icons/profile-icon';
+import { auth } from '@/firebase';
 
 
 export default function More() {
@@ -26,7 +27,7 @@ export default function More() {
 
   const checkParticipantStatus = useCallback(() => {
     if (isConnected && address) {
-      getParticipant(address);
+      getParticipant(address,  participant?.authId);
     }
   }, [isConnected, address, getParticipant]);
 

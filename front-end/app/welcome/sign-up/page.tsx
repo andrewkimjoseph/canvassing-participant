@@ -51,7 +51,7 @@ export default function SignUpPage() {
  
     const checkParticipantStatus = useCallback(() => {
       if (isConnected && address) {
-        getParticipant(address);
+        getParticipant(address, participant?.authId);
       }
     }, [isConnected, address, getParticipant]);
   
