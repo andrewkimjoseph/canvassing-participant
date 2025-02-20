@@ -247,6 +247,11 @@ export default function SuccessPage() {
           duration: 6000,
           type: 'error',
         });
+        trackAmplitudeEvent('Reward claim failed', {
+          participantWalletAddress: participant?.walletAddress,
+          participantId: participant?.id,
+          surveyId: survey?.id,
+        });
       }
     } catch (error) {
       toaster.dismiss(toasterIds.rewardRecordFound);
