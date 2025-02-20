@@ -10,7 +10,6 @@ export const checkIfParticipantHasCompletedSurvey = async ({
 
   const rewardsQuery = query(
     collection(db, 'rewards'),
-    where('participantId', '==', _participantId),
     where('participantWalletAddress', '==', _participantWalletAddress),
     where('surveyId', '==', _surveyId)
   );

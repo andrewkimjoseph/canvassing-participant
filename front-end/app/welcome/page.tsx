@@ -3,13 +3,17 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
-import { Box, Image, Button, VStack, Text } from '@chakra-ui/react';
+import { Box, Image, VStack, Text } from '@chakra-ui/react';
+import { Button } from '@/components/ui/button';
 import useParticipantStore from '@/stores/useParticipantStore';
 import { WelcomePageIconC } from '@/components/icons/welcome-page-icon';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
+import { SpinnerIconC } from '@/components/icons/spinner-icon';
 
 export default function WelcomePage() {
   const [isMounted, setIsMounted] = useState(false);
+  const [isGettingStarted, setIsGettingStarted] = useState(false);
+
   const { address, isConnected } = useAccount();
   const { participant, getParticipant } = useParticipantStore();
   const router = useRouter();
@@ -40,11 +44,12 @@ export default function WelcomePage() {
   }, []);
 
   const handleGetStarted = () => {
+    setIsGettingStarted(true);
     trackAmplitudeEvent('Get started clicked', {
       walletAddress: address,
     });
-
     router.push('/welcome/sign-up');
+    setIsGettingStarted(false);
   };
 
   return (
@@ -88,6 +93,9 @@ export default function WelcomePage() {
         px={6}
         w="3/6"
         mt={5}
+        loading={isGettingStarted}
+        disabled={isGettingStarted}
+        loadingText={<SpinnerIconC />}
         onClick={handleGetStarted}
       >
         <Text fontSize="16" fontWeight="bold" color="white">
