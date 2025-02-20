@@ -284,6 +284,11 @@ export default function Home() {
             type: 'warning',
           });
 
+          trackAmplitudeEvent('Survey booking record creation failed', {
+            walletAddress: address,
+            surveyId: survey.id,
+          });
+
           router.refresh();
         }
       } else {
@@ -294,6 +299,10 @@ export default function Home() {
             'On-chain booking failed. Kindly reach out to support via the "More" tab. ',
           duration: 6000,
           type: 'warning',
+        });
+        trackAmplitudeEvent('Survey on-chain booking failed', {
+          walletAddress: address,
+          surveyId: survey.id,
         });
 
         router.refresh();
