@@ -20,8 +20,7 @@ interface ParticipantStoreState {
   participant: Participant | null;
   loading: boolean;
   getParticipant: (
-    walletAddress: string,
-    authId: string | null | undefined
+    walletAddress: string
   ) => Promise<Participant | null>;
   setParticipant: (
     participant: Omit<Participant, 'id'>,
@@ -108,19 +107,13 @@ const useParticipantStore = create<ParticipantStoreState>()(
         }
       },
 
-      getParticipant: async (walletAddress, authId) => {
+      getParticipant: async (walletAddress) => {
         set({ loading: true });
-
-        if (!authId) {
-          set({ participant: null, loading: false });
-          return null;
-        }
 
         try {
           const q = query(
             collection(db, 'participants'),
             where('walletAddress', '==', walletAddress),
-            where('authId', '==', authId)
           );
           const snapshot = await getDocs(q);
 
@@ -135,7 +128,7 @@ const useParticipantStore = create<ParticipantStoreState>()(
           }
         } catch (error) {
           console.error('Error getting participant:', error);
-          set({ loading: false });
+          set({ participant: null, loading: false });
           return null;
         }
       },
@@ -151,7 +144,6 @@ const useParticipantStore = create<ParticipantStoreState>()(
         try {
           const existingParticipant = await get().getParticipant(
             participant.walletAddress,
-            authId
           );
 
           if (existingParticipant) {
