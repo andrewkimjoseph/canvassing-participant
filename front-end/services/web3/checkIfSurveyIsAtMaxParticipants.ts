@@ -1,8 +1,8 @@
-import { closedSurveyV4ContractABI } from '@/utils/abis/closedSurveyV4ContractABI';
+import { closedSurveyV5ContractABI } from '@/utils/abis/closedSurveyV4ContractABI';
 import { Address, createPublicClient, custom } from 'viem';
 import { celoAlfajores, celo } from 'viem/chains';
 
-export const checkIfSurveyIsFullyBooked = async ({
+export const checkIfSurveyIsAtMaxParticipants = async ({
   _surveyContractAddress,
   _chainId,
 }: CheckIfSurveyIsFullyBookedProps): Promise<boolean> => {
@@ -16,21 +16,21 @@ export const checkIfSurveyIsFullyBooked = async ({
     const numberOfTargetParticipants = Number(
       (await publicClient.readContract({
         address: _surveyContractAddress,
-        abi: closedSurveyV4ContractABI,
+        abi: closedSurveyV5ContractABI,
         functionName: 'getTargetNumberOfParticipants',
       })) ?? 0
     );
 
     // Get the number of screened participants
-    const numberOfScreenedParticipants = Number(
+    const numberOfRewardedParticipants = Number(
       (await publicClient.readContract({
         address: _surveyContractAddress,
-        abi: closedSurveyV4ContractABI,
-        functionName: 'getNumberOfScreenedParticipants',
+        abi: closedSurveyV5ContractABI,
+        functionName: 'getNumberOfRewardedParticipants',
       })) ?? 0
     );
 
-    return numberOfScreenedParticipants >= numberOfTargetParticipants;
+    return numberOfRewardedParticipants >= numberOfTargetParticipants;
   } catch (error) {
     return false;
   }
