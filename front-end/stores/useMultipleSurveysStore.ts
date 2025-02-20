@@ -1,12 +1,19 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { collection, getDocs, query, where, or, limit } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  or,
+  limit,
+} from 'firebase/firestore';
 import { Survey } from '@/entities/survey';
 import { db } from '@/firebase';
 import { Reward } from '@/entities/reward';
 import { Address } from 'viem';
 import useParticipantStore from './useParticipantStore';
-import { checkIfSurveyIsFullyBooked } from '@/services/web3/checkIfSurveyIsFullyBooked';
+import { checkIfSurveyIsAtMaxParticipants } from '@/services/web3/checkIfSurveyIsAtMaxParticipants';
 import { checkIfParticipantIsScreenedForSurvey } from '@/services/checkIfParticipantHasBeenBookedForSurvey';
 import { checkIfParticipantHasCompletedSurvey } from '@/services/db/checkIfParticipantHasCompletedSurvey';
 
@@ -35,7 +42,9 @@ const useMultipleSurveysStore = create<SurveyStoreState>()(
         const { participant } = useParticipantStore.getState();
 
         try {
-          const participatedSurveyIds = rewards.map((reward) => reward.surveyId);
+          const participatedSurveyIds = rewards.map(
+            (reward) => reward.surveyId
+          );
           let allSurveys: Survey[] = [];
 
           const surveyQuery = query(
@@ -51,9 +60,11 @@ const useMultipleSurveysStore = create<SurveyStoreState>()(
               const availableSurveys = await getDocs(surveyQuery);
               const availableSurveysNotDoneByParticipant =
                 availableSurveys.docs.filter((doc) => !chunk.includes(doc.id));
-              return availableSurveysNotDoneByParticipant.map((surveySnapshot) => ({
-                ...(surveySnapshot.data() as Survey),
-              }));
+              return availableSurveysNotDoneByParticipant.map(
+                (surveySnapshot) => ({
+                  ...(surveySnapshot.data() as Survey),
+                })
+              );
             });
 
             const chunkResults = await Promise.all(chunkPromises);
@@ -92,7 +103,7 @@ const useMultipleSurveysStore = create<SurveyStoreState>()(
               surveyIsAlreadyBookedByUser,
               participantHasCompletedSurvey,
             ] = await Promise.all([
-              checkIfSurveyIsFullyBooked({
+              checkIfSurveyIsAtMaxParticipants({
                 _surveyContractAddress: survey.contractAddress as Address,
                 _chainId: chainId,
               }),
@@ -134,6 +145,11 @@ const useMultipleSurveysStore = create<SurveyStoreState>()(
           const validSurveys = surveyResults.filter(
             (survey) => survey !== null
           ) as Survey[];
+
+          validSurveys.sort(
+            (a, b) =>
+              (b.timeCreated?.seconds ?? 0) - (a.timeCreated?.seconds ?? 0)
+          );
 
           set({ surveys: validSurveys, loading: false });
         } catch (error) {
