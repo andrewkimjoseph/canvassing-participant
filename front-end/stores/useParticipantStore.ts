@@ -111,10 +111,10 @@ const useParticipantStore = create<ParticipantStoreState>()(
       getParticipant: async (walletAddress, authId) => {
         set({ loading: true });
 
-        // if (!authId) {
-        //   set({ participant: null, loading: false });
-        //   return null;
-        // }
+        if (!authId) {
+          set({ participant: null, loading: false });
+          return null;
+        }
 
         try {
           const q = query(
