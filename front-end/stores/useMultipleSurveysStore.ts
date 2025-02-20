@@ -13,7 +13,7 @@ import { db } from '@/firebase';
 import { Reward } from '@/entities/reward';
 import { Address } from 'viem';
 import useParticipantStore from './useParticipantStore';
-import { checkIfSurveyIsFullyBooked } from '@/services/web3/checkIfSurveyIsFullyBooked';
+import { checkIfSurveyIsAtMaxParticipants } from '@/services/web3/checkIfSurveyIsAtMaxParticipants';
 import { checkIfParticipantIsScreenedForSurvey } from '@/services/checkIfParticipantHasBeenBookedForSurvey';
 import { checkIfParticipantHasCompletedSurvey } from '@/services/db/checkIfParticipantHasCompletedSurvey';
 
@@ -103,7 +103,7 @@ const useMultipleSurveysStore = create<SurveyStoreState>()(
               surveyIsAlreadyBookedByUser,
               participantHasCompletedSurvey,
             ] = await Promise.all([
-              checkIfSurveyIsFullyBooked({
+              checkIfSurveyIsAtMaxParticipants({
                 _surveyContractAddress: survey.contractAddress as Address,
                 _chainId: chainId,
               }),

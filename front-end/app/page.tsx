@@ -16,7 +16,7 @@ import { screenParticipantInBC } from '@/services/web3/screenParticipantInBC';
 import { Survey } from '@/entities/survey';
 import { Address } from 'viem';
 import { Participant } from '@/entities/participant';
-import { checkIfSurveyIsFullyBooked } from '@/services/web3/checkIfSurveyIsFullyBooked';
+import { checkIfSurveyIsAtMaxParticipants } from '@/services/web3/checkIfSurveyIsAtMaxParticipants';
 import { Toaster, toaster } from '@/components/ui/toaster';
 import { MaleAvatarC } from '@/components/avatars/male-avatar';
 import { FemaleAvatarC } from '@/components/avatars/female-avatar';
@@ -209,7 +209,7 @@ export default function Home() {
       [survey.id]: true,
     }));
 
-    const surveyIsFullyBooked = await checkIfSurveyIsFullyBooked({
+    const surveyIsFullyBooked = await checkIfSurveyIsAtMaxParticipants({
       _surveyContractAddress: survey.contractAddress as Address,
       _chainId: chainId,
     });

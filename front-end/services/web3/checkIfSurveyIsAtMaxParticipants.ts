@@ -1,4 +1,4 @@
-import { closedSurveyV5ContractABI } from '@/utils/abis/closedSurveyV4ContractABI';
+import { closedSurveyV5ContractABI } from '@/utils/abis/closedSurveyV5ContractABI';
 import { Address, createPublicClient, custom } from 'viem';
 import { celoAlfajores, celo } from 'viem/chains';
 
