@@ -141,7 +141,7 @@ contract ClosedSurveyV5 is Ownable, Pausable {
         bytes memory signature
     ) {
         require(
-            verifySignatureForRewardClaiming(participant, rewardId, nonce, signature),
+            verifySignature(participant, rewardId, nonce, signature),
             "Invalid signature"
         );
         _;
@@ -329,14 +329,14 @@ contract ClosedSurveyV5 is Ownable, Pausable {
     }
 
     /**
-     * @dev Verifies that a signature is valid for given participant data during reward claiming
+     * @dev Verifies that a signature is valid for given participant data
      * @param participant Address of the participant claiming the reward
      * @param rewardId Unique identifier for this reward claim
      * @param nonce Unique number to prevent relay attacks
      * @param signature Cryptographic signature to verify
      * @return bool True if signature is valid, false otherwise
      */
-    function verifySignatureForRewardClaiming(
+    function verifySignature(
         address participant,
         string memory rewardId,
         uint256 nonce,
@@ -553,21 +553,6 @@ contract ClosedSurveyV5 is Ownable, Pausable {
     {
         return participantsScreenedForSurvey[participant];
     }
-
-
-    /**
-     * @notice Checks if a given participant has been rewarded
-     * @param participant - Address of the participant to check
-     * @return bool True if the participant has been rewarded
-     */
-    function checkIfParticipantIsRewarded(address participant)
-        external
-        view
-        returns (bool)
-    {
-        return rewardedParticipants[participant];
-    }
-
 
     /**
      * @notice Checks if a given signature has been used
