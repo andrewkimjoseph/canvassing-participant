@@ -1,7 +1,0 @@
-[profile.default]
-src = "src"
-out = "out"
-libs = ["lib"]
-eth_rpc_url = "https://celo-alfajores.infura.io/v3/a7188daaf8ab4370ac12fad7e3693e96"
-
-# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
