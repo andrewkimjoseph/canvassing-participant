@@ -1,13 +1,14 @@
-import '@/styles/globals.css';
-import { Web3Provider } from '@/providers/web-3-provider';
-import { UIProvider } from '@/components/ui/provider';
-import { Metadata } from 'next';
-import { font } from '@/utils/font';
-import AmplitudeContextProvider from '@/providers/amplitude-provider';
+import "@/styles/globals.css";
+import { Web3Provider } from "@/providers/web-3-provider";
+import { UIProvider } from "@/components/ui/provider";
+import { Metadata } from "next";
+import { font } from "@/utils/font";
+import AmplitudeContextProvider from "@/providers/amplitude-provider";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
-  title: 'Canvassing - Participant',
-  description: 'opinions pay, today',
+  title: "Canvassing - Participant",
+  description: "opinions pay, today",
 };
 
 export default function RootLayout({
@@ -20,7 +21,10 @@ export default function RootLayout({
       <body>
         <AmplitudeContextProvider>
           <UIProvider>
-            <Web3Provider>{children}</Web3Provider>
+            <Web3Provider>
+              {children}
+              <SpeedInsights />
+            </Web3Provider>
           </UIProvider>
         </AmplitudeContextProvider>
       </body>
