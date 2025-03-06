@@ -4,7 +4,7 @@ import { UIProvider } from "@/components/ui/provider";
 import { Metadata } from "next";
 import { font } from "@/utils/font";
 import AmplitudeContextProvider from "@/providers/amplitude-provider";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata: Metadata = {
   title: "Canvassing - Participant",
@@ -23,10 +23,10 @@ export default function RootLayout({
           <UIProvider>
             <Web3Provider>
               {children}
-              {/* <SpeedInsights /> */}
             </Web3Provider>
           </UIProvider>
         </AmplitudeContextProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
