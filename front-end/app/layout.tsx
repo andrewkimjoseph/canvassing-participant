@@ -23,7 +23,7 @@ export default function RootLayout({
           <UIProvider>
             <Web3Provider>
               {children}
-              <SpeedInsights />
+              {/* <SpeedInsights /> */}
             </Web3Provider>
           </UIProvider>
         </AmplitudeContextProvider>
