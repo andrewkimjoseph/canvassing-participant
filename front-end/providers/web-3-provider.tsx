@@ -28,7 +28,7 @@ const connectors = connectorsForWallets(
   ],
   {
     appName: 'Canvassing - Participant',
-    projectId: String(),
+    projectId: String(process.env.NEXT_PUBLIC_REOWN_PROJECT_ID),
   }
 );
 
