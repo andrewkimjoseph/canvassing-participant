@@ -26,7 +26,7 @@ export default function RootLayout({
             </Web3Provider>
           </UIProvider>
         </AmplitudeContextProvider>
-        <SpeedInsights />
+        {/* <SpeedInsights /> */}
       </body>
     </html>
   );
