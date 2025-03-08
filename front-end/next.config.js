@@ -7,18 +7,6 @@ const nextConfig = {
       fs: false,
       child_process: false,
       tls: false,
-      events: false,
-      util: false,
-      process: false,
-      net: false,
-      path: false,
-      dns: false,
-      http: false,
-      https: false,
-      zlib: false,
-      stream: false,
-      crypto: false,
-      buffer: false,
     };
     return config;
   },

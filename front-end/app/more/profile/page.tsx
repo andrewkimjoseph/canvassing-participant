@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import { SpinnerIconC } from '@/components/icons/spinner-icon';
 import { Timestamp } from 'firebase-admin/firestore';
 import { Toaster, toaster } from '@/components/ui/toaster';
-import { serverTimestamp } from 'firebase/firestore';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 
 export default function Profile() {
