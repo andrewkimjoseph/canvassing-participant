@@ -9,9 +9,8 @@ import { Avatar, AvatarGroup } from '@/components/ui/avatar';
 import { Field } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
 import { SpinnerIconC } from '@/components/icons/spinner-icon';
-import { Timestamp } from 'firebase-admin/firestore';
+import { Timestamp } from 'firebase/firestore';
 import { Toaster, toaster } from '@/components/ui/toaster';
-import { serverTimestamp } from 'firebase/firestore';
 import useAmplitudeContext from '@/hooks/useAmplitudeContext';
 
 export default function Profile() {
