@@ -15,7 +15,7 @@ import { injectedWallet } from '@rainbow-me/rainbowkit/wallets';
 
 import CustomLayout from '@/components/custom-layout';
 import  ResponsiveLayoutProvider  from '@/providers/responsive-layout-provider';
-import NigeriaKenyaProvider from '@/providers/nigeria-kenya-provider';
+// import NigeriaKenyaProvider from '@/providers/nigeria-kenya-provider';
 import SetMiniPayProvider from './set-minipay-provider';
 import { RPCUrls } from '@/utils/rpcURLs/rpcUrls';
 
