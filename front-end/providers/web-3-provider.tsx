@@ -14,9 +14,9 @@ import { celo, celoAlfajores } from 'wagmi/chains';
 import { injectedWallet } from '@rainbow-me/rainbowkit/wallets';
 
 import CustomLayout from '@/components/custom-layout';
-import MobileOnlyProvider from '@/providers/mobile-only-provider';
-import NigeriaKenyaProvider from '@/providers/nigeria-kenya-provider';
-import MiniPayProvider from './minipay-provider';
+import  ResponsiveLayoutProvider  from '@/providers/responsive-layout-provider';
+// import NigeriaKenyaProvider from '@/providers/nigeria-kenya-provider';
+import SetMiniPayProvider from './set-minipay-provider';
 import { RPCUrls } from '@/utils/rpcURLs/rpcUrls';
 
 const connectors = connectorsForWallets(
@@ -56,13 +56,18 @@ export function Web3Provider({ children }: { children: React.ReactNode }) {
             overlayBlur: 'small',
           })}
         >
-          <MiniPayProvider>
-            <MobileOnlyProvider>
-              {/* <NigeriaKenyaProvider> */}
+          <SetMiniPayProvider>
+            <ResponsiveLayoutProvider
+               config={{
+                maxMobileWidth: 768, // Adjust to your definition of mobile
+                maxContentWidth: 480, // Width of the container on desktop
+                desktopBackgroundColor: "white",
+                showMobileBorder: true, 
+              }}
+            >
                 <CustomLayout>{children}</CustomLayout>
-              {/* </NigeriaKenyaProvider> */}
-            </MobileOnlyProvider>
-          </MiniPayProvider>
+            </ResponsiveLayoutProvider>
+          </SetMiniPayProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

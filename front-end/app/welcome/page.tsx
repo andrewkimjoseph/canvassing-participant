@@ -53,7 +53,7 @@ export default function WelcomePage() {
   };
 
   return (
-    <VStack width="100vw" h="100vh">
+    <VStack width="100%" h="100%">
       <Box
         position="relative"
         width="100%"

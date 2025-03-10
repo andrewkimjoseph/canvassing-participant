@@ -105,14 +105,14 @@ export default function Profile() {
 
   if (!isMounted) {
     return (
-      <Flex justify="center" align="center" h="100vh">
+      <Flex justify="center" align="center" h="100%">
         <SpinnerIconC />
       </Flex>
     );
   }
 
   return (
-    <Flex flexDirection="column" h="100vh" bgColor="#ECECEC" px={16}>
+    <Flex flexDirection="column" h="100%" bgColor="#ECECEC" px={16}>
       <Toaster />
       <Text
         fontSize="3xl"
