@@ -41,7 +41,7 @@ const CustomHeader = () => {
   const { participant } = useParticipantStore();
   const [mounted, setMounted] = useState(false);
   const { connect } = useConnect();
-  const { isConnected } = useAccount();
+  const { isConnected,isDisconnected } = useAccount();
   const { trackAmplitudeEvent } = useAmplitudeContext();
   const [user, setUser] = useState<User | null>(null);
   const { isMiniPay, isMiniPayContext } = useMiniPayStore();
@@ -52,7 +52,9 @@ const CustomHeader = () => {
 
   useEffect(() => {
     if (isMiniPay) {
-      connect({ connector: injected({ target: "metaMask" }) });
+      if (isDisconnected) {
+        connect({ connector: injected({ target: "metaMask" }) });
+      }
     }
   }, [connect]);
 
