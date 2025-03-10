@@ -7,7 +7,8 @@ export const SetMiniPayProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
   const [isMiniPay, setIsMiniPay] = useState<boolean>(false);
-  const { setIsMiniPay: setIsMiniPayInStore } = useMiniPayStore();
+  const { setIsMiniPay: setIsMiniPayInStore, setIsMiniPayContext } =
+    useMiniPayStore();
   useEffect(() => {
     const checkMiniPay = (): void => {
       const isPreviewOrDev =
@@ -22,8 +23,15 @@ export const SetMiniPayProvider: React.FC<{
           ((window as any).ethereum.isMiniPay !== undefined ||
             (window as any).ethereum.isMiniPay === true));
 
+      const isMiniPayContext: boolean =
+        typeof window !== "undefined" &&
+        (window as any).ethereum &&
+        ((window as any).ethereum.isMiniPay !== undefined ||
+          (window as any).ethereum.isMiniPay === true);
+
       setIsMiniPay(miniPayExists);
       setIsMiniPayInStore(miniPayExists);
+      setIsMiniPayContext(isMiniPayContext);
     };
 
     checkMiniPay();

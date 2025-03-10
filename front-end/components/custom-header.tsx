@@ -44,7 +44,7 @@ const CustomHeader = () => {
   const { isConnected } = useAccount();
   const { trackAmplitudeEvent } = useAmplitudeContext();
   const [user, setUser] = useState<User | null>(null);
-  const { isMiniPay } = useMiniPayStore();
+  const { isMiniPay, isMiniPayContext } = useMiniPayStore();
 
   useEffect(() => {
     setMounted(true);
@@ -240,7 +240,7 @@ const CustomHeader = () => {
               }}
             />
 
-            {!isMiniPay ? (
+            {!isMiniPayContext ? (
               <ConnectButton
                 chainStatus="none"
                 accountStatus={{
