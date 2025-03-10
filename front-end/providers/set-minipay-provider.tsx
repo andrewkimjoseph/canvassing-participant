@@ -39,7 +39,7 @@ export const SetMiniPayProvider: React.FC<{
 
   if (isMiniPay === null) {
     return (
-      <Flex justify="center" align="center" minH="100vh">
+      <Flex justify="center" align="center" minH="100%">
         <SpinnerIconC />
       </Flex>
     );
