@@ -519,6 +519,10 @@ contract ClosedSurveyV6 is Ownable, Pausable {
     )
         external
         whenNotPaused
+        onlyIfSenderIsGivenParticipant(participant)
+        onlyWhenAllParticipantsHaveNotBeenRewarded
+        onlyUnrewardedParticipant(participant)
+        mustBeScreened(participant)
         onlyIfGivenClaimingSignatureIsValid(
             participant,
             rewardId,
@@ -527,10 +531,6 @@ contract ClosedSurveyV6 is Ownable, Pausable {
         )
         onlyIfGivenClaimingSignatureIsUnused(signature)
         onlyIfContractHasEnoughRewardTokens
-        onlyWhenAllParticipantsHaveNotBeenRewarded
-        onlyIfSenderIsGivenParticipant(participant)
-        onlyUnrewardedParticipant(participant)
-        mustBeScreened(participant)
     {
         bool rewardTransferIsSuccesful = rewardParticipant(participant);
 
@@ -760,7 +760,11 @@ contract ClosedSurveyV6 is Ownable, Pausable {
      * @dev Indicates how many more rewards can be distributed
      * @return uint256 The current reward token balance in wei
      */
-    function getRewardTokenContractBalanceAmount() external view returns (uint256) {
+    function getRewardTokenContractBalanceAmount()
+        external
+        view
+        returns (uint256)
+    {
         return rewardToken.balanceOf(address(this));
     }
 
