@@ -1,7 +1,9 @@
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Flex, Box } from "@chakra-ui/react";
 import CustomHeader from "./custom-header";
+import { injected, useAccount, useConnect } from "wagmi";
+import useMiniPayStore from "@/stores/useMiniPayStore";
 
 interface Props {
   children: ReactNode;
@@ -11,6 +13,17 @@ const CustomLayout: FC<Props> = ({ children }) => {
   const pathname = usePathname();
   const noHeaderRoutes = ["/welcome", "/welcome/sign-up"];
   const showHeader = !noHeaderRoutes.includes(pathname);
+
+  const { connect } = useConnect();
+
+  const { isConnected } = useAccount();
+  const { isMiniPay } = useMiniPayStore();
+  
+  useEffect(() => {
+    if (isMiniPay && !isConnected) {
+      connect({ connector: injected({ target: "metaMask" }) });
+    }
+  }, [isMiniPay, isConnected, connect]);
 
   return (
     <Flex

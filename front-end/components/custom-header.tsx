@@ -40,8 +40,7 @@ import useMiniPayStore from "@/stores/useMiniPayStore";
 const CustomHeader = () => {
   const { participant } = useParticipantStore();
   const [mounted, setMounted] = useState(false);
-  const { connect } = useConnect();
-  const { isConnected,isDisconnected } = useAccount();
+  const { isConnected } = useAccount();
   const { trackAmplitudeEvent } = useAmplitudeContext();
   const [user, setUser] = useState<User | null>(null);
   const { isMiniPay, isMiniPayContext } = useMiniPayStore();
@@ -50,13 +49,6 @@ const CustomHeader = () => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (isMiniPay) {
-      if (isDisconnected) {
-        connect({ connector: injected({ target: "metaMask" }) });
-      }
-    }
-  }, [connect]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -269,7 +261,7 @@ const CustomHeader = () => {
                 >
                   This decentralized application (dApp) is independently
                   operated and maintained by Canvassing. It is not affiliated
-                  with, endorsed by, or operated by Opera or MiniPay.
+                  with, endorsed by, or operated by Opera or MiniPay, Mento, or GoodDollar.
                 </Text>
               </Box>
             </Box>
