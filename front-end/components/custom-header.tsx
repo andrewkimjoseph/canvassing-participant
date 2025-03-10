@@ -229,7 +229,7 @@ const CustomHeader = () => {
               </DrawerActionTrigger>
             </Flex>
           </DrawerBody>
-          <DrawerFooter flexDirection={"column"} alignItems={"center"} pb={16}>
+          <DrawerFooter flexDirection={"column"} alignItems={"center"}>
             <hr
               style={{
                 backgroundColor: "D9D9D9",
@@ -259,7 +259,6 @@ const CustomHeader = () => {
               <Box className="flex flex-col items-left relative">
                 <Text
                   fontSize={12}
-                  mb={2}
                   color={"#94B9FF"}
                   mt={8}
                   lineHeight={"short"}
