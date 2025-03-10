@@ -410,10 +410,13 @@ contract ClosedSurveyV6 is Ownable, Pausable {
         require(participant != address(0), "Zero address passed");
 
         participantsScreenedForSurvey[participant] = true;
-        signaturesUsedForScreening[signature] = true;
+
         unchecked {
             ++numberOfScreenedParticipants;
         }
+        
+        markScreeningSignatureAsHavingBeenUsed(signature, participant);
+
         emit ParticipantScreened(participant);
     }
 
@@ -607,6 +610,23 @@ contract ClosedSurveyV6 is Ownable, Pausable {
             ++numberOfClaimedRewards;
         }
         emit ParticipantMarkedAsRewarded(participant);
+    }
+
+    /**
+     * @notice Updates internal state to mark a screening signature as used
+     * @dev Prevents signature reuse in future survey screenings
+     * @param signature The signature to mark as used
+     * @param participant The address of the participant who used the signature
+     */
+    function markScreeningSignatureAsHavingBeenUsed(
+        bytes memory signature,
+        address participant
+    ) private {
+        signaturesUsedForScreening[signature] = true;
+        unchecked {
+            ++numberOfUsedScreeningSignatures;
+        }
+        emit ScreeningSignatureUsed(signature, participant);
     }
 
     /**
