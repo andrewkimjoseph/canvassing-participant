@@ -141,6 +141,8 @@ export default function Home() {
 
           // Handle amplitude tracking
           handleAmplitudeTracking(fetchedParticipant);
+        } else {
+          router.replace('/welcome');
         }
       } catch (error) {
         console.error('Initialization error:', error);
