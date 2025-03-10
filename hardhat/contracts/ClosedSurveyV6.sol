@@ -224,6 +224,19 @@ contract ClosedSurveyV6 is Ownable, Pausable {
     }
 
     /**
+     * @notice Ensures a screening signature hasn't been used before
+     * @dev Prevents replay attacks by checking signature uniqueness
+     * @param signature The cryptographic signature to check
+     */
+    modifier onlyIfGivenScreeningSignatureIsUnused(bytes memory signature) {
+        require(
+            !signaturesUsedForScreening[signature],
+            "Signature already used"
+        );
+        _;
+    }
+
+    /**
      * @notice Ensures a claiming signature hasn't been used before
      * @dev Prevents replay attacks by checking signature uniqueness
      * @param signature The cryptographic signature to check
@@ -370,17 +383,34 @@ contract ClosedSurveyV6 is Ownable, Pausable {
      * @notice Registers a participant as screened for the survey
      * @dev Marks the participant as eligible to claim rewards if they pass screening
      * @param participant Address of the participant to screen
+     * @param surveyId Unique identifier for this survey instance
+     * @param nonce Unique number to prevent replay attacks
+     * @param signature Cryptographic signature from the contract owner
      */
-    function screenParticipant(address participant)
+    function screenParticipant(
+        address participant,
+        string memory surveyId,
+        uint256 nonce,
+        bytes memory signature
+    )
         external
+        whenNotPaused
         onlyIfSenderIsGivenParticipant(participant)
+        onlyWhenAllParticipantsHaveNotBeenRewarded
         onlyUnscreenedParticipant(participant)
         onlyUnrewardedParticipant(participant)
-        onlyWhenAllParticipantsHaveNotBeenRewarded
+        onlyIfGivenScreeningSignatureIsValid(
+            participant,
+            surveyId,
+            nonce,
+            signature
+        )
+        onlyIfGivenScreeningSignatureIsUnused(signature)
     {
         require(participant != address(0), "Zero address passed");
 
         participantsScreenedForSurvey[participant] = true;
+        signaturesUsedForScreening[signature] = true;
         unchecked {
             ++numberOfScreenedParticipants;
         }
