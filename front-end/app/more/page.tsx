@@ -53,7 +53,7 @@ export default function More() {
 
   if (!isMounted) {
     return (
-      <Flex justify="center" align="center" h="100vh">
+      <Flex justify="center" align="center" h="100%">
         <SpinnerIconC />
       </Flex>
     );
@@ -62,7 +62,7 @@ export default function More() {
   const moreOptions = getMoreOptions(participant?.walletAddress);
 
   return (
-    <Flex flexDirection="column" w="100%" h="100vh" bgColor="#ECECEC" px={4}>
+    <Flex flexDirection="column" w="100%" h="100%" bgColor="#ECECEC" px={4}>
       {moreOptions.map((option, index) => (
         <MoreOptionsCard
           key={index}

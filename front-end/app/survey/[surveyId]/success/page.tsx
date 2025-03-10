@@ -268,13 +268,13 @@ export default function SuccessPage() {
 
   if (!isMounted)
     return (
-      <Flex justify="center" align="center" minH="100vh">
+      <Flex justify="center" align="center" minH="100%">
         <Spinner size="xl" color="#363062" />
       </Flex>
     );
 
   return (
-    <Flex flexDirection={'column'} w={'100%'} bgColor={'#ECECEC'} h={'100vh'}>
+    <Flex flexDirection={'column'} w={'100%'} bgColor={'#ECECEC'} h={'100%'}>
       <Toaster />
 
       <Box

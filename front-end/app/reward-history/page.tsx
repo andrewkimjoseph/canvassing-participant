@@ -43,14 +43,14 @@ export default function RewardHistory() {
 
   if (!isMounted) {
     return (
-      <Flex justify="center" align="center" h="100vh">
+      <Flex justify="center" align="center" h="100%">
         <SpinnerIconC />
       </Flex>
     );
   }
 
   return (
-    <Flex flexDirection="column" w="100%" h="100vh" bgColor="#ECECEC" px={4}>
+    <Flex flexDirection="column" w="100%" h="100%" bgColor="#ECECEC" px={4}>
       <Text
         fontSize="2xl"
         fontWeight="bold"
