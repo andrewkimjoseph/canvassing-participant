@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAccount } from 'wagmi';
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAccount } from "wagmi";
 import {
   Box,
   Image,
@@ -10,11 +10,11 @@ import {
   Text,
   Flex,
   createListCollection,
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 
-import { Toaster, toaster } from '@/components/ui/toaster';
+import { Toaster, toaster } from "@/components/ui/toaster";
 
 import {
   SelectContent,
@@ -22,15 +22,15 @@ import {
   SelectRoot,
   SelectTrigger,
   SelectValueText,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 
-import { SignUpPageIconC } from '@/components/icons/signup-page-icon';
-import useParticipantStore from '@/stores/useParticipantStore';
-import { Timestamp } from 'firebase/firestore';
-import { SpinnerIconC } from '@/components/icons/spinner-icon';
-import { signInAnonymously } from 'firebase/auth';
-import { auth } from '@/firebase';
-import useAmplitudeContext from '@/hooks/useAmplitudeContext';
+import { SignUpPageIconC } from "@/components/icons/signup-page-icon";
+import useParticipantStore from "@/stores/useParticipantStore";
+import { Timestamp } from "firebase/firestore";
+import { SpinnerIconC } from "@/components/icons/spinner-icon";
+import { signInAnonymously } from "firebase/auth";
+import { auth } from "@/firebase";
+import useAmplitudeContext from "@/hooks/useAmplitudeContext";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -43,35 +43,32 @@ export default function SignUpPage() {
   const { address, isConnected } = useAccount();
   const [isCreatingParticipant, setIsCreatingParticipant] = useState(false);
 
-  
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
- 
-    const checkParticipantStatus = useCallback(() => {
-      if (isConnected && address) {
-        getParticipant(address);
-      }
-    }, [isConnected, address, getParticipant]);
-  
-    useEffect(() => {
-      checkParticipantStatus();
-    }, [checkParticipantStatus]);
-  
-    useEffect(() => {
-      if (isMounted && participant) {
-        router.replace('/');
-      }
-    }, [isMounted, participant, router]);
-  
-    useEffect(() => {
-      setIsMounted(true);
-    }, []);
-  
+  const checkParticipantStatus = useCallback(() => {
+    if (isConnected && address) {
+      getParticipant(address);
+    }
+  }, [isConnected, address, getParticipant]);
+
+  useEffect(() => {
+    checkParticipantStatus();
+  }, [checkParticipantStatus]);
+
+  useEffect(() => {
+    if (isMounted && participant) {
+      router.replace("/");
+    }
+  }, [isMounted, participant, router]);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleSubmit = async () => {
-    trackAmplitudeEvent('Create account clicked', {
+    trackAmplitudeEvent("Create account clicked", {
       walletAddress: address,
     });
 
@@ -79,17 +76,31 @@ export default function SignUpPage() {
 
     if (!gender || !country || !address) {
       toaster.create({
-        description: 'Please select all required fields',
+        description: "Please select all required fields",
         duration: 3000,
-        type: 'info',
+        type: "info",
       });
-
+      trackAmplitudeEvent("Create account slowed down", {
+        walletAddress: address,
+      });
       setIsCreatingParticipant(false);
-
       return;
     }
 
     try {
+      if (auth.currentUser) {
+        toaster.create({
+          description: "Failed. Cannot create another user from the same context.",
+          duration: 3000,
+          type: "warning",
+        });
+        setIsCreatingParticipant(false);
+        trackAmplitudeEvent("Create account failed", {
+          walletAddress: address,
+        });
+        return;
+      }
+
       const anonUserCredentials = await signInAnonymously(auth);
 
       const authId = anonUserCredentials.user.uid;
@@ -109,7 +120,7 @@ export default function SignUpPage() {
         authId
       );
 
-      trackAmplitudeEvent('Account created', {
+      trackAmplitudeEvent("Account created", {
         walletAddress: address,
         authId,
         gender,
@@ -117,9 +128,9 @@ export default function SignUpPage() {
       });
 
       toaster.create({
-        description: 'Account created successfully!',
+        description: "Account created successfully!",
         duration: 3000,
-        type: 'success',
+        type: "success",
       });
 
       // Wait for 1 second to show the success message
@@ -130,12 +141,12 @@ export default function SignUpPage() {
       // Wait a bit more before navigation to ensure the user sees the success message
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      router.replace('/');
+      router.replace("/");
     } catch (error) {
       toaster.create({
-        description: 'Failed to create account. Please try again.',
+        description: "Failed to create account. Please try again.",
         duration: 3000,
-        type: 'warning',
+        type: "warning",
       });
       setIsCreatingParticipant(false);
     }
@@ -146,32 +157,36 @@ export default function SignUpPage() {
   }
 
   return (
-    <VStack width="100vw" h={'100vh'}>
+    <VStack width="100%" h={"100%"} bgColor={"#E2E9F7"}>
       <Toaster />
 
-      <Box position="relative" width="100%" height="50%" overflow="hidden">
+      <Box position="relative" width="100%" height="100%" overflow="hidden">
         <Image
           src="/signup-page.jpg"
           alt="Background"
-          width="100vw"
+          width="100%"
           objectFit="cover"
-          blur={'md'}
+          blur={"md"}
         />
       </Box>
 
       <Flex
-        flex={'1'}
-        flexDirection={'column'}
-        justify={'start'}
-        alignItems={'center'}
-        position="relative"
+        flex={"1"}
+        flexDirection={"column"}
+        justify={"start"}
+        alignItems={"center"}
+        position="absolute"
+        top="40%" // Changed from 50% to 45% to move it higher
+        left="0"
         overflow="hidden"
-        margin={-40}
-        bgColor={'#E2E9F7'}
-        w={'100vw'}
-        h={'100%'}
+        padding={0}
+        paddingBottom={10}
+        bgColor={"#E2E9F7"}
+        w={"100%"}
+        h={"60%"} // Increased from 50% to 55% to maintain coverage
         borderTopLeftRadius={70}
         borderTopRightRadius={70}
+        zIndex={10} // Ensure it appears above the image
       >
         <Box pt={4}>
           <SignUpPageIconC />
@@ -181,10 +196,10 @@ export default function SignUpPage() {
           Get Started
         </Text>
 
-        <Box w={'4/6'}>
+        <Box w={"4/6"}>
           <SelectRoot
             collection={genders}
-            bgColor={'white'}
+            bgColor={"white"}
             borderRadius={10}
             onValueChange={(selectedGender) => {
               const gender: string = selectedGender.items[0].value;
@@ -195,7 +210,7 @@ export default function SignUpPage() {
             <SelectTrigger>
               <SelectValueText
                 placeholder="Select Gender"
-                color={'black'}
+                color={"black"}
                 ml={3}
               />
             </SelectTrigger>
@@ -209,10 +224,10 @@ export default function SignUpPage() {
           </SelectRoot>
         </Box>
 
-        <Box w={'4/6'} pt={6}>
+        <Box w={"4/6"} pt={6}>
           <SelectRoot
             collection={countries}
-            bgColor={'white'}
+            bgColor={"white"}
             borderRadius={10}
             onValueChange={(selectedCountry) => {
               const country: string = selectedCountry.items[0].value;
@@ -223,7 +238,7 @@ export default function SignUpPage() {
             <SelectTrigger>
               <SelectValueText
                 placeholder="Select Country"
-                color={'black'}
+                color={"black"}
                 ml={3}
               />
             </SelectTrigger>
@@ -238,12 +253,13 @@ export default function SignUpPage() {
         </Box>
 
         <Button
-          bgColor={'#363062'}
+          bgColor={"#363062"}
           borderRadius={15}
-          color={'white'}
+          color={"white"}
           px={6}
-          w={'3/6'}
-          mt={20}
+          w={"3/6"}
+          mt={20} // Reduced from 20 to give more breathing room
+          mb={6} // Add margin bottom for spacing
           onClick={handleSubmit}
           disabled={!gender || !country || isCreatingParticipant}
           loading={isCreatingParticipant}
@@ -260,20 +276,20 @@ export default function SignUpPage() {
 
 const genders = createListCollection({
   items: [
-    { label: '♂️ Male', value: 'M' },
-    { label: '♀️ Female', value: 'F' },
+    { label: "♂️ Male", value: "M" },
+    { label: "♀️ Female", value: "F" },
   ],
 });
 
 const countries = createListCollection({
   items: [
-    { label: '🇳🇬 Nigeria', value: 'NIG' },
-    { label: '🇰🇪 Kenya', value: 'KEN' },
-    { label: '🇬🇭 Ghana', value: 'GHN' },
-    { label: '🇺🇬 Uganda', value: 'UGN' },
-    { label: '🇿🇦 South Africa', value: 'RSA' },
-    { label: '🇹🇿 Tanzania', value: 'TZA' },
-    { label: '🇲🇼 Malawi', value: 'MWI' },
-    { label: '🏳️ Other', value: 'OTH' },
+    { label: "🇳🇬 Nigeria", value: "NIG" },
+    { label: "🇰🇪 Kenya", value: "KEN" },
+    { label: "🇬🇭 Ghana", value: "GHN" },
+    { label: "🇺🇬 Uganda", value: "UGN" },
+    { label: "🇿🇦 South Africa", value: "RSA" },
+    { label: "🇹🇿 Tanzania", value: "TZA" },
+    { label: "🇲🇼 Malawi", value: "MWI" },
+    { label: "🏳️ Other", value: "OTH" },
   ],
 });
