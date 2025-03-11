@@ -58,19 +58,19 @@ export default function SurveyPage() {
 
   if (!isMounted)
     return (
-      <Flex justify="center" align="center" h="100%">
+      <Flex justify="center" align="center" h="100vh">
         <SpinnerIconC />
       </Flex>
     );
   if (loading)
     return (
-      <Flex justify="center" align="center" hideFrom="100%">
+      <Flex justify="center" align="center" h="100vh">
         <SpinnerIconC />
       </Flex>
     );
   if (!survey)
     return (
-      <Flex justify="center" align="center" h="100%">
+      <Flex justify="center" align="center" h="100vh">
         <Text>Survey not found</Text>
       </Flex>
     );
