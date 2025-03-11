@@ -1,4 +1,4 @@
-export const closedSurveyV5ContractABI = [
+export const closedSurveyV6ContractABI = [
 	{
 		"inputs": [
 			{
@@ -18,7 +18,7 @@ export const closedSurveyV5ContractABI = [
 			},
 			{
 				"internalType": "address",
-				"name": "cUSDToken",
+				"name": "_rewardToken",
 				"type": "address"
 			}
 		],
@@ -89,18 +89,18 @@ export const closedSurveyV5ContractABI = [
 		"inputs": [
 			{
 				"indexed": false,
-				"internalType": "address",
-				"name": "researcher",
-				"type": "address"
+				"internalType": "bytes",
+				"name": "signature",
+				"type": "bytes"
 			},
 			{
 				"indexed": false,
-				"internalType": "uint256",
-				"name": "rewardAmount",
-				"type": "uint256"
+				"internalType": "address",
+				"name": "participant",
+				"type": "address"
 			}
 		],
-		"name": "CUSDWithdrawn",
+		"name": "ClaimingSignatureUsed",
 		"type": "event"
 	},
 	{
@@ -211,17 +211,36 @@ export const closedSurveyV5ContractABI = [
 			{
 				"indexed": false,
 				"internalType": "uint256",
-				"name": "oldcUSDRewardAmountPerParticipantInWei",
+				"name": "oldRewardTokenRewardAmountPerParticipantInWei",
 				"type": "uint256"
 			},
 			{
 				"indexed": false,
 				"internalType": "uint256",
-				"name": "newcUSDRewardAmountPerParticipantInWei",
+				"name": "newRewardTokenRewardAmountPerParticipantInWei",
 				"type": "uint256"
 			}
 		],
 		"name": "RewardAmountUpdated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "researcher",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "rewardAmount",
+				"type": "uint256"
+			}
+		],
+		"name": "RewardTokenWithdrawn",
 		"type": "event"
 	},
 	{
@@ -240,7 +259,7 @@ export const closedSurveyV5ContractABI = [
 				"type": "address"
 			}
 		],
-		"name": "SignatureUsed",
+		"name": "ScreeningSignatureUsed",
 		"type": "event"
 	},
 	{
@@ -277,20 +296,26 @@ export const closedSurveyV5ContractABI = [
 	},
 	{
 		"inputs": [],
-		"name": "cUSD",
+		"name": "checkIfContractIsPaused",
 		"outputs": [
 			{
-				"internalType": "contract IERC20Metadata",
+				"internalType": "bool",
 				"name": "",
-				"type": "address"
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "checkIfContractIsPaused",
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "participant",
+				"type": "address"
+			}
+		],
+		"name": "checkIfParticipantIsRewarded",
 		"outputs": [
 			{
 				"internalType": "bool",
@@ -341,19 +366,6 @@ export const closedSurveyV5ContractABI = [
 	},
 	{
 		"inputs": [],
-		"name": "getCUSDContractBalanceAmount",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
 		"name": "getNumberOfClaimedRewards",
 		"outputs": [
 			{
@@ -393,7 +405,20 @@ export const closedSurveyV5ContractABI = [
 	},
 	{
 		"inputs": [],
-		"name": "getNumberOfUsedSignatures",
+		"name": "getNumberOfUsedClaimingSignatures",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getNumberOfUsedScreeningSignatures",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -432,6 +457,19 @@ export const closedSurveyV5ContractABI = [
 	},
 	{
 		"inputs": [],
+		"name": "getRewardTokenContractBalanceAmount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "getTargetNumberOfParticipants",
 		"outputs": [
 			{
@@ -458,7 +496,20 @@ export const closedSurveyV5ContractABI = [
 	},
 	{
 		"inputs": [],
-		"name": "numberOfUsedSignatures",
+		"name": "numberOfUsedClaimingSignatures",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "numberOfUsedScreeningSignatures",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -551,11 +602,39 @@ export const closedSurveyV5ContractABI = [
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "rewardToken",
+		"outputs": [
+			{
+				"internalType": "contract IERC20Metadata",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
 				"name": "participant",
 				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "surveyId",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "nonce",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bytes",
+				"name": "signature",
+				"type": "bytes"
 			}
 		],
 		"name": "screenParticipant",
@@ -637,7 +716,7 @@ export const closedSurveyV5ContractABI = [
 	},
 	{
 		"inputs": [],
-		"name": "withdrawAllcUSDToResearcher",
+		"name": "withdrawAllRewardTokenToResearcher",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
