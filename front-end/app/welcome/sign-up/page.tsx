@@ -261,7 +261,7 @@ export default function SignUpPage() {
           mt={20} // Reduced from 20 to give more breathing room
           mb={6} // Add margin bottom for spacing
           onClick={handleSubmit}
-          disabled={!gender || !country || isCreatingParticipant}
+          disabled={!gender || !country || !address || isCreatingParticipant}
           loading={isCreatingParticipant}
           loadingText={<SpinnerIconC />}
         >
