@@ -138,22 +138,22 @@ export default function SuccessPage() {
 
     const fetchedSurvey = surveySnapshot.data() as Survey;
 
-    const contractBalance = await getContractBalance(address, {
-      _contractAddress: fetchedSurvey.contractAddress as Address,
-      _chainId: chainId,
-    });
+    // const contractBalance = await getContractBalance(address, {
+    //   _contractAddress: fetchedSurvey.contractAddress as Address,
+    //   _chainId: chainId,
+    // });
 
-    if (contractBalance < (fetchedSurvey.rewardAmountIncUSD as number)) {
-      toaster.dismiss();
-      toaster.create({
-        id: toasterIds.notEnoughBalance,
-        description: 'Not enough balance to pay you out. Contact support via "More".',
-        duration: 6000,
-        type: 'warning',
-      });
-      setIsProcessingRewardClaim(false);
-      return;
-    }
+    // if (contractBalance < (fetchedSurvey.rewardAmountIncUSD as number)) {
+    //   toaster.dismiss();
+    //   toaster.create({
+    //     id: toasterIds.notEnoughBalance,
+    //     description: 'Not enough balance to pay you out. Contact support via "More".',
+    //     duration: 6000,
+    //     type: 'warning',
+    //   });
+    //   setIsProcessingRewardClaim(false);
+    //   return;
+    // }
 
     toaster.create({
       id: toasterIds.claimProcessInitiated,
