@@ -1,6 +1,7 @@
 import { initializeApp, FirebaseApp } from 'firebase/app';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { Auth, getAuth } from 'firebase/auth';
+import { Functions, getFunctions } from 'firebase/functions';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
@@ -17,6 +18,8 @@ let db: Firestore;
 
 let auth: Auth;
 
+let functions: Functions;
+
 if (
   !firebaseConfig.apiKey ||
   !firebaseConfig.authDomain ||
@@ -32,5 +35,6 @@ if (
 app = initializeApp(firebaseConfig);
 db = getFirestore(app);
 auth = getAuth(app);
+functions = getFunctions(app);
 
-export { db, auth };
+export { db, auth, functions };

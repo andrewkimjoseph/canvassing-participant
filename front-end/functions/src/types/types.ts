@@ -53,7 +53,7 @@ export interface CreateRewardResult {
   alreadyExisted: boolean
 }
 
-export interface SignForRewardProps {
+export interface SignForClaimingProps {
   surveyContractAddress: Address,
   chainId: number,
   participantWalletAddress: Address;
@@ -61,7 +61,21 @@ export interface SignForRewardProps {
   network: 'mainnet' | 'testnet';
 }
 
-export interface SignForRewardResult {
+export interface TempSignForScreeningProps {
+  surveyContractAddress: Address,
+  chainId: number,
+  participantWalletAddress: Address;
+  surveyId: string;
+  network: 'mainnet' | 'testnet';
+}
+
+export interface TempSignForClaimingResult {
+  success: boolean;
+  signature: Address | null;
+  nonce: string;
+}
+
+export interface SignForClaimingResult {
   success: boolean;
   signature: Address | null;
   nonce: string;

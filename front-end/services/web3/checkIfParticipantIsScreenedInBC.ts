@@ -1,4 +1,4 @@
-import { closedSurveyV5ContractABI } from "@/utils/abis/closedSurveyV5ContractABI";
+import { closedSurveyV6ContractABI } from "@/utils/abis/closedSurveyV6ContractABI";
 import { Address, createPublicClient, custom } from "viem";
 import { celoAlfajores, celo } from "viem/chains";
 
@@ -19,7 +19,7 @@ export const checkIfParticipantIsScreenedInBC = async (
         const userIsScreened =
           await publicClient.readContract({
             address: _surveyContractAddress,
-            abi: closedSurveyV5ContractABI,
+            abi: closedSurveyV6ContractABI,
             functionName: "checkIfParticipantIsScreened",
             args: [_participantWalletAddress],
           });

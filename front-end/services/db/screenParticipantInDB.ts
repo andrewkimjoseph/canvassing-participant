@@ -12,7 +12,9 @@ import {
 export const screenParticipantInDB = async ({
   _participant,
   _survey,
-  _transactionHash
+  _transactionHash,
+  _signature,
+  _nonce
 }: ScreenParticipantInDBProps): Promise<boolean> => {
   let success: boolean = false;
 
@@ -27,6 +29,8 @@ export const screenParticipantInDB = async ({
       surveyId: _survey.id,
       timeCreated: Timestamp.now(),
       transactionHash: _transactionHash,
+      signature: _signature,
+      nonce: _nonce
     };
 
     await setDoc(screeningRef, data);
@@ -45,4 +49,6 @@ export type ScreenParticipantInDBProps = {
   _participant: Participant;
   _survey: Survey;
   _transactionHash: string;
+  _signature: string;
+  _nonce: string
 };

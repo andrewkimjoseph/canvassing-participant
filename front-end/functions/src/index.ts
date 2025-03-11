@@ -1,8 +1,9 @@
 // src/index.ts
 import * as functions from 'firebase-functions/v2';
 import * as admin from 'firebase-admin';
-import { WebhookPayload } from './types/types';
+import { TempSignForClaimingResult, TempSignForScreeningProps, WebhookPayload } from './types/types';
 import { processWebhook } from './utils/tallyForms/webhookProcessor';
+import { tempSignForScreening } from './utils/tempSignForScreening';
 
 /**
  * HTTP Cloud Function that processes a webhook request to create an unclaimed reward upon submission for the mainnet.
@@ -192,6 +193,62 @@ export const createUnclaimedRewardUponFormSubmission = functions.https.onRequest
     } catch (error) {
       console.error('Error processing webhook:', error);
       response.status(500).send('Internal server error');
+    }
+  }
+);
+/**
+ * Callable Cloud Function that generates a signature for participant screening.
+ * 
+ * @function
+ * @name generateScreeningSignature
+ * @param {functions.https.CallableRequest<any>} request - The callable request object.
+ * @param {functions.https.CallableResponse<TempSignForClaimingResult>} response - The callable response object.
+ * @returns {Promise<TempSignForClaimingResult>} - A promise that resolves with the signature result.
+ * @throws {functions.https.HttpsError} - Throws an error if the parameters are invalid or the signing fails.
+ */
+export const generateScreeningSignature = functions.https.onCall(
+  async (request: functions.https.CallableRequest<any>): Promise<TempSignForClaimingResult> => {
+    try {
+      const data = request.data as TempSignForScreeningProps;
+  
+      // Validate required parameters
+      if (!data.surveyContractAddress || 
+          !data.chainId || 
+          !data.participantWalletAddress || 
+          !data.surveyId || 
+          !data.network) {
+        throw new functions.https.HttpsError(
+          'invalid-argument',
+          'Missing required parameters for signature generation'
+        );
+      }
+
+      if (!request.auth) {
+        throw new functions.https.HttpsError(
+          'unauthenticated',
+          'The function must be called while authenticated.'
+        );
+      }
+
+      // Generate the signature
+      const result = await tempSignForScreening({
+        surveyContractAddress: data.surveyContractAddress,
+        chainId: data.chainId,
+        participantWalletAddress: data.participantWalletAddress,
+        surveyId: data.surveyId,
+        network: data.network
+      });
+
+      console.log('Signature generation completed:', result.success);
+      
+      return result;
+    } catch (error) {
+      console.error('Error generating signature:', error);
+      throw new functions.https.HttpsError(
+        'internal',
+        'Failed to generate signature',
+        error
+      );
     }
   }
 );

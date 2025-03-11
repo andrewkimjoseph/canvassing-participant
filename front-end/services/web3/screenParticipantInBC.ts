@@ -1,7 +1,7 @@
-import { closedSurveyV5ContractABI } from '@/utils/abis/closedSurveyV5ContractABI';
-import { Address, createPublicClient, createWalletClient, custom } from 'viem';
-import { celoAlfajores } from 'viem/chains';
-import { celo } from 'viem/chains';
+import { closedSurveyV6ContractABI } from "@/utils/abis/closedSurveyV6ContractABI";
+import { Address, createPublicClient, createWalletClient, custom } from "viem";
+import { celoAlfajores } from "viem/chains";
+import { celo } from "viem/chains";
 
 export type ScreenParticipantResult = {
   success: boolean;
@@ -11,16 +11,20 @@ export type ScreenParticipantResult = {
 export type ScreenParticipantProps = {
   _smartContractAddress: Address;
   _participantWalletAddress: Address;
+  _nonce: BigInt;
   _chainId: number;
+  _signature: string;
+  _surveyId: string;
 };
 
-export const screenParticipantInBC = async (
-  {
-    _smartContractAddress: smartContractAddress,
-    _participantWalletAddress: participantWalletAddress,
-    _chainId
-  }: ScreenParticipantProps
-): Promise<ScreenParticipantResult> => {
+export const screenParticipantInBC = async ({
+  _smartContractAddress: smartContractAddress,
+  _participantWalletAddress: participantWalletAddress,
+  _nonce,
+  _chainId,
+  _signature,
+  _surveyId,
+}: ScreenParticipantProps): Promise<ScreenParticipantResult> => {
   if (!window.ethereum) {
     return { success: false, transactionHash: null };
   }
@@ -42,13 +46,14 @@ export const screenParticipantInBC = async (
       await publicClient.simulateContract({
         account: address,
         address: smartContractAddress,
-        abi: closedSurveyV5ContractABI,
-        functionName: 'screenParticipant',
-        args: [participantWalletAddress],
+        abi: closedSurveyV6ContractABI,
+        functionName: "screenParticipant",
+        args: [participantWalletAddress, _surveyId, _nonce, _signature],
       });
 
-    const screenParticipantTxnHash =
-      await privateClient.writeContract(screenParticipantRqst);
+    const screenParticipantTxnHash = await privateClient.writeContract(
+      screenParticipantRqst
+    );
 
     const screenParticipantTxnReceipt =
       await publicClient.waitForTransactionReceipt({
@@ -56,7 +61,7 @@ export const screenParticipantInBC = async (
       });
 
     return {
-      success: screenParticipantTxnReceipt.status === 'success',
+      success: screenParticipantTxnReceipt.status === "success",
       transactionHash: screenParticipantTxnHash,
     };
   } catch (err) {

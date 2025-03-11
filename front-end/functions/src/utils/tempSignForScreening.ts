@@ -7,41 +7,41 @@ import {
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { CHAIN_CONFIGS } from '../config/config';
-import { SignForRewardProps, SignForRewardResult } from '../types/types';
+import { TempSignForScreeningProps, TempSignForClaimingResult } from '../types/types';
 import { randomBytes } from 'crypto';
 
 const PK = `0x${process.env.PK}` as Address;
 
 /**
- * Signs a reward for a participant in a survey.
+ * Generates a signature for participant screening in a survey.
  *
- * @param {Object} params - The parameters for signing the reward.
+ * @param {Object} params - The parameters for signing the screening request.
  * @param {string} params.surveyContractAddress - The address of the survey contract.
  * @param {number} params.chainId - The ID of the blockchain network.
  * @param {string} params.participantWalletAddress - The wallet address of the participant.
- * @param {string} params.rewardId - The ID of the reward.
+ * @param {string} params.surveyId - The ID of the survey.
  * @param {string} params.network - The network name.
- * @returns {Promise<SignForRewardResult>} A promise that resolves to the result of the signing operation.
+ * @returns {Promise<TempSignForClaimingResult>} A promise that resolves to the result of the signing operation.
  *
- * @typedef {Object} SignForRewardProps
+ * @typedef {Object} TempSignForScreeningProps
  * @property {string} surveyContractAddress - The address of the survey contract.
  * @property {number} chainId - The ID of the blockchain network.
  * @property {string} participantWalletAddress - The wallet address of the participant.
- * @property {string} rewardId - The ID of the reward.
+ * @property {string} surveyId - The ID of the survey.
  * @property {string} network - The network name.
  *
- * @typedef {Object} SignForRewardResult
+ * @typedef {Object} TempSignForClaimingResult
  * @property {boolean} success - Indicates if the signing was successful.
  * @property {string | null} signature - The signature of the message, or null if unsuccessful.
  * @property {string} nonce - The nonce used in the signing process.
  */
-export const signForReward = async ({
+export const tempSignForScreening = async ({
   surveyContractAddress,
   chainId,
   participantWalletAddress,
-  rewardId,
+  surveyId,
   network,
-}: SignForRewardProps): Promise<SignForRewardResult> => {
+}: TempSignForScreeningProps): Promise<TempSignForClaimingResult> => {
   try {
     const config = CHAIN_CONFIGS[network];
     const account = privateKeyToAccount(PK);
@@ -60,7 +60,7 @@ export const signForReward = async ({
         surveyContractAddress,
         chainId,
         participantWalletAddress,
-        rewardId,
+        surveyId,
         nonce,
       ],
     ];
