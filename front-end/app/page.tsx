@@ -1,32 +1,35 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useAccount, useChainId } from 'wagmi';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Box, Text, Flex } from '@chakra-ui/react';
-import useParticipantStore from '@/stores/useParticipantStore';
-import useMultipleSurveysStore from '@/stores/useMultipleSurveysStore';
-import useRewardStore from '@/stores/useRewardStore';
-import useAmplitudeContext from '@/hooks/useAmplitudeContext';
-import { SpinnerIconC } from '@/components/icons/spinner-icon';
-import { Identify } from '@amplitude/analytics-browser';
-import { screenParticipantInDB } from '@/services/db/screenParticipantInDB';
-import { screenParticipantInBC } from '@/services/web3/screenParticipantInBC';
-import { Survey } from '@/entities/survey';
-import { Address } from 'viem';
-import { Participant } from '@/entities/participant';
-import { checkIfSurveyIsAtMaxParticipants } from '@/services/web3/checkIfSurveyIsAtMaxParticipants';
-import { Toaster, toaster } from '@/components/ui/toaster';
-import { MaleAvatarC } from '@/components/avatars/male-avatar';
-import { FemaleAvatarC } from '@/components/avatars/female-avatar';
-import { NeverMissOutPersonC } from '@/components/images/never-miss-out-person';
-import { EllipseRingsC } from '@/components/images/ellipse-rings';
-import YouAreSetCard from '@/components/you-are-set-card';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from '@/firebase';
-import { AnonUserIconC } from '@/components/icons/checkmarks/anon-user';
-import { CanvassingUserIconC } from '@/components/icons/checkmarks/canvassing-user';
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useAccount, useChainId } from "wagmi";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Box, Text, Flex } from "@chakra-ui/react";
+import useParticipantStore from "@/stores/useParticipantStore";
+import useMultipleSurveysStore from "@/stores/useMultipleSurveysStore";
+import useRewardStore from "@/stores/useRewardStore";
+import useAmplitudeContext from "@/hooks/useAmplitudeContext";
+import { SpinnerIconC } from "@/components/icons/spinner-icon";
+import { Identify } from "@amplitude/analytics-browser";
+import { screenParticipantInDB } from "@/services/db/screenParticipantInDB";
+import { screenParticipantInBC } from "@/services/web3/screenParticipantInBC";
+import { Survey } from "@/entities/survey";
+import { Address } from "viem";
+import { Participant } from "@/entities/participant";
+import { checkIfSurveyIsAtMaxParticipants } from "@/services/web3/checkIfSurveyIsAtMaxParticipants";
+import { Toaster, toaster } from "@/components/ui/toaster";
+import { MaleAvatarC } from "@/components/avatars/male-avatar";
+import { FemaleAvatarC } from "@/components/avatars/female-avatar";
+import { NeverMissOutPersonC } from "@/components/images/never-miss-out-person";
+import { EllipseRingsC } from "@/components/images/ellipse-rings";
+import YouAreSetCard from "@/components/you-are-set-card";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { auth, functions } from "@/firebase";
+import { AnonUserIconC } from "@/components/icons/checkmarks/anon-user";
+import { CanvassingUserIconC } from "@/components/icons/checkmarks/canvassing-user";
+import { httpsCallable } from "firebase/functions";
+import { TempSigningResult } from "@/types/tempSigningResult";
+import { generateTempSignature } from "@/services/web3/generateTempSignature";
 
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -58,11 +61,11 @@ export default function Home() {
 
   const toasterIds = useMemo(
     () => ({
-      surveyIsFullyBooked: '1',
-      bookingInProgress: '2',
-      bookingRecordCreationFailed: '3',
-      onchainBookingFailed: '4',
-      bookingSuccess: '5',
+      surveyIsFullyBooked: "1",
+      bookingInProgress: "2",
+      bookingRecordCreationFailed: "3",
+      onchainBookingFailed: "4",
+      bookingSuccess: "5",
     }),
     []
   );
@@ -78,25 +81,24 @@ export default function Home() {
   }, []);
 
   // Handle Amplitude tracking
-  const handleAmplitudeTracking =
-    (fetchedParticipant: Participant) => {
-      const identifyEvent = new Identify();
-      identifyEvent.set('[Canvassing] Surveys Taken', rewards.length);
-      identifyEvent.setOnce(
-        '[Canvassing] Wallet Address',
-        fetchedParticipant.walletAddress
-      );
-      identifyEvent.setOnce('[Canvassing] Gender', fetchedParticipant.gender);
-      identifyEvent.setOnce('[Canvassing] Country', fetchedParticipant.country);
-      identifyEvent.set('[Canvassing] Username', fetchedParticipant.username);
-      identifyEvent.setOnce(
-        '[Canvassing] Time Created',
-        new Date(fetchedParticipant.timeCreated.seconds * 1000).toLocaleString()
-      );
-      identifyEvent.setOnce('[Canvassing] Id', fetchedParticipant.id);
-      identifyEvent.setOnce('[Canvassing] AuthId', fetchedParticipant.authId);
-      identifyUser(identifyEvent);
-    };
+  const handleAmplitudeTracking = (fetchedParticipant: Participant) => {
+    const identifyEvent = new Identify();
+    identifyEvent.set("[Canvassing] Surveys Taken", rewards.length);
+    identifyEvent.setOnce(
+      "[Canvassing] Wallet Address",
+      fetchedParticipant.walletAddress
+    );
+    identifyEvent.setOnce("[Canvassing] Gender", fetchedParticipant.gender);
+    identifyEvent.setOnce("[Canvassing] Country", fetchedParticipant.country);
+    identifyEvent.set("[Canvassing] Username", fetchedParticipant.username);
+    identifyEvent.setOnce(
+      "[Canvassing] Time Created",
+      new Date(fetchedParticipant.timeCreated.seconds * 1000).toLocaleString()
+    );
+    identifyEvent.setOnce("[Canvassing] Id", fetchedParticipant.id);
+    identifyEvent.setOnce("[Canvassing] AuthId", fetchedParticipant.authId);
+    identifyUser(identifyEvent);
+  };
 
   // Initialize app state after auth is initialized
   useEffect(() => {
@@ -142,10 +144,10 @@ export default function Home() {
           // Handle amplitude tracking
           handleAmplitudeTracking(fetchedParticipant);
         } else {
-          router.replace('/welcome');
+          router.replace("/welcome");
         }
       } catch (error) {
-        console.error('Initialization error:', error);
+        console.error("Initialization error:", error);
       } finally {
         if (isMounted) setIsInitialized(true);
       }
@@ -156,16 +158,12 @@ export default function Home() {
     return () => {
       isMounted = false;
     };
-  }, [
-    authInitialized,
-    isConnected,
-    address
-  ]);
+  }, [authInitialized, isConnected, address]);
 
   // Handle redirect after initialization
   useEffect(() => {
     if (isInitialized && !participantLoading && !participant) {
-      router.replace('/welcome');
+      router.replace("/welcome");
     }
   }, [isInitialized, participant, participantLoading, router]);
 
@@ -201,7 +199,7 @@ export default function Home() {
    * @throws {Error} - Throws an error if the booking process fails.
    */
   const bookSurveyFn = async (survey: Survey): Promise<void> => {
-    trackAmplitudeEvent('Book clicked', {
+    trackAmplitudeEvent("Book clicked", {
       walletAddress: address,
       surveyId: survey.id,
     });
@@ -219,12 +217,12 @@ export default function Home() {
     if (surveyIsFullyBooked) {
       toaster.create({
         id: toasterIds.surveyIsFullyBooked,
-        description: 'Sorry, the survey is fully booked.',
+        description: "Sorry, the survey is fully booked.",
         duration: 6000,
-        type: 'error',
+        type: "error",
       });
 
-      trackAmplitudeEvent('Survey fully booked', {
+      trackAmplitudeEvent("Survey fully booked", {
         walletAddress: address,
         surveyId: survey.id,
       });
@@ -234,7 +232,7 @@ export default function Home() {
         [survey.id]: false,
       }));
 
-      window.location.replace('/');
+      window.location.replace("/");
       return;
     }
 
@@ -242,15 +240,31 @@ export default function Home() {
       toaster.create({
         id: toasterIds.bookingInProgress,
         description:
-          'Booking in progress. You will now be prompted to approve the booking.',
+          "Booking in progress. You will now be prompted to approve the booking.",
         duration: 15000,
-        type: 'info',
+        type: "info",
       });
 
+      const tempSignatureResult = await generateTempSignature({
+        surveyContractAddress: survey.contractAddress as Address,
+        chainId: chainId,
+        participantWalletAddress: participant?.walletAddress as Address,
+        surveyId: survey.id,
+        network: process.env.NEXT_PUBLIC_NETWORK || "mainnet",
+      });
+
+      if (!tempSignatureResult.data.success) {
+        throw new Error("Failed to generate signature for screening");
+      }
+
+      // Use the signature in the blockchain transaction
       const screenParticipantRslt = await screenParticipantInBC({
         _smartContractAddress: survey.contractAddress as Address,
         _participantWalletAddress: participant?.walletAddress as Address,
         _chainId: chainId,
+        _signature: tempSignatureResult.data.signature as string,
+        _nonce: BigInt(tempSignatureResult.data.nonce as string),
+        _surveyId: survey.id,
       });
 
       if (screenParticipantRslt.success) {
@@ -258,6 +272,8 @@ export default function Home() {
           _participant: participant as Participant,
           _survey: survey,
           _transactionHash: screenParticipantRslt.transactionHash as string,
+          _signature: tempSignatureResult.data.signature as string,
+          _nonce: tempSignatureResult.data.nonce as string,
         });
 
         if (participantIsScreenedInDB) {
@@ -265,14 +281,14 @@ export default function Home() {
           toaster.create({
             id: toasterIds.bookingSuccess,
             description:
-              'Booking success. You are being redirected to the survey page... ',
+              "Booking success. You are being redirected to the survey page... ",
             duration: 9000,
-            type: 'success',
+            type: "success",
           });
 
           router.push(`/survey/${survey.id}`);
 
-          trackAmplitudeEvent('Survey booked', {
+          trackAmplitudeEvent("Survey booked", {
             walletAddress: address,
             surveyId: survey.id,
           });
@@ -283,10 +299,10 @@ export default function Home() {
             description:
               'Booking record creation failed. Kindly reach out to support via the "More" tab. ',
             duration: 3000,
-            type: 'warning',
+            type: "warning",
           });
 
-          trackAmplitudeEvent('Survey booking record creation failed', {
+          trackAmplitudeEvent("Survey booking record creation failed", {
             walletAddress: address,
             surveyId: survey.id,
           });
@@ -300,9 +316,9 @@ export default function Home() {
           description:
             'On-chain booking failed. Kindly reach out to support via the "More" tab. ',
           duration: 6000,
-          type: 'warning',
+          type: "warning",
         });
-        trackAmplitudeEvent('Survey on-chain booking failed', {
+        trackAmplitudeEvent("Survey on-chain booking failed", {
           walletAddress: address,
           surveyId: survey.id,
         });
@@ -310,11 +326,12 @@ export default function Home() {
         router.refresh();
       }
     } catch (error) {
+      console.error("Booking error:", error);
       toaster.dismiss(toasterIds.bookingInProgress);
       toaster.create({
-        description: 'An error occurred during booking. Try again later.',
+        description: "An error occurred during booking. Try again later.",
         duration: 6000,
-        type: 'warning',
+        type: "warning",
       });
     } finally {
       setIsBeingBooked((prevStatus) => ({
@@ -349,15 +366,15 @@ export default function Home() {
 
   return (
     <Flex
-      flexDirection={'column'}
-      w={'100%'}
-      bgColor={'#ECECEC'}
+      flexDirection={"column"}
+      w={"100%"}
+      bgColor={"#ECECEC"}
       px={4}
-      h={'full'}
+      h={"full"}
     >
       <Toaster />
 
-      <Box position={'absolute'} top={4} right={0}>
+      <Box position={"absolute"} top={4} right={0}>
         <EllipseRingsC />
       </Box>
 
@@ -436,13 +453,13 @@ export default function Home() {
       >
         <Flex flexDirection="row" alignItems="top" p={4}>
           <Box>
-            {participant?.gender === 'M' ? <MaleAvatarC /> : <FemaleAvatarC />}
+            {participant?.gender === "M" ? <MaleAvatarC /> : <FemaleAvatarC />}
           </Box>
 
           <Box ml={4}>
             <Flex alignItems="center" mb={2}>
               <Text fontSize={18} color="white" mr={2}>
-                {participant?.username || 'Userxxxx'}
+                {participant?.username || "Userxxxx"}
               </Text>
 
               {user && (
@@ -474,7 +491,7 @@ export default function Home() {
         </Text>
       </Flex>
 
-      <Box w="full" h={'full'}>
+      <Box w="full" h={"full"}>
         {surveys.length > 0 && !surveyLoading && (
           <Flex justify="flex-start">
             <Text
@@ -498,19 +515,19 @@ export default function Home() {
               key={survey.id}
               bgColor={
                 isBeingBooked[survey.id] || survey.isAlreadyBookedByUser
-                  ? '#CDFFD8'
-                  : 'white'
+                  ? "#CDFFD8"
+                  : "white"
               }
               h="25"
               w="full"
               borderRadius={10}
-              flexDirection={'column'}
+              flexDirection={"column"}
               pb={2}
               mb={4}
               mt={0}
               pt={1}
               onClick={() => {
-                trackAmplitudeEvent('Survey clicked', {
+                trackAmplitudeEvent("Survey clicked", {
                   walletAddress: address,
                   surveyId: survey.id,
                 });
@@ -530,10 +547,10 @@ export default function Home() {
                   pt={2}
                   mt={1}
                 >
-                  <Text fontSize={'larger'} mb={2} color="#363062">
+                  <Text fontSize={"larger"} mb={2} color="#363062">
                     {survey.topic}
                   </Text>
-                  <Text fontSize={'sm'} mb={2} color="black">
+                  <Text fontSize={"sm"} mb={2} color="black">
                     {survey.brief}
                   </Text>
                 </Flex>
@@ -542,27 +559,27 @@ export default function Home() {
                 flexDirection="row"
                 pl={2}
                 pt={2}
-                justifyContent={'space-between'}
-                alignItems={'center'}
+                justifyContent={"space-between"}
+                alignItems={"center"}
               >
                 <Flex
                   flexDirection="row"
-                  justifyContent={'start'}
-                  alignItems={'center'}
+                  justifyContent={"start"}
+                  alignItems={"center"}
                 >
-                  <Text fontSize={'lg'} color="green">
+                  <Text fontSize={"lg"} color="green">
                     ${survey.rewardAmountIncUSD}
                   </Text>
 
-                  <Text fontSize={'lg'} color="grey" pl={1}>
+                  <Text fontSize={"lg"} color="grey" pl={1}>
                     per survey
                   </Text>
                 </Flex>
 
                 <Button
-                  bgColor={survey.isAlreadyBookedByUser ? 'green' : '#363062'}
+                  bgColor={survey.isAlreadyBookedByUser ? "green" : "#363062"}
                   borderRadius={20}
-                  w={'1/6'}
+                  w={"1/6"}
                   mr={2}
                   loading={isBeingBooked[survey.id] as boolean}
                   loadingText={
@@ -575,7 +592,7 @@ export default function Home() {
                   )}
                 >
                   <Text fontSize="8" color="white" mx={4}>
-                    {survey.isAlreadyBookedByUser ? 'Start' : 'Book'}
+                    {survey.isAlreadyBookedByUser ? "Start" : "Book"}
                   </Text>
                 </Button>
               </Flex>
