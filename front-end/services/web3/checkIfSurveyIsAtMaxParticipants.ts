@@ -1,4 +1,4 @@
-import { closedSurveyV5ContractABI } from '@/utils/abis/closedSurveyV5ContractABI';
+import { closedSurveyV6ContractABI } from '@/utils/abis/closedSurveyV6ContractABI';
 import { Address, createPublicClient, custom } from 'viem';
 import { celoAlfajores, celo } from 'viem/chains';
 
@@ -16,7 +16,7 @@ export const checkIfSurveyIsAtMaxParticipants = async ({
     const numberOfTargetParticipants = Number(
       (await publicClient.readContract({
         address: _surveyContractAddress,
-        abi: closedSurveyV5ContractABI,
+        abi: closedSurveyV6ContractABI,
         functionName: 'getTargetNumberOfParticipants',
       })) ?? 0
     );
@@ -25,7 +25,7 @@ export const checkIfSurveyIsAtMaxParticipants = async ({
     const numberOfRewardedParticipants = Number(
       (await publicClient.readContract({
         address: _surveyContractAddress,
-        abi: closedSurveyV5ContractABI,
+        abi: closedSurveyV6ContractABI,
         functionName: 'getNumberOfRewardedParticipants',
       })) ?? 0
     );
