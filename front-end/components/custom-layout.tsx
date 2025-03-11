@@ -20,7 +20,7 @@ const CustomLayout: FC<Props> = ({ children }) => {
   const { isMiniPay } = useMiniPayStore();
   
   useEffect(() => {
-    if (isMiniPay && !isConnected) {
+    if (!isMiniPay && !isConnected) {
       connect({ connector: injected({ target: "metaMask" }) });
     }
   }, [isMiniPay, isConnected, connect]);
