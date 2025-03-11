@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 import { Survey, WebhookData } from '../../types/types';
 import { createRewardDocument, updateRewardSignature } from '../db';
-import { signForReward } from '../web3';
+import { signForReward } from '../signForClaiming';
 import { Address } from 'viem';
 import { CHAIN_CONFIGS } from '../../config/config';
 
