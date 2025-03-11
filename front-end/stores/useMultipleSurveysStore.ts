@@ -115,13 +115,12 @@ const useMultipleSurveysStore = create<SurveyStoreState>()(
                 _chainId: chainId,
               }),
               checkIfParticipantHasCompletedSurvey({
-                _participantId: participant?.id as string,
                 _participantWalletAddress: participant?.walletAddress as string,
                 _surveyId: survey.id,
               }),
             ]);
 
-            if (survey.isTest && participant?.isAdmin && surveyIsFullyBooked)
+            if (survey.isTest && participant?.isAdmin && surveyIsFullyBooked && participantHasCompletedSurvey)
               return null;
 
             if (!survey.isTest && !participant?.isAdmin && surveyIsFullyBooked)
