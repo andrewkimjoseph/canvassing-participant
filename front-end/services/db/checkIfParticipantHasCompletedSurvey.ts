@@ -2,7 +2,6 @@ import { db } from '@/firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 
 export const checkIfParticipantHasCompletedSurvey = async ({
-  _participantId,
   _participantWalletAddress,
   _surveyId,
 }: CheckIfParticipantHasCompletedSurveyProps): Promise<boolean> => {
@@ -15,11 +14,10 @@ export const checkIfParticipantHasCompletedSurvey = async ({
   );
   const snapshot = await getDocs(rewardsQuery);
 
-  return snapshot.empty ? !participantHasCompletedSurvey : participantHasCompletedSurvey;
+  return !snapshot.empty;
 };
 
 export type CheckIfParticipantHasCompletedSurveyProps = {
   _participantWalletAddress: string;
-  _participantId: string;
   _surveyId: string;
 };
