@@ -467,13 +467,10 @@ export default function Home() {
       <Box
         bgColor="#625C89"
         h="25"
-        w="5/6"
+        w="6/6"
         borderWidth={1}
         borderColor={"#363062"}
-        borderTopLeftRadius={40}
-        borderTopRightRadius={20}
-        borderBottomLeftRadius={20}
-        borderBottomRightRadius={20}
+        borderRadius={20}
       >
         <Flex flexDirection="row" alignItems="top" p={4}>
           <Box>
