@@ -12,7 +12,7 @@ import { Address } from "viem";
 import { Toaster, toaster } from "@/components/ui/toaster";
 import useSingleSurveyStore from "@/stores/useSingleSurveyStore";
 import { Button } from "@/components/ui/button";
-import { getContractBalance } from "@/services/web3/checkContractBalance";
+import { getTokenContractBalance } from "@/services/web3/checkTokenContractBalance";
 import {
   collection,
   query,
@@ -31,6 +31,7 @@ import { SpinnerIconC } from "@/components/icons/spinner-icon";
 import { Reward } from "@/entities/reward";
 import { Survey } from "@/entities/survey";
 import { RewardToken } from "@/types/rewardToken";
+import useRewardTokenStore from "@/stores/useRewardTokenStore";
 
 export default function SuccessPage() {
   const chainId = useChainId();
@@ -43,6 +44,7 @@ export default function SuccessPage() {
   const { participant } = useParticipantStore.getState();
   const params = useParams();
   const { trackAmplitudeEvent } = useAmplitudeContext();
+  const { currentToken } = useRewardTokenStore();
 
   const surveyId = params.surveyId;
 
@@ -138,9 +140,10 @@ export default function SuccessPage() {
 
     const fetchedSurvey = surveySnapshot.data() as Survey;
 
-    const contractBalance = await getContractBalance(address, {
+    const contractBalance = await getTokenContractBalance(address, {
       _contractAddress: fetchedSurvey.contractAddress as Address,
       _chainId: chainId,
+      _token: currentToken
     });
 
     if (contractBalance < (fetchedSurvey.rewardAmountIncUSD as number)) {
