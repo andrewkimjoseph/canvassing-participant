@@ -74,16 +74,16 @@ const CustomHeader = () => {
             zIndex: 1000,
           }}
         />
-        {/* Fixed header */}
         <Box
           bg="#363062"
           px={4}
           position="fixed"
           top="0"
-          left="0"
-          right="0"
           zIndex="999"
           width="100%"
+          maxWidth="480px" // Add this line
+          transform="translateX(-50%)" // Add this line
+          left="50%" // Change to this
           boxShadow="0 2px 4px rgba(0,0,0,0.1)"
         >
           <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
