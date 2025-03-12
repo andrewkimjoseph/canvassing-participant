@@ -16,6 +16,13 @@ import useParticipantStore from './useParticipantStore';
 import { checkIfSurveyIsFullyBooked } from '@/services/web3/checkIfSurveyIsAtMaxParticipants';
 import { checkIfParticipantIsScreenedForSurvey } from '@/services/checkIfParticipantHasBeenBookedForSurvey';
 import { checkIfParticipantHasCompletedSurvey } from '@/services/db/checkIfParticipantHasCompletedSurvey';
+import { checkIfSurveyIsForTestnet } from '@/services/web3/checkIfSurveyIsForTestnet';
+
+// Helper function to determine if a chainId is for testnet
+const isTestnetChainId = (chainId: number): boolean => {
+  // Only Celo Alfajores testnet is considered a testnet
+  return chainId === 44787;
+};
 
 interface SurveyStoreState {
   surveys: Survey[];
@@ -40,6 +47,7 @@ const useMultipleSurveysStore = create<SurveyStoreState>()(
         set({ loading: true });
 
         const { participant } = useParticipantStore.getState();
+        const isOnTestnet = isTestnetChainId(chainId);
 
         try {
           const participatedSurveyIds = rewards.map(
@@ -97,6 +105,19 @@ const useMultipleSurveysStore = create<SurveyStoreState>()(
             if (!countryIsValid) return null;
             if (!genderIsValid) return null;
             if (survey.isTest && !participant?.isAdmin) return null;
+
+            // Check if survey is for testnet
+            const isForTestnet = await checkIfSurveyIsForTestnet({
+              _contractAddress: survey.contractAddress,
+            });
+
+            // Set the isForTestnet property on the survey
+            survey.isForTestnet = isForTestnet;
+
+            // Skip survey if network type doesn't match
+            // If we're on a testnet but survey is not for testnet, skip it
+            // If we're on mainnet but survey is for testnet, skip it
+            if (isOnTestnet !== isForTestnet) return null;
 
             const [
               surveyIsFullyBooked,
