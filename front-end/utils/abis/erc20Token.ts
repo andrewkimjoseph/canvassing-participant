@@ -1,4 +1,4 @@
-export const cUSDContractABI: Object[] = [
+export const erc20TokenABI: Object[] = [
     {
         constant: true,
         inputs: [],
