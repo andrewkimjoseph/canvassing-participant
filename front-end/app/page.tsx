@@ -31,6 +31,7 @@ import { BlueDollarIcon } from "@/components/icons/blue-dollar-icon";
 import { GreenDollarIcon } from "@/components/icons/green-dollar-icon";
 import useRewardTokenStore from "@/stores/useRewardTokenStore";
 import { RewardToken } from "@/types/rewardToken";
+import { formatTokenAmount } from "@/utils/formatTokenAmount";
 
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -593,7 +594,7 @@ export default function Home() {
                     {survey.rewardToken === RewardToken.celoDollar
                       ? "cUSD"
                       : "G$"}{" "}
-                    {survey.rewardAmountIncUSD}
+                    {formatTokenAmount(survey?.rewardAmountIncUSD as number)}
                   </Text>
 
                   <Text fontSize={"lg"} color="grey" pl={1}>

@@ -32,6 +32,7 @@ import { Reward } from "@/entities/reward";
 import { Survey } from "@/entities/survey";
 import { RewardToken } from "@/types/rewardToken";
 import useRewardTokenStore from "@/stores/useRewardTokenStore";
+import { formatTokenAmount } from "@/utils/formatTokenAmount";
 
 export default function SuccessPage() {
   const chainId = useChainId();
@@ -143,7 +144,7 @@ export default function SuccessPage() {
     const contractBalance = await getTokenContractBalance(address, {
       _contractAddress: fetchedSurvey.contractAddress as Address,
       _chainId: chainId,
-      _token: currentToken
+      _token: currentToken,
     });
 
     if (contractBalance < (fetchedSurvey.rewardAmountIncUSD as number)) {
@@ -317,7 +318,7 @@ export default function SuccessPage() {
               alignSelf={"center"}
               mt={4}
             >
-              You earned {survey?.rewardAmountIncUSD}{" "}
+              You earned {formatTokenAmount(survey?.rewardAmountIncUSD as number)}{" "}
               {survey?.rewardToken === RewardToken.celoDollar ? "cUSD" : "G$"}
             </Text>
 
