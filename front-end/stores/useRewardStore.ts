@@ -55,6 +55,8 @@ const useRewardStore = create<RewardStoreState>()(
               } catch (tokenError) {
                 reward.token = RewardToken.celoDollar;
               }
+            } else {
+              reward.token = RewardToken.celoDollar;
             }
 
             improvedRewards.push(reward);
