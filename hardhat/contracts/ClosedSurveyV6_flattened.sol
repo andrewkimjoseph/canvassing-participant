@@ -3474,7 +3474,7 @@ contract ClosedSurveyV6 is Ownable, Pausable {
         unchecked {
             ++numberOfScreenedParticipants;
         }
-        
+
         markScreeningSignatureAsHavingBeenUsed(signature, participant);
 
         emit ParticipantScreened(participant);
@@ -3876,6 +3876,19 @@ contract ClosedSurveyV6 is Ownable, Pausable {
         returns (uint256)
     {
         return rewardToken.balanceOf(address(this));
+    }
+
+    /**
+     * @notice Gets the contract address of the reward token
+     * @dev Returns the ERC20 token interface used for rewards
+     * @return IERC20Metadata The ERC20 interface of the reward token
+     */
+    function getRewardTokenContractAddress()
+        external
+        view
+        returns (IERC20Metadata)
+    {
+        return rewardToken;
     }
 
     /**
