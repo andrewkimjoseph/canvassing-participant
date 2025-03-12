@@ -429,7 +429,7 @@ export default function Home() {
       )} */}
 
       <Flex justify="space-between" flexDirection="row" py={3}>
-        <Text fontSize="2xl" fontWeight="bold" color="#363062" textAlign="left">
+        <Text fontSize="3xl" fontWeight="bold" color="black" textAlign="left">
           Dashboard
         </Text>
 
