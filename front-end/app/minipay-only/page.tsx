@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Button, Text, Flex, Box } from "@chakra-ui/react";
+import { useState } from "react";
+import { Button, Text, Flex } from "@chakra-ui/react";
 import useAmplitudeContext from "@/hooks/useAmplitudeContext";
 
 import {
@@ -14,25 +14,15 @@ import {
 import { useRouter } from "next/navigation";
 
 export default function MiniPayOnlyPage() {
-  const [isMounted, setIsMounted] = useState(false);
   const { trackAmplitudeEvent } = useAmplitudeContext();
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(true);
   const minipayInviteLink0xA38 = "https://invite.minipay.xyz/fs4Wxzv4QYqxJuzq8";
   const router = useRouter();
-
-  useEffect(() => {
-    setIsMounted(true);
-    setShowModal(true);
-  }, []);
 
   const handleOpenMiniPay = () => {
     trackAmplitudeEvent("Go to MiniPay clicked", {});
     router.replace(minipayInviteLink0xA38);
   };
-
-  if (!isMounted) {
-    return null;
-  }
 
   return (
     <Flex flexDirection="column" w="100%" h="100vh" bgColor="#ECECEC">
