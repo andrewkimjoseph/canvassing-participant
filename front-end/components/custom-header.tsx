@@ -36,7 +36,7 @@ import { auth } from "@/firebase";
 import { AnonUserIconC } from "./icons/checkmarks/anon-user";
 import { CanvassingUserIconC } from "./icons/checkmarks/canvassing-user";
 import useMiniPayStore from "@/stores/useMiniPayStore";
-import { Tooltip } from "@/components/ui/tooltip";
+import { Popover, PopoverTrigger, PopoverContent } from "@heroui/popover";
 
 const CustomHeader = () => {
   const { participant } = useParticipantStore();
@@ -116,18 +116,21 @@ const CustomHeader = () => {
             </Link>
 
             {mounted ? (
-              <Tooltip
-                content={
-                  isConnected
-                    ? "You are connected."
-                    : "You are disconnected. Refresh the page to connect."
-                }
-              >
-                <Circle
-                  size="10px"
-                  bgColor={isConnected ? "green.500" : "red.500"}
-                />
-              </Tooltip>
+              <Popover placement="left">
+                <PopoverTrigger>
+                  <Circle
+                    size="10px"
+                    bgColor={isConnected ? "green.500" : "red.500"}
+                  />
+                </PopoverTrigger>
+                <PopoverContent>
+                  <Text>
+                    {isConnected
+                      ? "You are connected."
+                      : "You are disconnected. Refresh the page to connect."}
+                  </Text>
+                </PopoverContent>
+              </Popover>
             ) : (
               <Box w="10px" h="10px" /> // Placeholder with same dimensions
             )}
