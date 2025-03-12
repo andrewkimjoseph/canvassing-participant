@@ -1,33 +1,34 @@
-'use client';
+"use client";
 
-import '@rainbow-me/rainbowkit/styles.css';
+import "@rainbow-me/rainbowkit/styles.css";
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   RainbowKitProvider,
   connectorsForWallets,
   lightTheme,
-} from '@rainbow-me/rainbowkit';
-import { WagmiProvider, createConfig, http } from 'wagmi';
-import { celo, celoAlfajores } from 'wagmi/chains';
+} from "@rainbow-me/rainbowkit";
+import { WagmiProvider, createConfig, http } from "wagmi";
+import { celo, celoAlfajores } from "wagmi/chains";
 
-import { injectedWallet } from '@rainbow-me/rainbowkit/wallets';
+import { injectedWallet } from "@rainbow-me/rainbowkit/wallets";
 
-import CustomLayout from '@/components/custom-layout';
-import  ResponsiveLayoutProvider  from '@/providers/responsive-layout-provider';
+import CustomLayout from "@/components/custom-layout";
+import ResponsiveLayoutProvider from "@/providers/responsive-layout-provider";
 // import NigeriaKenyaProvider from '@/providers/nigeria-kenya-provider';
-import SetMiniPayProvider from './set-minipay-provider';
-import { RPCUrls } from '@/utils/rpcURLs/rpcUrls';
+import SetMiniPayProvider from "./set-minipay-provider";
+import { RPCUrls } from "@/utils/rpcURLs/rpcUrls";
+import NoMobileProvider from "./no-mobile-provider";
 
 const connectors = connectorsForWallets(
   [
     {
-      groupName: 'Recommended',
+      groupName: "Recommended",
       wallets: [injectedWallet],
     },
   ],
   {
-    appName: 'Canvassing - Participant',
+    appName: "Canvassing - Participant",
     projectId: String(process.env.NEXT_PUBLIC_REOWN_PROJECT_ID),
   }
 );
@@ -49,23 +50,25 @@ export function Web3Provider({ children }: { children: React.ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider
           theme={lightTheme({
-            accentColor: '#9D99B4',
-            accentColorForeground: 'white',
-            borderRadius: 'large',
-            fontStack: 'rounded',
-            overlayBlur: 'small',
+            accentColor: "#9D99B4",
+            accentColorForeground: "white",
+            borderRadius: "large",
+            fontStack: "rounded",
+            overlayBlur: "small",
           })}
         >
           <SetMiniPayProvider>
             <ResponsiveLayoutProvider
-               config={{
+              config={{
                 maxMobileWidth: 768, // Adjust to your definition of mobile
                 maxContentWidth: 480, // Width of the container on desktop
                 desktopBackgroundColor: "white",
-                showMobileBorder: true, 
+                showMobileBorder: true,
               }}
             >
+              <NoMobileProvider>
                 <CustomLayout>{children}</CustomLayout>
+              </NoMobileProvider>
             </ResponsiveLayoutProvider>
           </SetMiniPayProvider>
         </RainbowKitProvider>
