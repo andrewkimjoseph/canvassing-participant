@@ -20,16 +20,17 @@ import { checkIfSurveyIsFullyBooked } from "@/services/web3/checkIfSurveyIsAtMax
 import { Toaster, toaster } from "@/components/ui/toaster";
 import { MaleAvatarC } from "@/components/avatars/male-avatar";
 import { FemaleAvatarC } from "@/components/avatars/female-avatar";
-import { NeverMissOutPersonC } from "@/components/images/never-miss-out-person";
 import { EllipseRingsC } from "@/components/images/ellipse-rings";
-import YouAreSetCard from "@/components/you-are-set-card";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth, functions } from "@/firebase";
 import { AnonUserIconC } from "@/components/icons/checkmarks/anon-user";
 import { CanvassingUserIconC } from "@/components/icons/checkmarks/canvassing-user";
-import { httpsCallable } from "firebase/functions";
-import { TempSigningResult } from "@/types/tempSigningResult";
 import { generateTempSignature } from "@/services/web3/generateTempSignature";
+import { SwitchButtonIcon } from "@/components/icons/switch-button-icon";
+import { BlueDollarIcon } from "@/components/icons/blue-dollar-icon";
+import { GreenDollarIcon } from "@/components/icons/green-dollar-icon";
+import useRewardTokenStore from "@/stores/useRewardTokenStore";
+import { RewardToken } from "@/types/rewardToken";
 
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -55,6 +56,8 @@ export default function Home() {
     fetchSurveys,
     loading: surveyLoading,
   } = useMultipleSurveysStore();
+
+  const { currentToken, setCurrentToken } = useRewardTokenStore();
 
   const { rewards, fetchRewards } = useRewardStore();
   const { trackAmplitudeEvent, identifyUser } = useAmplitudeContext();
@@ -226,8 +229,6 @@ export default function Home() {
         walletAddress: address,
         surveyId: survey.id,
       });
-
-
 
       window.location.replace("/");
       return;
@@ -427,16 +428,39 @@ export default function Home() {
         <YouAreSetCard />
       )} */}
 
-      <Flex justify="flex-start">
-        <Text
-          fontSize="2xl"
-          fontWeight="bold"
-          color="#363062"
-          textAlign="left"
-          py={3}
-        >
-          Hello!
+      <Flex justify="space-between" flexDirection="row" py={3}>
+        <Text fontSize="2xl" fontWeight="bold" color="#363062" textAlign="left">
+          Dashboard!
         </Text>
+
+        <Button
+          bgColor={
+            currentToken === RewardToken.celoDollar ? "#82CEB9" : "#7DC2E8"
+          }
+          borderRadius={8}
+          w={"1/4"}
+          borderWidth={1}
+          borderColor={ currentToken === RewardToken.celoDollar ? "#0ECE8B" : "#02B1FF"}
+          onClick={() => {
+            // Simple toggle between celoDollar and goodDollar
+            setCurrentToken(
+              currentToken === RewardToken.celoDollar
+                ? RewardToken.goodDollar
+                : RewardToken.celoDollar
+            );
+          }}
+        >
+          <Text fontSize="8" color="white">
+            {currentToken === RewardToken.celoDollar ? "cUSD" : "G$"}
+          </Text>
+          {currentToken === RewardToken.celoDollar ? (
+            <GreenDollarIcon />
+          ) : (
+            <BlueDollarIcon />
+          )}
+
+          <SwitchButtonIcon />
+        </Button>
       </Flex>
 
       <Box
