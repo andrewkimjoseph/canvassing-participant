@@ -161,7 +161,7 @@ export default function Home() {
     return () => {
       isMounted = false;
     };
-  }, [authInitialized, isConnected, address]);
+  }, [authInitialized, isConnected, address, chainId]);
 
   // Handle redirect after initialization
   useEffect(() => {
@@ -430,7 +430,7 @@ export default function Home() {
 
       <Flex justify="space-between" flexDirection="row" py={3}>
         <Text fontSize="2xl" fontWeight="bold" color="#363062" textAlign="left">
-          Dashboard!
+          Dashboard
         </Text>
 
         <Button
@@ -438,11 +438,12 @@ export default function Home() {
             currentToken === RewardToken.celoDollar ? "#82CEB9" : "#7DC2E8"
           }
           borderRadius={8}
-          w={"1/4"}
+          w={"2/6"}
           borderWidth={1}
-          borderColor={ currentToken === RewardToken.celoDollar ? "#0ECE8B" : "#02B1FF"}
+          borderColor={
+            currentToken === RewardToken.celoDollar ? "#0ECE8B" : "#02B1FF"
+          }
           onClick={() => {
-            // Simple toggle between celoDollar and goodDollar
             setCurrentToken(
               currentToken === RewardToken.celoDollar
                 ? RewardToken.goodDollar

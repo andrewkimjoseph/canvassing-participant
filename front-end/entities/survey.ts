@@ -1,3 +1,4 @@
+import { RewardToken } from '@/types/rewardToken';
 import * as admin from 'firebase-admin';
 import { Address } from 'viem';
 
@@ -18,4 +19,6 @@ export interface Survey {
     targetGender: string | null;
     isAlreadyBookedByUser: boolean | null;
     isTest: boolean | null;
+    isForTestnet: boolean | null;
+    rewardToken: RewardToken  | null;
   }
