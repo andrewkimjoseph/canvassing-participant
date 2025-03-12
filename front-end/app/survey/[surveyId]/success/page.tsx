@@ -12,7 +12,7 @@ import { Address } from "viem";
 import { Toaster, toaster } from "@/components/ui/toaster";
 import useSingleSurveyStore from "@/stores/useSingleSurveyStore";
 import { Button } from "@/components/ui/button";
-import { getTokenContractBalance } from "@/services/web3/checkContractBalance";
+import { getTokenContractBalance } from "@/services/web3/checkTokenContractBalance";
 import {
   collection,
   query,
