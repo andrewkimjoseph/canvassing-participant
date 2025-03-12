@@ -29,6 +29,7 @@ export const createRewardDocument = async ({
   data,
   participantId,
   walletAddress,
+  contractAddress
 }: CreateRewardProps): Promise<CreateRewardResult> => {
   let reward: Reward | null = null;
   let signature: string | null = null;
@@ -58,6 +59,7 @@ export const createRewardDocument = async ({
       submissionId: data.submissionId,
       isClaimed: false,
       participantWalletAddress: walletAddress,
+      contractAddress,
       responseId: data.responseId,
       timeCreated: admin.firestore.FieldValue.serverTimestamp(),
       timeUpdated: null,
