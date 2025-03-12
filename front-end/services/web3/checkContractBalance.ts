@@ -1,6 +1,5 @@
 import { cUSDContractABI } from '@/utils/abis/cUSDContractABI';
-import { cUSDAlfajoresContractAddress } from '@/utils/addresses/cUSDAlfajoresContractAddress';
-import { cUSDMainnetContractAddress } from '@/utils/addresses/cUSDMainnetContractAddress';
+import { cUSDAlfajoresContractAddress, cUSDMainnetContractAddress } from '@/utils/addresses/tokens';
 import { Address, createPublicClient, custom } from 'viem';
 import { celoAlfajores, celo } from 'viem/chains';
 

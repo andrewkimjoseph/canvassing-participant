@@ -5,7 +5,7 @@ module.exports = {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./node_modules/@heroui/theme/dist/components/spinner.js"
+    "./node_modules/@heroui/theme/dist/components/(popover|spinner|button|ripple).js"
   ],
   theme: {
     extend: {

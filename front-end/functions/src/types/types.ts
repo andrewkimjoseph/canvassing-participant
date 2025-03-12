@@ -44,7 +44,8 @@ export interface Survey {
 export interface CreateRewardProps {
   data: WebhookData,
   participantId: string,
-  walletAddress: string
+  walletAddress: string,
+  contractAddress: Address,
 }
 
 export interface CreateRewardResult {

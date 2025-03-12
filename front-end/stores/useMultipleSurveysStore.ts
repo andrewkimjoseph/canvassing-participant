@@ -1,22 +1,17 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  or,
-  limit,
-} from 'firebase/firestore';
-import { Survey } from '@/entities/survey';
-import { db } from '@/firebase';
-import { Reward } from '@/entities/reward';
-import { Address } from 'viem';
-import useParticipantStore from './useParticipantStore';
-import { checkIfSurveyIsFullyBooked } from '@/services/web3/checkIfSurveyIsAtMaxParticipants';
-import { checkIfParticipantIsScreenedForSurvey } from '@/services/checkIfParticipantHasBeenBookedForSurvey';
-import { checkIfParticipantHasCompletedSurvey } from '@/services/db/checkIfParticipantHasCompletedSurvey';
-import { checkIfSurveyIsForTestnet } from '@/services/web3/checkIfSurveyIsForTestnet';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { collection, getDocs, query, where, limit } from "firebase/firestore";
+import { Survey } from "@/entities/survey";
+import { db } from "@/firebase";
+import { Reward } from "@/entities/reward";
+import { Address } from "viem";
+import useParticipantStore from "./useParticipantStore";
+import { checkIfSurveyIsFullyBooked } from "@/services/web3/checkIfSurveyIsAtMaxParticipants";
+import { checkIfParticipantIsScreenedForSurvey } from "@/services/checkIfParticipantHasBeenBookedForSurvey";
+import { checkIfParticipantHasCompletedSurvey } from "@/services/db/checkIfParticipantHasCompletedSurvey";
+import { checkIfSurveyIsForTestnet } from "@/services/web3/checkIfSurveyIsForTestnet";
+import { getRewardTokenForSurvey } from "@/services/web3/getRewardTokenContractAddress";
+import { RewardToken } from "@/types/rewardToken";
 
 // Helper function to determine if a chainId is for testnet
 const isTestnetChainId = (chainId: number): boolean => {
@@ -27,15 +22,12 @@ const isTestnetChainId = (chainId: number): boolean => {
 interface SurveyStoreState {
   surveys: Survey[];
   loading: boolean;
-  fetchSurveys: (chainId: number, rewards: Reward[]) => Promise<void>;
+  fetchSurveys: (
+    chainId: number,
+    rewards: Reward[],
+    currentToken: RewardToken
+  ) => Promise<void>;
 }
-
-// Helper function to chunk array into smaller arrays
-const chunkArray = <T>(array: T[], size: number): T[][] => {
-  return Array.from({ length: Math.ceil(array.length / size) }, (_, i) =>
-    array.slice(i * size, i * size + size)
-  );
-};
 
 const useMultipleSurveysStore = create<SurveyStoreState>()(
   persist(
@@ -43,7 +35,7 @@ const useMultipleSurveysStore = create<SurveyStoreState>()(
       surveys: [],
       loading: false,
 
-      fetchSurveys: async (chainId, rewards) => {
+      fetchSurveys: async (chainId, rewards, currentToken) => {
         set({ loading: true });
 
         const { participant } = useParticipantStore.getState();
@@ -53,52 +45,36 @@ const useMultipleSurveysStore = create<SurveyStoreState>()(
           const participatedSurveyIds = rewards.map(
             (reward) => reward.surveyId
           );
-          let allSurveys: Survey[] = [];
 
+          // Simple query to get available surveys
           const surveyQuery = query(
-            collection(db, 'surveys'),
-            where('isAvailable', '==', true),
+            collection(db, "surveys"),
+            where("isAvailable", "==", true),
             limit(5)
           );
 
-          if (participatedSurveyIds.length > 0) {
-            const chunks = chunkArray(participatedSurveyIds, 10);
+          // Get available surveys
+          const surveySnapshot = await getDocs(surveyQuery);
 
-            const chunkPromises = chunks.map(async (chunk) => {
-              const availableSurveys = await getDocs(surveyQuery);
-              const availableSurveysNotDoneByParticipant =
-                availableSurveys.docs.filter((doc) => !chunk.includes(doc.id));
-              return availableSurveysNotDoneByParticipant.map(
-                (surveySnapshot) => ({
-                  ...(surveySnapshot.data() as Survey),
-                })
-              );
-            });
-
-            const chunkResults = await Promise.all(chunkPromises);
-            allSurveys = chunkResults.flat();
-
-            const surveyMap = new Map<string, Survey>();
-            allSurveys.forEach((survey) => surveyMap.set(survey.id, survey));
-            allSurveys = Array.from(surveyMap.values());
-          } else {
-            const surveySnapshot = await getDocs(surveyQuery);
-            allSurveys = surveySnapshot.docs.map((doc) => ({
+          // Filter out surveys the participant has already completed
+          let allSurveys = surveySnapshot.docs
+            .filter((doc) => !participatedSurveyIds.includes(doc.id))
+            .map((doc) => ({
               ...(doc.data() as Survey),
+              id: doc.id,
             }));
-          }
 
           const surveyPromises = allSurveys.map(async (survey) => {
             if (!survey.isAvailable) return null;
 
             const countryIsValid =
-              survey.targetCountry === 'ALL' ||
+              survey.targetCountry === "ALL" ||
               survey.targetCountry
-                ?.split(', ')
-                .includes(participant?.country || '');
+                ?.split(", ")
+                .includes(participant?.country || "");
 
             const genderIsValid =
-              survey.targetGender === 'ALL' ||
+              survey.targetGender === "ALL" ||
               survey.targetGender === participant?.gender;
 
             if (!survey.contractAddress) return null;
@@ -118,6 +94,15 @@ const useMultipleSurveysStore = create<SurveyStoreState>()(
             // If we're on a testnet but survey is not for testnet, skip it
             // If we're on mainnet but survey is for testnet, skip it
             if (isOnTestnet !== isForTestnet) return null;
+
+            // Get the reward token address
+            const rewardToken = await getRewardTokenForSurvey({
+              _surveyContractAddress: survey.contractAddress,
+              _chainId: chainId,
+            });
+            survey.rewardToken = rewardToken;
+
+            if (survey.rewardToken !== currentToken) return null;
 
             const [
               surveyIsFullyBooked,
@@ -141,7 +126,12 @@ const useMultipleSurveysStore = create<SurveyStoreState>()(
               }),
             ]);
 
-            if (survey.isTest && participant?.isAdmin && surveyIsFullyBooked && participantHasCompletedSurvey)
+            if (
+              survey.isTest &&
+              participant?.isAdmin &&
+              surveyIsFullyBooked &&
+              participantHasCompletedSurvey
+            )
               return null;
 
             if (!survey.isTest && !participant?.isAdmin && surveyIsFullyBooked)
@@ -173,13 +163,13 @@ const useMultipleSurveysStore = create<SurveyStoreState>()(
 
           set({ surveys: validSurveys, loading: false });
         } catch (error) {
-          console.error('Error fetching surveys:', error);
+          console.error("Error fetching surveys:", error);
           set({ loading: false });
         }
       },
     }),
     {
-      name: 'surveys-storage',
+      name: "surveys-storage",
       partialize: (state) => ({ surveys: state.surveys }), // Only persist surveys array
     }
   )

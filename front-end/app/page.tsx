@@ -125,8 +125,8 @@ export default function Home() {
 
           // Fetch data in parallel
           await Promise.all([
-            fetchRewards(address),
-            fetchSurveys(chainId, rewards),
+            fetchRewards(address, chainId),
+            fetchSurveys(chainId, rewards, currentToken),
           ]);
 
           if (!isMounted) return;
@@ -161,7 +161,7 @@ export default function Home() {
     return () => {
       isMounted = false;
     };
-  }, [authInitialized, isConnected, address, chainId]);
+  }, [authInitialized, isConnected, address, chainId, currentToken]);
 
   // Handle redirect after initialization
   useEffect(() => {
@@ -509,7 +509,8 @@ export default function Home() {
           textAlign="left"
           py={3}
         >
-          Available Surveys
+          Available Surveys (
+          {currentToken === RewardToken.celoDollar ? "cUSD" : "G$"})
         </Text>
       </Flex>
 
@@ -590,7 +591,10 @@ export default function Home() {
                   alignItems={"center"}
                 >
                   <Text fontSize={"lg"} color="green">
-                    ${survey.rewardAmountIncUSD}
+                    {survey.rewardToken === RewardToken.celoDollar
+                      ? "cUSD"
+                      : "G$"}{" "}
+                    {survey.rewardAmountIncUSD}
                   </Text>
 
                   <Text fontSize={"lg"} color="grey" pl={1}>

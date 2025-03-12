@@ -1,19 +1,21 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useState } from 'react';
-import { useAccount } from 'wagmi';
-import { Box, Text, Flex } from '@chakra-ui/react';
-import useRewardStore from '@/stores/useRewardStore';
-import { useRouter } from 'next/navigation';
-import useParticipantStore from '@/stores/useParticipantStore';
+import { useCallback, useEffect, useState } from "react";
+import { useAccount, useChainId } from "wagmi";
+import { Box, Text, Flex } from "@chakra-ui/react";
+import useRewardStore from "@/stores/useRewardStore";
+import { useRouter } from "next/navigation";
+import useParticipantStore from "@/stores/useParticipantStore";
 
-import { ClipboardIconButton, ClipboardRoot } from '@/components/ui/clipboard';
-import useAmplitudeContext from '@/hooks/useAmplitudeContext';
-import { SpinnerIconC } from '@/components/icons/spinner-icon';
-import { MainnetCheckmarkC } from '@/components/icons/checkmarks/mainnet';
-import { TestnetCheckmarkC } from '@/components/icons/checkmarks/testnet';
+import { ClipboardIconButton, ClipboardRoot } from "@/components/ui/clipboard";
+import useAmplitudeContext from "@/hooks/useAmplitudeContext";
+import { SpinnerIconC } from "@/components/icons/spinner-icon";
+import { MainnetCheckmarkC } from "@/components/icons/checkmarks/mainnet";
+import { TestnetCheckmarkC } from "@/components/icons/checkmarks/testnet";
+import { RewardToken } from "@/types/rewardToken";
 
 export default function RewardHistory() {
+  const chainId = useChainId();
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
   const { rewards, fetchRewards } = useRewardStore();
@@ -23,7 +25,7 @@ export default function RewardHistory() {
 
   const checkParticipantStatus = useCallback(() => {
     if (isConnected && address) {
-      fetchRewards(address);
+      fetchRewards(address, chainId);
     }
   }, [isConnected, address, getParticipant]);
 
@@ -33,7 +35,7 @@ export default function RewardHistory() {
 
   useEffect(() => {
     if (isMounted && !participant) {
-      router.replace('/');
+      router.replace("/");
     }
   }, [isMounted, participant, router]);
 
@@ -94,23 +96,25 @@ export default function RewardHistory() {
               </Flex>
 
               <Flex justify="space-between" align="center" mt={2}>
-                <Text fontSize="lg" color={reward.isClaimed ? 'green' : 'red'}>
-                  {reward.isClaimed ? 'Claim Completed' : 'Pending Claim'}
+                <Text fontSize="lg" color={reward.isClaimed ? "green" : "red"}>
+                  {reward.isClaimed ? "Claim Completed" : "Pending Claim"}
                 </Text>
                 <Text fontSize="sm" color="black">
                   {reward.amountIncUSD
-                    ? `cUSD ${reward.amountIncUSD.toFixed(2)}`
-                    : 'N/A'}
+                    ? `${
+                        reward.token === RewardToken.celoDollar ? "cUSD" : "G$"
+                      } ${reward.amountIncUSD.toFixed(2)}`
+                    : "N/A"}
                 </Text>
               </Flex>
               <Flex justify="start" align="center" mt={2}>
                 <Text fontSize="lg" color="#94B9FF">
                   {reward.id}
                 </Text>
-                <ClipboardRoot value={reward.id} color={'black'}>
+                <ClipboardRoot value={reward.id} color={"black"}>
                   <ClipboardIconButton
                     onClick={() => {
-                      trackAmplitudeEvent('Copy reward id clicked', {
+                      trackAmplitudeEvent("Copy reward id clicked", {
                         participantWalletAddress: participant?.walletAddress,
                         participantId: participant?.id,
                         rewardId: reward.id,
@@ -124,7 +128,7 @@ export default function RewardHistory() {
                 <Text
                   fontSize="sm"
                   color="black"
-                  textDecoration={'underline'}
+                  textDecoration={"underline"}
                   onClick={() => {
                     if (reward.isClaimed) {
                       if (reward.isForTestnet) {
@@ -136,7 +140,7 @@ export default function RewardHistory() {
                           `https://celoscan.io/tx/${reward.transactionHash}`
                         );
                       }
-                      trackAmplitudeEvent('View on block explorer clicked', {
+                      trackAmplitudeEvent("View on block explorer clicked", {
                         participantWalletAddress: participant?.walletAddress,
                         participantId: participant?.id,
                         rewardId: reward.id,
@@ -147,7 +151,7 @@ export default function RewardHistory() {
                         `/survey/${reward.surveyId}/success?submissionId=${reward.submissionId}&respondentId=${reward.respondentId}`
                       );
 
-                      trackAmplitudeEvent('Unclaimed claim clicked', {
+                      trackAmplitudeEvent("Unclaimed claim clicked", {
                         participantWalletAddress: participant?.walletAddress,
                         participantId: participant?.id,
                         rewardId: reward.id,
@@ -156,7 +160,7 @@ export default function RewardHistory() {
                     }
                   }}
                 >
-                  {reward.isClaimed ? 'View on block explorer' : 'Claim'}
+                  {reward.isClaimed ? "View on block explorer" : "Claim"}
                 </Text>
               </Flex>
             </Box>

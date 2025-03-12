@@ -36,6 +36,7 @@ import { auth } from "@/firebase";
 import { AnonUserIconC } from "./icons/checkmarks/anon-user";
 import { CanvassingUserIconC } from "./icons/checkmarks/canvassing-user";
 import useMiniPayStore from "@/stores/useMiniPayStore";
+import { Popover, PopoverTrigger, PopoverContent } from "@heroui/popover";
 
 const CustomHeader = () => {
   const { participant } = useParticipantStore();
@@ -74,16 +75,16 @@ const CustomHeader = () => {
             zIndex: 1000,
           }}
         />
-        {/* Fixed header */}
         <Box
           bg="#363062"
           px={4}
           position="fixed"
           top="0"
-          left="0"
-          right="0"
           zIndex="999"
           width="100%"
+          maxWidth="480px" // Add this line
+          transform="translateX(-50%)" // Add this line
+          left="50%" // Change to this
           boxShadow="0 2px 4px rgba(0,0,0,0.1)"
         >
           <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
@@ -115,10 +116,21 @@ const CustomHeader = () => {
             </Link>
 
             {mounted ? (
-              <Circle
-                size="10px"
-                bgColor={isConnected ? "green.500" : "red.500"}
-              />
+              <Popover placement="left">
+                <PopoverTrigger>
+                  <Circle
+                    size="10px"
+                    bgColor={isConnected ? "green.500" : "red.500"}
+                  />
+                </PopoverTrigger>
+                <PopoverContent>
+                  <Text>
+                    {isConnected
+                      ? "You are connected."
+                      : "You are disconnected. Refresh the page to connect."}
+                  </Text>
+                </PopoverContent>
+              </Popover>
             ) : (
               <Box w="10px" h="10px" /> // Placeholder with same dimensions
             )}

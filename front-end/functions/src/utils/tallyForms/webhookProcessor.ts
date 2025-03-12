@@ -139,6 +139,7 @@ export const processWebhook = async (
     data,
     participantId,
     walletAddress,
+    contractAddress: survey.contractAddress as Address,
   });
 
   if (rewardCreationResult.signature && rewardCreationResult.alreadyExisted) {
