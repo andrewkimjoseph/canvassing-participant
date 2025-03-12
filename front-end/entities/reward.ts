@@ -1,3 +1,4 @@
+import { RewardToken } from '@/types/rewardToken';
 import * as admin from 'firebase-admin';
 import { Address } from 'viem';
 
@@ -18,4 +19,6 @@ export interface Reward {
   signature: Address | null;
   nonce: string | null;
   isForTestnet: boolean | null;
+  contractAddress: string | null;
+  token: RewardToken | null;
 }
