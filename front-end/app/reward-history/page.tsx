@@ -13,6 +13,7 @@ import { SpinnerIconC } from "@/components/icons/spinner-icon";
 import { MainnetCheckmarkC } from "@/components/icons/checkmarks/mainnet";
 import { TestnetCheckmarkC } from "@/components/icons/checkmarks/testnet";
 import { RewardToken } from "@/types/rewardToken";
+import { formatTokenAmount } from "@/utils/formatTokenAmount";
 
 export default function RewardHistory() {
   const chainId = useChainId();
@@ -103,7 +104,7 @@ export default function RewardHistory() {
                   {reward.amountIncUSD
                     ? `${
                         reward.token === RewardToken.celoDollar ? "cUSD" : "G$"
-                      } ${reward.amountIncUSD.toFixed(2)}`
+                      } ${formatTokenAmount(reward.amountIncUSD)}`
                     : "N/A"}
                 </Text>
               </Flex>

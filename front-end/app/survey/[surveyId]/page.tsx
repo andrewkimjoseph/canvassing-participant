@@ -19,6 +19,7 @@ import useAmplitudeContext from "@/hooks/useAmplitudeContext";
 import { SpinnerIconC } from "@/components/icons/spinner-icon";
 import { auth } from "@/firebase";
 import { RewardToken } from "@/types/rewardToken";
+import { formatTokenAmount } from "@/utils/formatTokenAmount";
 
 export default function SurveyPage() {
   const [isMounted, setIsMounted] = useState(false);
@@ -98,7 +99,7 @@ export default function SurveyPage() {
         >
           <Text fontSize="lg" color="green">
             {survey.rewardToken === RewardToken.celoDollar ? "cUSD" : "G$"}{" "}
-            {survey.rewardAmountIncUSD}
+            {formatTokenAmount(survey?.rewardAmountIncUSD as number)}
           </Text>
           <Text fontSize={"lg"} color="grey" pl={1}>
             per survey
