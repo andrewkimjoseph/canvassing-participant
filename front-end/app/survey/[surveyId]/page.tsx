@@ -1,30 +1,31 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useAccount } from 'wagmi';
-import { usePathname } from 'next/navigation';
-import { Box, Button, Text, Flex } from '@chakra-ui/react';
+import { useEffect, useState } from "react";
+import { useAccount, useChainId } from "wagmi";
+import { usePathname } from "next/navigation";
+import { Box, Button, Text, Flex } from "@chakra-ui/react";
 import {
   AccordionItem,
   AccordionItemContent,
   AccordionItemTrigger,
   AccordionRoot,
-} from '@/components/ui/accordion';
-import useSingleSurveyStore from '@/stores/useSingleSurveyStore';
-import { Toaster, toaster } from '@/components/ui/toaster';
-import useParticipantStore from '@/stores/useParticipantStore';
-import { useRouter } from 'next/navigation';
-import useSingleResearcherStore from '@/stores/useResearcherStore';
-import useAmplitudeContext from '@/hooks/useAmplitudeContext';
-import { SpinnerIconC } from '@/components/icons/spinner-icon';
-import { auth } from '@/firebase';
+} from "@/components/ui/accordion";
+import useSingleSurveyStore from "@/stores/useSingleSurveyStore";
+import { Toaster, toaster } from "@/components/ui/toaster";
+import useParticipantStore from "@/stores/useParticipantStore";
+import { useRouter } from "next/navigation";
+import useSingleResearcherStore from "@/stores/useResearcherStore";
+import useAmplitudeContext from "@/hooks/useAmplitudeContext";
+import { SpinnerIconC } from "@/components/icons/spinner-icon";
+import { auth } from "@/firebase";
+import { RewardToken } from "@/types/rewardToken";
 
 export default function SurveyPage() {
   const [isMounted, setIsMounted] = useState(false);
-  const [userAddress, setUserAddress] = useState('');
+  const [userAddress, setUserAddress] = useState("");
   const { address, isConnected } = useAccount();
   const pathname = usePathname();
-  const surveyId = pathname?.split('/').pop();
+  const surveyId = pathname?.split("/").pop();
   const { trackAmplitudeEvent } = useAmplitudeContext();
 
   const router = useRouter();
@@ -32,6 +33,7 @@ export default function SurveyPage() {
   const { survey, loading, fetchSurvey } = useSingleSurveyStore();
   const { researcher, fetchResearcher } = useSingleResearcherStore();
   const { participant, getParticipant } = useParticipantStore();
+  const chainId = useChainId();
 
   useEffect(() => {
     setIsMounted(true);
@@ -46,7 +48,7 @@ export default function SurveyPage() {
 
   useEffect(() => {
     if (isMounted && surveyId) {
-      fetchSurvey(surveyId);
+      fetchSurvey(surveyId, chainId);
     }
   }, [isMounted, surveyId, fetchSurvey]);
 
@@ -95,9 +97,10 @@ export default function SurveyPage() {
           alignItems="center"
         >
           <Text fontSize="lg" color="green">
-            ${survey.rewardAmountIncUSD}
+            {survey.rewardToken === RewardToken.celoDollar ? "cUSD" : "G$"}{" "}
+            {survey.rewardAmountIncUSD}
           </Text>
-          <Text fontSize={'lg'} color="grey" pl={1}>
+          <Text fontSize={"lg"} color="grey" pl={1}>
             per survey
           </Text>
         </Flex>
@@ -117,7 +120,7 @@ export default function SurveyPage() {
           // value={value}
           multiple
           onClick={() => {
-            trackAmplitudeEvent('Survey instructions clicked', {
+            trackAmplitudeEvent("Survey instructions clicked", {
               participantWalletAddress: participant?.walletAddress,
               participantId: participant?.id,
               surveyId: survey.id,
@@ -147,7 +150,7 @@ export default function SurveyPage() {
       >
         <AccordionRoot
           onClick={() => {
-            trackAmplitudeEvent('Time duration clicked', {
+            trackAmplitudeEvent("Time duration clicked", {
               participantWalletAddress: participant?.walletAddress,
               participantId: participant?.id,
               surveyId: survey.id,
@@ -180,7 +183,7 @@ export default function SurveyPage() {
       >
         <AccordionRoot
           onClick={() => {
-            trackAmplitudeEvent('Researcher clicked', {
+            trackAmplitudeEvent("Researcher clicked", {
               participantWalletAddress: participant?.walletAddress,
               participantId: participant?.id,
               surveyId: survey.id,
@@ -195,7 +198,7 @@ export default function SurveyPage() {
               Researcher
             </AccordionItemTrigger>
             <AccordionItemContent>
-              <Text>Researcher: {researcher?.name || 'Loading...'}</Text>
+              <Text>Researcher: {researcher?.name || "Loading..."}</Text>
             </AccordionItemContent>
           </AccordionItem>
         </AccordionRoot>
@@ -220,17 +223,17 @@ export default function SurveyPage() {
             survey?.researcherId
           ) {
             toaster.create({
-              description: 'Redirecting you to survey page, please wait ...',
+              description: "Redirecting you to survey page, please wait ...",
               duration: 6000,
-              type: 'info',
+              type: "info",
             });
 
             router.push(
               `${survey.formLink}?walletAddress=${participant?.walletAddress}&surveyId=${survey.id}&participantId=${participant?.id}&authId=${auth.currentUser?.uid}&gender=${participant?.gender}&country=${participant?.country}&researcherId=${survey?.researcherId}&contractAddress=${survey?.contractAddress}` ||
-                '#'
+                "#"
             );
 
-            trackAmplitudeEvent('Start survey clicked', {
+            trackAmplitudeEvent("Start survey clicked", {
               participantWalletAddress: participant?.walletAddress,
               participantId: participant?.id,
               surveyId: survey.id,
@@ -240,15 +243,15 @@ export default function SurveyPage() {
           } else {
             toaster.create({
               description:
-                'Missing required information to start survey. Refresh the page and try again.',
+                "Missing required information to start survey. Refresh the page and try again.",
               duration: 6000,
-              type: 'warning',
+              type: "warning",
             });
           }
         }}
       >
         <Text fontSize="16" fontWeight="bold" color="white">
-          {survey.isAvailable ? 'Start Survey' : 'Survey Unavailable'}
+          {survey.isAvailable ? "Start Survey" : "Survey Unavailable"}
         </Text>
       </Button>
     </Flex>
