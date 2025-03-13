@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Flex, Box } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import { SpinnerIconC } from "@/components/icons/spinner-icon";
-import { useRouter } from "next/navigation";
 import useMiniPayStore from "@/stores/useMiniPayStore";
 
 // Function to detect mobile devices
@@ -29,26 +28,25 @@ interface NoMobileProviderProps {
 
 const NoMobileProvider: React.FC<NoMobileProviderProps> = ({ children }) => {
   const [mounted, setMounted] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const router = useRouter();
-  const { isMiniPay } = useMiniPayStore(); // Get isMinipay status from the store
+  const { isMiniPay } = useMiniPayStore();
 
   useEffect(() => {
-    // Check on initial mount if we need to redirect
-    const checkEnvironment = () => {
+    // Only run once on initial mount
+    if (!mounted) {
       const mobile = isMobileDevice();
-      setIsMobile(mobile);
       
       // Redirect only if mobile AND not in MiniPay
       if (mobile && !isMiniPay) {
-        router.push("/minipay-only");
+        // Use window.location for a hard redirect instead of router
+        window.location.href = "/minipay-only";
+        return; // Don't set mounted to true if redirecting
       }
-    };
+      
+      setMounted(true);
+    }
+  }, [isMiniPay, mounted]);
 
-    checkEnvironment();
-    setMounted(true);
-  }, [isMiniPay, router]);
-
+  // Show spinner while checking or if not mounted yet
   if (!mounted) {
     return (
       <Flex justify="center" align="center" h="100vh">
@@ -57,19 +55,11 @@ const NoMobileProvider: React.FC<NoMobileProviderProps> = ({ children }) => {
     );
   }
 
-  // For non-mobile OR mobile devices inside MiniPay, render children
-  if (!isMobile || (isMobile && isMiniPay)) {
-    return <>{children}</>;
-  }
-
-  // For mobile devices not in MiniPay, show loading while redirecting
-  return (
-    <Box position="fixed" top="0" left="0" width="100%" height="100%" zIndex="999">
-      <Flex justify="center" align="center" h="100vh">
-        <SpinnerIconC />
-      </Flex>
-    </Box>
-  );
+  // If we get here, we're either:
+  // 1. Not on mobile
+  // 2. On mobile but in MiniPay
+  // In either case, render children
+  return <>{children}</>;
 };
 
 export default NoMobileProvider;
