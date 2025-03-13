@@ -16,7 +16,7 @@ import { config } from "dotenv";
 
 import { abi } from "../artifacts/contracts/ClosedSurveyV6.sol/ClosedSurveyV6.json";
 import { bytecode } from "../artifacts/contracts/ClosedSurveyV6.sol/ClosedSurveyV6.json";
-import { cUSDAlfajoresContractABI } from "./utils/cUSDAlfajoresContractABI";
+import { cUSDAlfajoresContractABI } from "../utils/cUSDAlfajoresContractABI";
 
 config();
 
