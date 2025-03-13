@@ -11,7 +11,7 @@ interface Props {
 
 const CustomLayout: FC<Props> = ({ children }) => {
   const pathname = usePathname();
-  const noHeaderRoutes = ["/welcome", "/welcome/sign-up"];
+  const noHeaderRoutes = ["/welcome", "/welcome/sign-up", "/minipay-only"];
   const showHeader = !noHeaderRoutes.includes(pathname);
 
   const { connect } = useConnect();

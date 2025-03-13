@@ -74,7 +74,7 @@ export default function SuccessPage() {
     if (surveyId) {
       fetchSurvey(surveyId as string, chainId);
     }
-  }, [surveyId, fetchSurvey]);
+  }, [surveyId, fetchSurvey, chainId]);
 
   /**
    * Processes the reward claim by a participant.
@@ -318,7 +318,7 @@ export default function SuccessPage() {
               alignSelf={"center"}
               mt={4}
             >
-              You earned {formatTokenAmount(survey?.rewardAmountIncUSD as number)}{" "}
+              You earned {formatTokenAmount(survey?.rewardAmountIncUSD)}{" "}
               {survey?.rewardToken === RewardToken.celoDollar ? "cUSD" : "G$"}
             </Text>
 
