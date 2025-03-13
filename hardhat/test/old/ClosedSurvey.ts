@@ -12,9 +12,9 @@ import { celoAlfajores } from "viem/chains";
 import { mnemonicToAccount } from "viem/accounts";
 import { config } from "dotenv";
 
-import { abi } from "../artifacts/contracts/ClosedSurveyV2.sol/ClosedSurveyV2.json";
-import { bytecode } from "../artifacts/contracts/ClosedSurveyV2.sol/ClosedSurveyV2.json";
-import { cUSDAlfajoresContractABI } from "./utils/cUSDAlfajoresContractABI";
+import { abi } from "../../artifacts/contracts/ClosedSurveyV2.sol/ClosedSurveyV2.json";
+import { bytecode } from "../../artifacts/contracts/ClosedSurveyV2.sol/ClosedSurveyV2.json";
+import { cUSDAlfajoresContractABI } from "../../utils/cUSDAlfajoresContractABI";
 
 config();
 
