@@ -31,8 +31,14 @@ const NoMobileProvider: React.FC<NoMobileProviderProps> = ({ children }) => {
   const { isMiniPay } = useMiniPayStore();
 
   useEffect(() => {
-    // Only run once on initial mount
-    if (!mounted) {
+    // First, check if we're already on the minipay-only page to prevent loops
+    const isAlreadyOnMinipayOnlyPage = 
+      typeof window !== "undefined" && 
+      (window.location.pathname === "/minipay-only" || 
+       window.location.pathname.includes("/minipay-only"));
+    
+    // Only run once on initial mount and only if not already on the target page
+    if (!mounted && !isAlreadyOnMinipayOnlyPage) {
       const mobile = isMobileDevice();
       
       // Redirect only if mobile AND not in MiniPay
@@ -41,9 +47,10 @@ const NoMobileProvider: React.FC<NoMobileProviderProps> = ({ children }) => {
         window.location.href = "/minipay-only";
         return; // Don't set mounted to true if redirecting
       }
-      
-      setMounted(true);
     }
+    
+    // Always set mounted to true after checks
+    setMounted(true);
   }, [isMiniPay, mounted]);
 
   // Show spinner while checking or if not mounted yet
@@ -55,10 +62,7 @@ const NoMobileProvider: React.FC<NoMobileProviderProps> = ({ children }) => {
     );
   }
 
-  // If we get here, we're either:
-  // 1. Not on mobile
-  // 2. On mobile but in MiniPay
-  // In either case, render children
+  // If we get here, render children
   return <>{children}</>;
 };
 
