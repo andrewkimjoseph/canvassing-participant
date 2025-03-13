@@ -22,7 +22,7 @@ contract ClosedSurveyV6 is Ownable, Pausable {
      * @notice Reference to the ERC20 token contract used for participant rewards
      * @dev Marked as immutable to save gas and prevent changes after deployment
      */
-    IERC20Metadata public immutable rewardToken;
+    IERC20Metadata private immutable rewardToken;
 
     /**
      * @notice Mapping to track participants who have received rewards
@@ -52,13 +52,13 @@ contract ClosedSurveyV6 is Ownable, Pausable {
      * @notice Amount of the reward token to reward each participant
      * @dev Stored in the token's smallest unit (wei equivalent)
      */
-    uint256 public rewardAmountPerParticipantInWei;
+    uint256 private rewardAmountPerParticipantInWei;
 
     /**
      * @notice Maximum number of participants allowed in the survey
      * @dev Used to limit the total number of rewards that can be distributed
      */
-    uint256 public targetNumberOfParticipants;
+    uint256 private targetNumberOfParticipants;
 
     /**
      * @notice Counter for number of participants who have been rewarded
@@ -76,19 +76,19 @@ contract ClosedSurveyV6 is Ownable, Pausable {
      * @notice Counter for number of participants who have been screened
      * @dev Tracks the total number of successful screenings
      */
-    uint256 public numberOfScreenedParticipants;
+    uint256 private numberOfScreenedParticipants;
 
     /**
      * @notice Counter for number of screening signatures that have been used
      * @dev For monitoring signature usage and preventing replay attacks
      */
-    uint256 public numberOfUsedScreeningSignatures;
+    uint256 private numberOfUsedScreeningSignatures;
 
     /**
      * @notice Counter for number of claiming signatures that have been used
      * @dev For monitoring signature usage and preventing replay attacks
      */
-    uint256 public numberOfUsedClaimingSignatures;
+    uint256 private numberOfUsedClaimingSignatures;
 
     /**
      * @notice Emitted when a participant completes the screening process
@@ -788,12 +788,26 @@ contract ClosedSurveyV6 is Ownable, Pausable {
      * @param signature Cryptographic signature to check
      * @return bool True if the signature has already been used
      */
-    function checkIfSignatureIsUsed(bytes memory signature)
+    function checkIfClaimingSignatureIsUsed(bytes memory signature)
         external
         view
         returns (bool)
     {
         return signaturesUsedForClaiming[signature];
+    }
+
+    /**
+     * @notice Checks if a signature has been used for screening a participant
+     * @dev Public view function for signature validation
+     * @param signature Cryptographic signature to check
+     * @return bool True if the signature has already been used
+     */
+    function checkIfScreeningSignatureIsUsed(bytes memory signature)
+        external
+        view
+        returns (bool)
+    {
+        return signaturesUsedForScreening[signature];
     }
 
     /**
