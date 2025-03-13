@@ -36,32 +36,30 @@ export default function MiniPayOnlyPage() {
         className="flex items-center justify-center" // Additional centering classes
       >
         <ModalContent className="w-1/2 max-w-md mx-auto my-auto">
-          <>
-            <ModalHeader className="flex flex-col gap-1">Oops</ModalHeader>
-            <ModalBody>
-              <Text fontSize="13" color="black" textAlign={"center"}>
-                You can only open this app inside MiniPay.
-              </Text>
-            </ModalBody>
-            <ModalFooter>
-              <Button
-                bgColor="#363062"
-                borderRadius={15}
-                px={6}
-                w="full"
-                onClick={handleOpenMiniPay}
+          <ModalHeader className="flex flex-col gap-1">Oops</ModalHeader>
+          <ModalBody>
+            <Text fontSize="13" color="black" textAlign={"center"}>
+              You can only open this app inside MiniPay.
+            </Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              bgColor="#363062"
+              borderRadius={15}
+              px={6}
+              w="full"
+              onClick={handleOpenMiniPay}
+            >
+              <Text
+                fontSize="16"
+                fontWeight="bold"
+                color="white"
+                textAlign={"center"}
               >
-                <Text
-                  fontSize="16"
-                  fontWeight="bold"
-                  color="white"
-                  textAlign={"center"}
-                >
-                  Go to MiniPay
-                </Text>
-              </Button>
-            </ModalFooter>
-          </>
+                Go to MiniPay
+              </Text>
+            </Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
     </Flex>
