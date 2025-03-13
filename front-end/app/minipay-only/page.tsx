@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 export default function MiniPayOnlyPage() {
   const { trackAmplitudeEvent } = useAmplitudeContext();
   const [showModal, setShowModal] = useState(true);
-  const minipayInviteLink0xA38 = "https://invite.minipay.xyz/fs4Wxzv4QYqxJuzq8";
+  const minipayInviteLink0xA38 = "https://invite.minipay.xyz/nt5KaYhyvonKfbCUA";
   const router = useRouter();
 
   const handleOpenMiniPay = () => {
