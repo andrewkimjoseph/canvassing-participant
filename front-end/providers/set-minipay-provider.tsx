@@ -45,21 +45,6 @@ export const SetMiniPayProvider: React.FC<{
     );
   }
 
-  // if (isMiniPay === false || isMiniPay === undefined) {
-  //   return (
-  //     <Flex justify="center" align="center" minH="100vh">
-  //       <Text fontSize={'md'} color="#363062" textAlign={'center'}>
-  //         This dApp is only available on MiniPay on Opera Mini / Opera Mini
-  //         Beta, or the MiniPay Standalone App
-  //       </Text>
-  //     </Flex>
-  //   );
-  // }
-
-  // if (isMiniPay === true) {
-  //   return <>{children}</>;
-  // }
-
   return <>{children}</>;
 };
 
