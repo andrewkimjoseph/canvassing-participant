@@ -258,7 +258,7 @@ export default function SignUpPage() {
           color={"white"}
           px={6}
           w={"3/6"}
-          mt={20} // Reduced from 20 to give more breathing room
+          mt={10} // Reduced from 20 to give more breathing room
           mb={6} // Add margin bottom for spacing
           onClick={handleSubmit}
           disabled={!gender || !country || !address || isCreatingParticipant}
