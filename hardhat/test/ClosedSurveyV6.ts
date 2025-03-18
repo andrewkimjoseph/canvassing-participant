@@ -21,8 +21,8 @@ import { cUSDAlfajoresContractABI } from "../utils/cUSDAlfajoresContractABI";
 config();
 
 const CUSD_ADDRESS = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1";
-const PK_ONE = `0x${process.env.PK_ONE}` as Address; // 0xE49B05F2c7DD51f61E415E1DFAc10B80074B001A (Owner)
-const PK_TWO = `0x${process.env.PK_TWO}` as Address; // 0x6dce6E80b113607bABf97041A0C8C5ACCC4d1a4e
+const PK_ONE = `0x${process.env.PK_ONE}` as Address; // (Owner)
+const PK_TWO = `0x${process.env.PK_TWO}` as Address; // (Non-owner)
 const INFURA_API_KEY = process.env.INFURA_API_KEY;
 const INFURA_RPC_URL = `https://celo-alfajores.infura.io/v3/${INFURA_API_KEY}`;
 
@@ -105,6 +105,19 @@ describe("Closed Survey V6 Test", () => {
       } CUSD)`
     );
     console.log(`Verified contract balance: ${contractBalance} wei`);
+  });
+
+  after(async function () {
+    const withdrawTx = await privateClient.writeContract({
+      account: mnemonicAccountOne,
+      address: contractAddress as Address,
+      abi: abi,
+      functionName: "withdrawAllRewardTokenToResearcher",
+    });
+
+    await publicClient.waitForTransactionReceipt({
+      hash: withdrawTx,
+    });
   });
 
   // TEST DESCRIPTION 1 - SIGNATURE CREATION AND VERIFICATION
