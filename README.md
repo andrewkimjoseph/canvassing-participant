@@ -63,7 +63,14 @@ SENTRY_AUTH_TOKEN=""
 NEXT_PUBLIC_REOWN_PROJECT_ID=""
 ```
 
-3. Launch development server:
+Or copy the `.env.example` file
+
 ```bash
+cp .env.example .env
+```
+
+3. Launch development server (front-end):
+```bash
+cd front-end
 npm run dev  # or yarn dev
 ```
