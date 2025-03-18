@@ -32,7 +32,7 @@ if (!PK_TWO) throw new Error("PK_TWO not found in environment variables");
 if (!INFURA_API_KEY)
   throw new Error("INFURA_API_KEY not found in environment variables");
 
-describe("Closed Survey V6 Test Extended", () => {
+describe("Closed Survey V6 Test", () => {
   const publicClient = createPublicClient({
     chain: celoAlfajores,
     transport: http(INFURA_RPC_URL),
