@@ -4,18 +4,20 @@ import "@nomicfoundation/hardhat-verify";
 import { Address } from "viem";
 import { vars } from "hardhat/config";
 
-const PK_ONE = vars.get("SRP");
+const PK_ONE = vars.get("PK_ONE");
 const INFURA_API_KEY = vars.get("INFURA_API_KEY");
 
 import * as dotenv from "dotenv";
 
 dotenv.config();
 
-if (!PK_ONE) throw new Error("SRP not found in environment variables");
+if (!PK_ONE) throw new Error("PK_ONE not found in environment variables");
 if (!INFURA_API_KEY)
   throw new Error("INFURA_API_KEY not found in environment variables");
 
-const INFURA_RPC_URL = `https://celo-alfajores.infura.io/v3/${INFURA_API_KEY}`;
+const ALFAJORES_INFURA_RPC_URL = `https://celo-alfajores.infura.io/v3/${INFURA_API_KEY}`;
+
+const MAINNET_INFURA_RPC_URL = `https://celo-mainnet.infura.io/v3/${INFURA_API_KEY}`;
 
 const PK = `0x${process.env.PK_ONE}` as Address;
 
@@ -31,9 +33,14 @@ const config: HardhatUserConfig = {
   },
   networks: {
     celoAlfajores: {
-      url: INFURA_RPC_URL,
+      url: ALFAJORES_INFURA_RPC_URL,
       accounts: [PK],
       chainId: 44787,
+    },
+    celo: {
+      url: MAINNET_INFURA_RPC_URL,
+      accounts: [PK],
+      chainId: 42220,
     },
   },
   sourcify: {
@@ -42,6 +49,7 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: {
       celoAlfajores: "no-api-key-needed",
+      celo: "no-api-key-needed",
     },
     customChains: [
       {
@@ -50,6 +58,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://celo-alfajores.blockscout.com/api",
           browserURL: "https://celo-alfajores.blockscout.com",
+        },
+      },
+      {
+        network: "celo",
+        chainId: 42220,
+        urls: {
+          apiURL: "https://celo.blockscout.com/api",
+          browserURL: "https://celo.blockscout.com",
         },
       },
     ],
