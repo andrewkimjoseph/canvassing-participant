@@ -14,7 +14,7 @@ A Next.js-based Web3 application that bring surveys to participants (active Celo
 Participants perform an on-chain booking of a survey to secure their reward and do the survey at their own time.
 
 ### 2. Automated Rewarding
-Once a [Participant] completes a surveys (e.g. submits a form), an off-chain signature is created to help them claim from the smart contract.
+Once a `Participant` completes a surveys (e.g. submits a form), an off-chain signature is created to help them claim from the smart contract.
 
 ### 3. Secure Smart Contract Transactions
 [`ClosedSurveyV6.sol`](https://github.com/andrewkimjoseph/canvassing-participant/blob/main/hardhat/contracts/ClosedSurveyV6.sol) is a secure Solidity smart contract that manages value by ensuring only the right person gets a reward.
