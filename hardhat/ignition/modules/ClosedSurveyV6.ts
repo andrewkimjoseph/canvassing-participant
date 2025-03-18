@@ -32,7 +32,7 @@ const ClosedSurveyV6Module = buildModule("ClosedSurveyV6Module", (imb) => {
     researcher,
     _rewardAmountPerParticipantInWei,
     _targetNumberOfParticipants,
-    _rewardToken,
+    _rewardToken
   ]);
 
   return { closedSurveyV6 };
