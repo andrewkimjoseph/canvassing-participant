@@ -8,6 +8,8 @@
 A Next.js-based Web3 application that bring surveys to participants (active Celo wallet addresses), and uses a smart contract to distribute rewards.
 ## How It Works
 
+[![Demo Video](https://img.youtube.com/vi/nK_TJN7ecOc/maxresdefault.jpg)](https://www.youtube.com/watch?v=nK_TJN7ecOc)
+
 ### 1. Survey Booking
 Participants perform an on-chain booking of a survey to secure their reward and do the survey at their own time.
 
