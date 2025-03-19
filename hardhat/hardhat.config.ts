@@ -2,18 +2,18 @@ import type { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox-viem";
 import "@nomicfoundation/hardhat-verify";
 import { Address } from "viem";
-import { vars } from "hardhat/config";
-
-const PK_ONE = vars.get("PK_ONE");
-const INFURA_API_KEY = vars.get("INFURA_API_KEY");
-
 import * as dotenv from "dotenv";
-
 dotenv.config();
+
+const PK_ONE = process.env.PK_ONE;
+const INFURA_API_KEY = process.env.INFURA_API_KEY;
+const CELOSCAN_API_KEY = process.env.CELOSCAN_API_KEY;
 
 if (!PK_ONE) throw new Error("PK_ONE not found in environment variables");
 if (!INFURA_API_KEY)
   throw new Error("INFURA_API_KEY not found in environment variables");
+if (!CELOSCAN_API_KEY)
+  throw new Error("CELOSCAN_API_KEY not found in environment variables");
 
 const ALFAJORES_INFURA_RPC_URL = `https://celo-alfajores.infura.io/v3/${INFURA_API_KEY}`;
 
@@ -44,28 +44,28 @@ const config: HardhatUserConfig = {
     },
   },
   sourcify: {
-    enabled: true,
+    enabled: true
   },
   etherscan: {
     apiKey: {
-      celoAlfajores: "no-api-key-needed",
-      celo: "no-api-key-needed",
+      celoAlfajores: CELOSCAN_API_KEY,
+      celo: CELOSCAN_API_KEY,
     },
     customChains: [
       {
         network: "celoAlfajores",
         chainId: 44787,
         urls: {
-          apiURL: "https://celo-alfajores.blockscout.com/api",
-          browserURL: "https://celo-alfajores.blockscout.com",
+          apiURL: "https://api-alfajores.celoscan.io/api",
+          browserURL: "https://alfajores.celoscan.io",
         },
       },
       {
         network: "celo",
         chainId: 42220,
         urls: {
-          apiURL: "https://celo.blockscout.com/api",
-          browserURL: "https://celo.blockscout.com",
+          apiURL: "https://api.celoscan.io/api",
+          browserURL: "https://celoscan.io",
         },
       },
     ],
