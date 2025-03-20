@@ -12,7 +12,7 @@ interface RewardTokenStoreState {
 const useRewardTokenStore = create<RewardTokenStoreState>()(
   persist(
     (set) => ({
-      currentToken: RewardToken.celoDollar, // Default value
+      currentToken: RewardToken.goodDollar, // Default value
       setCurrentToken: (token: RewardToken) => set({ currentToken: token }),
     }),
     {
