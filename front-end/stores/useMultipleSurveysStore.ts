@@ -126,25 +126,27 @@ const useMultipleSurveysStore = create<SurveyStoreState>()(
               }),
             ]);
 
+            if (surveyIsFullyBooked) return null;
+
             if (
               survey.isTest &&
               participant?.isAdmin &&
-              surveyIsFullyBooked &&
               participantHasCompletedSurvey
             )
               return null;
 
-            if (!survey.isTest && !participant?.isAdmin && surveyIsFullyBooked)
+            if (!survey.isTest && !participant?.isAdmin)
               return null;
 
             if (surveyIsAlreadyBookedByUser) {
               survey.isAlreadyBookedByUser = true;
             }
+
             if (survey.isAlreadyBookedByUser && participantHasCompletedSurvey) {
               return null;
             }
 
-            if (surveyIsFullyBooked && participantHasCompletedSurvey) {
+            if (participantHasCompletedSurvey) {
               return null;
             }
 
