@@ -134,11 +134,11 @@ export default function RewardHistory() {
                     if (reward.isClaimed) {
                       if (reward.isForTestnet) {
                         router.push(
-                          `https://alfajores.celoscan.io/tx/${reward.transactionHash}`
+                          `https://celo-alfajores.blockscout.com/tx/${reward.transactionHash}`
                         );
                       } else {
                         router.push(
-                          `https://celoscan.io/tx/${reward.transactionHash}`
+                          `https://celo.blockscout.com/tx/${reward.transactionHash}`
                         );
                       }
                       trackAmplitudeEvent("View on block explorer clicked", {
