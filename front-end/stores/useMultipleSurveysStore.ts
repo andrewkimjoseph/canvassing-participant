@@ -135,7 +135,7 @@ const useMultipleSurveysStore = create<SurveyStoreState>()(
             )
               return null;
 
-            if (!survey.isTest && !participant?.isAdmin)
+            if (survey.isTest && !participant?.isAdmin)
               return null;
 
             if (surveyIsAlreadyBookedByUser) {
