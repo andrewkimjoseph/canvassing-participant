@@ -40,17 +40,17 @@ import { HttpsCallableResult } from "firebase/functions";
 import { useIdentitySDK } from "@goodsdks/identity-sdk";
 import { BotUserIconC } from "@/components/icons/checkmarks/bot-user";
 import { Chip } from "@heroui/chip";
+import useGoodDollarIdentityStore from "@/stores/useGoodDollarIdentityStore";
 
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [isBeingBooked, setIsBeingBooked] = useState<Record<string, boolean>>(
     {}
   );
-  const [isWhitelistedIdentity, setIsWhitelistedIdentity] = useState(false);
+  const identitySDK = useIdentitySDK("production");
 
   const [user, setUser] = useState<User | null>(null);
   const [authInitialized, setAuthInitialized] = useState(false);
-
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const router = useRouter();
@@ -72,7 +72,8 @@ export default function Home() {
 
   const { rewards, fetchRewards } = useRewardStore();
   const { trackAmplitudeEvent, identifyUser } = useAmplitudeContext();
-  const identitySDK = useIdentitySDK('production');
+  const { setIsWhitelisted, setRoot, isWhitelisted, root } =
+    useGoodDollarIdentityStore();
 
   const toasterIds = useMemo(
     () => ({
@@ -106,45 +107,28 @@ export default function Home() {
     identifyEvent.setOnce("[Canvassing] Gender", fetchedParticipant.gender);
     identifyEvent.setOnce("[Canvassing] Country", fetchedParticipant.country);
     identifyEvent.set("[Canvassing] Username", fetchedParticipant.username);
-    identifyEvent.setOnce(
-      "[Canvassing] Time Created",
-      new Date(fetchedParticipant.timeCreated.seconds * 1000).toLocaleString()
-    );
     identifyEvent.setOnce("[Canvassing] Id", fetchedParticipant.id);
     identifyEvent.setOnce("[Canvassing] AuthId", fetchedParticipant.authId);
     identifyUser(identifyEvent);
   };
 
   const checkWhitelistedRoot = async () => {
-    try {
-      const result = await identitySDK?.getWhitelistedRoot(
-        participant?.walletAddress as Address
-      );
-      setIsWhitelistedIdentity(result?.isWhitelisted || false);
-      console.log(
-        `Is Whitelisted: ${result?.isWhitelisted}, Root: ${result?.root}`
-      );
-    } catch (error) {
-      console.error(error);
+    console.log("isWhitelisted", isWhitelisted);
+    console.log("root", root);
+    if (isWhitelisted === null) {
+      if (address) {
+        const result = await identitySDK?.getWhitelistedRoot(address);
+
+        setIsWhitelisted(result?.isWhitelisted || false);
+        if (result?.root) {
+          setRoot(result.root);
+        }
+        console.log(
+          `Is Whitelisted: ${result?.isWhitelisted}, Root: ${result?.root}`
+        );
+      }
     }
   };
-
-  // const createFaceVerificationLink = async () => {
-  //   console.log("Creating face verification link");
-  //   const result = await identitySDK?.generateFVLink();
-
-
-  //   if (result){
-  //     console.log("Got result");
-
-  //     console.log("Result", result);
-  //   } else {
-  //     console.log("Did not get result");
-
-  //   }
-
-  //   return await identitySDK?.generateFVLink();
-  // };
 
   // Initialize app state after auth is initialized
   useEffect(() => {
@@ -205,13 +189,7 @@ export default function Home() {
     return () => {
       isMounted = false;
     };
-  }, [
-    authInitialized,
-    isConnected,
-    address,
-    chainId,
-    currentToken,
-  ]);
+  }, [authInitialized, isConnected, address, chainId, currentToken]);
 
   // Handle redirect after initialization
   useEffect(() => {
@@ -655,18 +633,24 @@ export default function Home() {
                   ) : null}
                 </>
               )}
-              {!isWhitelistedIdentity && (
+              {isWhitelisted === false && (
                 <Box ml={1} flexDirection="row">
                   <BotUserIconC />
                 </Box>
               )}
-              {!isWhitelistedIdentity && (
+              {isWhitelisted === false && (
                 <Box ml={1} flexDirection="row">
                   <Chip
-                    // onClick={async () => {
-                    //   const link = await createFaceVerificationLink();
-                    //   console.log(link);
-                    // }}
+                    onClick={async () => {
+                      const link = await identitySDK?.generateFVLink(
+                        false,
+                        window.location.href,
+                        chainId
+                      );
+                      if (link) {
+                        window.location.href = link;
+                      }
+                    }}
                     size="sm"
                   >
                     Get verified
