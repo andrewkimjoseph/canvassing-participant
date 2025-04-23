@@ -12,7 +12,10 @@ import useAmplitudeContext from "@/hooks/useAmplitudeContext";
 import { SpinnerIconC } from "@/components/icons/spinner-icon";
 import { Identify } from "@amplitude/analytics-browser";
 import { screenParticipantInDB } from "@/services/db/screenParticipantInDB";
-import { screenParticipantInBC, ScreenParticipantResult } from "@/services/web3/screenParticipantInBC";
+import {
+  screenParticipantInBC,
+  ScreenParticipantResult,
+} from "@/services/web3/screenParticipantInBC";
 import { Survey } from "@/entities/survey";
 import { Address } from "viem";
 import { Participant } from "@/entities/participant";
@@ -34,12 +37,17 @@ import { RewardToken } from "@/types/rewardToken";
 import { formatTokenAmount } from "@/utils/formatTokenAmount";
 import { TempSigningResult } from "@/types/tempSigningResult";
 import { HttpsCallableResult } from "firebase/functions";
+import { useIdentitySDK } from "@goodsdks/identity-sdk";
+import { BotUserIconC } from "@/components/icons/checkmarks/bot-user";
+import { Chip } from "@heroui/chip";
 
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [isBeingBooked, setIsBeingBooked] = useState<Record<string, boolean>>(
     {}
   );
+  const [isWhitelistedIdentity, setIsWhitelistedIdentity] = useState(false);
+
   const [user, setUser] = useState<User | null>(null);
   const [authInitialized, setAuthInitialized] = useState(false);
 
@@ -64,6 +72,7 @@ export default function Home() {
 
   const { rewards, fetchRewards } = useRewardStore();
   const { trackAmplitudeEvent, identifyUser } = useAmplitudeContext();
+  const identitySDK = useIdentitySDK('production');
 
   const toasterIds = useMemo(
     () => ({
@@ -106,6 +115,37 @@ export default function Home() {
     identifyUser(identifyEvent);
   };
 
+  const checkWhitelistedRoot = async () => {
+    try {
+      const result = await identitySDK?.getWhitelistedRoot(
+        participant?.walletAddress as Address
+      );
+      setIsWhitelistedIdentity(result?.isWhitelisted || false);
+      console.log(
+        `Is Whitelisted: ${result?.isWhitelisted}, Root: ${result?.root}`
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // const createFaceVerificationLink = async () => {
+  //   console.log("Creating face verification link");
+  //   const result = await identitySDK?.generateFVLink();
+
+
+  //   if (result){
+  //     console.log("Got result");
+
+  //     console.log("Result", result);
+  //   } else {
+  //     console.log("Did not get result");
+
+  //   }
+
+  //   return await identitySDK?.generateFVLink();
+  // };
+
   // Initialize app state after auth is initialized
   useEffect(() => {
     let isMounted = true;
@@ -130,6 +170,7 @@ export default function Home() {
           await Promise.all([
             fetchRewards(address, chainId),
             fetchSurveys(chainId, rewards, currentToken),
+            checkWhitelistedRoot(),
           ]);
 
           if (!isMounted) return;
@@ -164,7 +205,13 @@ export default function Home() {
     return () => {
       isMounted = false;
     };
-  }, [authInitialized, isConnected, address, chainId, currentToken]);
+  }, [
+    authInitialized,
+    isConnected,
+    address,
+    chainId,
+    currentToken,
+  ]);
 
   // Handle redirect after initialization
   useEffect(() => {
@@ -193,272 +240,267 @@ export default function Home() {
   );
 
   /**
- * Module for survey booking functionality
- * 
- * This refactoring breaks down the original bookSurveyFn into smaller,
- * more focused functions while maintaining the same overall behavior.
- */
+   * Module for survey booking functionality
+   *
+   * This refactoring breaks down the original bookSurveyFn into smaller,
+   * more focused functions while maintaining the same overall behavior.
+   */
 
-/**
- * Books a survey for the participant.
- *
- * This function orchestrates the booking process by coordinating several sub-functions
- * that each handle a specific part of the booking flow.
- *
- * @param {Survey} survey - The survey to be booked.
- * @returns {Promise<void>} - A promise that resolves when the booking process is complete.
- */
-const bookSurveyFn = async (survey: Survey): Promise<void> => {
-  // Track initial booking attempt
-  trackAmplitudeEvent("Book clicked", {
-    walletAddress: address,
-    surveyId: survey.id,
-  });
-
-  // Set booking status to reflect UI changes
-  setIsBeingBooked((prevStatus) => ({
-    ...prevStatus,
-    [survey.id]: true,
-  }));
-
-  try {
-    // Step 1: Check if survey is still available for booking
-    const isAvailable = await checkSurveyAvailability(survey);
-    if (!isAvailable) {
-      return; // Early return, availability check handles UI updates
-    }
-
-    // Step 2: Generate signature required for blockchain transaction
-    const signatureResult = await prepareBookingSignature(survey);
-    if (!signatureResult.data.success) {
-      throw new Error("Failed to generate signature for screening");
-    }
-
-    // Step 3: Process the blockchain transaction
-    const blockchainResult = await processBlockchainBooking(survey, signatureResult.data);
-    if (!blockchainResult.success) {
-      handleBlockchainFailure(survey);
-      return;
-    }
-
-    // Step 4: Update database records
-    const databaseUpdateSuccessful = await updateBookingDatabase(survey, blockchainResult, signatureResult.data);
-    if (!databaseUpdateSuccessful) {
-      handleDatabaseFailure(survey);
-      return;
-    }
-
-    // Step 5: Handle successful booking
-    handleSuccessfulBooking(survey);
-  } catch (error) {
-    // Handle any unexpected errors
-    handleBookingError(error);
-  } finally {
-    // Always reset booking status
-    setIsBeingBooked((prevStatus) => ({
-      ...prevStatus,
-      [survey.id]: false,
-    }));
-  }
-};
-
-/**
- * Checks if a survey is available for booking.
- * 
- * @param {Survey} survey - The survey to check
- * @returns {Promise<boolean>} - True if available, false if fully booked
- */
-const checkSurveyAvailability = async (survey: Survey): Promise<boolean> => {
-  const surveyIsFullyBooked = await checkIfSurveyIsFullyBooked({
-    _surveyContractAddress: survey.contractAddress as Address,
-    _chainId: chainId,
-  });
-
-  if (surveyIsFullyBooked) {
-    toaster.create({
-      id: toasterIds.surveyIsFullyBooked,
-      description: "Sorry, the survey is fully booked.",
-      duration: 6000,
-      type: "error",
-    });
-
-    trackAmplitudeEvent("Survey fully booked", {
+  /**
+   * Books a survey for the participant.
+   *
+   * This function orchestrates the booking process by coordinating several sub-functions
+   * that each handle a specific part of the booking flow.
+   *
+   * @param {Survey} survey - The survey to be booked.
+   * @returns {Promise<void>} - A promise that resolves when the booking process is complete.
+   */
+  const bookSurveyFn = async (survey: Survey): Promise<void> => {
+    // Track initial booking attempt
+    trackAmplitudeEvent("Book clicked", {
       walletAddress: address,
       surveyId: survey.id,
     });
 
-    window.location.replace("/");
-    return false;
-  }
+    // Set booking status to reflect UI changes
+    setIsBeingBooked((prevStatus) => ({
+      ...prevStatus,
+      [survey.id]: true,
+    }));
 
-  // Notify user that booking is in progress
-  toaster.create({
-    id: toasterIds.bookingInProgress,
-    description:
-      "Booking in progress. You will now be prompted to approve the booking.",
-    duration: 15000,
-    type: "info",
-  });
+    try {
+      // Step 1: Check if survey is still available for booking
+      const isAvailable = await checkSurveyAvailability(survey);
+      if (!isAvailable) {
+        return; // Early return, availability check handles UI updates
+      }
 
-  return true;
-};
+      // Step 2: Generate signature required for blockchain transaction
+      const signatureResult = await prepareBookingSignature(survey);
+      if (!signatureResult.data.success) {
+        throw new Error("Failed to generate signature for screening");
+      }
 
-/**
- * Prepares the signature needed for the blockchain transaction.
- * 
- * @param {Survey} survey - The survey being booked
- * @returns {Promise<SignatureResult>} - The signature result
- */
-const prepareBookingSignature = async (survey: Survey): Promise<HttpsCallableResult< TempSigningResult>> => {
-  return await generateTempSignature({
-    surveyContractAddress: survey.contractAddress as Address,
-    chainId: chainId,
-    participantWalletAddress: participant?.walletAddress as Address,
-    surveyId: survey.id,
-    network: process.env.NEXT_PUBLIC_NETWORK || "mainnet",
-  });
-};
+      // Step 3: Process the blockchain transaction
+      const blockchainResult = await processBlockchainBooking(
+        survey,
+        signatureResult.data
+      );
+      if (!blockchainResult.success) {
+        handleBlockchainFailure(survey);
+        return;
+      }
 
-/**
- * Executes the blockchain transaction for booking.
- * 
- * @param {Survey} survey - The survey being booked
- * @param {SignatureResult} signatureResult - The signature to use
- * @returns {Promise<BlockchainResult>} - The blockchain transaction result
- */
-const processBlockchainBooking = async (
-  survey: Survey, 
-  signatureResult: TempSigningResult
-): Promise<ScreenParticipantResult> => {
-  return await screenParticipantInBC({
-    _smartContractAddress: survey.contractAddress as Address,
-    _participantWalletAddress: participant?.walletAddress as Address,
-    _chainId: chainId,
-    _signature: signatureResult.signature as string,
-    _nonce: BigInt(signatureResult.nonce as string),
-    _surveyId: survey.id,
-  });
-};
+      // Step 4: Update database records
+      const databaseUpdateSuccessful = await updateBookingDatabase(
+        survey,
+        blockchainResult,
+        signatureResult.data
+      );
+      if (!databaseUpdateSuccessful) {
+        handleDatabaseFailure(survey);
+        return;
+      }
 
-/**
- * Updates the database with booking information.
- * 
- * @param {Survey} survey - The survey being booked
- * @param {BlockchainResult} blockchainResult - Blockchain transaction result
- * @param {SignatureResult} signatureResult - Signature information
- * @returns {Promise<boolean>} - True if successful, false otherwise
- */
-const updateBookingDatabase = async (
-  survey: Survey,
-  blockchainResult: ScreenParticipantResult,
-  signatureResult: TempSigningResult
-): Promise<boolean> => {
-  return await screenParticipantInDB({
-    _participant: participant as Participant,
-    _survey: survey,
-    _transactionHash: blockchainResult.transactionHash as string,
-    _signature: signatureResult.signature as string,
-    _nonce: signatureResult.nonce as string,
-  });
-};
-
-/**
- * Handles successful booking completion.
- * 
- * @param {Survey} survey - The booked survey
- */
-const handleSuccessfulBooking = (survey: Survey): void => {
-  toaster.dismiss(toasterIds.bookingInProgress);
-  toaster.create({
-    id: toasterIds.bookingSuccess,
-    description:
-      "Booking success. You are being redirected to the survey page... ",
-    duration: 9000,
-    type: "success",
-  });
-
-  router.push(`/survey/${survey.id}`);
-
-  trackAmplitudeEvent("Survey booked", {
-    walletAddress: address,
-    surveyId: survey.id,
-  });
-};
-
-/**
- * Handles failure during blockchain transaction.
- * 
- * @param {Survey} survey - The survey being booked
- */
-const handleBlockchainFailure = (survey: Survey): void => {
-  toaster.dismiss(toasterIds.bookingInProgress);
-  toaster.create({
-    id: toasterIds.onchainBookingFailed,
-    description:
-      'On-chain booking failed. Kindly reach out to support via the "More" tab. ',
-    duration: 6000,
-    type: "warning",
-  });
-  
-  trackAmplitudeEvent("Survey on-chain booking failed", {
-    walletAddress: address,
-    surveyId: survey.id,
-  });
-
-  router.refresh();
-};
-
-/**
- * Handles failure during database update.
- * 
- * @param {Survey} survey - The survey being booked
- */
-const handleDatabaseFailure = (survey: Survey): void => {
-  toaster.dismiss(toasterIds.bookingInProgress);
-  toaster.create({
-    id: toasterIds.bookingRecordCreationFailed,
-    description:
-      'Booking record creation failed. Kindly reach out to support via the "More" tab. ',
-    duration: 3000,
-    type: "warning",
-  });
-
-  trackAmplitudeEvent("Survey booking record creation failed", {
-    walletAddress: address,
-    surveyId: survey.id,
-  });
-
-  router.refresh();
-};
-
-/**
- * Handles unexpected errors during booking.
- * 
- * @param {unknown} error - The error that occurred
- */
-const handleBookingError = (error: unknown): void => {
-  console.error("Booking error:", error);
-  toaster.dismiss(toasterIds.bookingInProgress);
-  toaster.create({
-    description: "An error occurred during booking. Try again later.",
-    duration: 6000,
-    type: "warning",
-  });
-};
-
-// Type definitions for better code clarity
-interface SignatureResult {
-  data: {
-    success: boolean;
-    signature?: string;
-    nonce?: string;
+      // Step 5: Handle successful booking
+      handleSuccessfulBooking(survey);
+    } catch (error) {
+      // Handle any unexpected errors
+      handleBookingError(error);
+    } finally {
+      // Always reset booking status
+      setIsBeingBooked((prevStatus) => ({
+        ...prevStatus,
+        [survey.id]: false,
+      }));
+    }
   };
-}
 
-interface BlockchainResult {
-  success: boolean;
-  transactionHash?: string;
-}
+  /**
+   * Checks if a survey is available for booking.
+   *
+   * @param {Survey} survey - The survey to check
+   * @returns {Promise<boolean>} - True if available, false if fully booked
+   */
+  const checkSurveyAvailability = async (survey: Survey): Promise<boolean> => {
+    const surveyIsFullyBooked = await checkIfSurveyIsFullyBooked({
+      _surveyContractAddress: survey.contractAddress as Address,
+      _chainId: chainId,
+    });
+
+    if (surveyIsFullyBooked) {
+      toaster.create({
+        id: toasterIds.surveyIsFullyBooked,
+        description: "Sorry, the survey is fully booked.",
+        duration: 6000,
+        type: "error",
+      });
+
+      trackAmplitudeEvent("Survey fully booked", {
+        walletAddress: address,
+        surveyId: survey.id,
+      });
+
+      window.location.replace("/");
+      return false;
+    }
+
+    // Notify user that booking is in progress
+    toaster.create({
+      id: toasterIds.bookingInProgress,
+      description:
+        "Booking in progress. You will now be prompted to approve the booking.",
+      duration: 15000,
+      type: "info",
+    });
+
+    return true;
+  };
+
+  /**
+   * Prepares the signature needed for the blockchain transaction.
+   *
+   * @param {Survey} survey - The survey being booked
+   * @returns {Promise<SignatureResult>} - The signature result
+   */
+  const prepareBookingSignature = async (
+    survey: Survey
+  ): Promise<HttpsCallableResult<TempSigningResult>> => {
+    return await generateTempSignature({
+      surveyContractAddress: survey.contractAddress as Address,
+      chainId: chainId,
+      participantWalletAddress: participant?.walletAddress as Address,
+      surveyId: survey.id,
+      network: process.env.NEXT_PUBLIC_NETWORK || "mainnet",
+    });
+  };
+
+  /**
+   * Executes the blockchain transaction for booking.
+   *
+   * @param {Survey} survey - The survey being booked
+   * @param {SignatureResult} signatureResult - The signature to use
+   * @returns {Promise<BlockchainResult>} - The blockchain transaction result
+   */
+  const processBlockchainBooking = async (
+    survey: Survey,
+    signatureResult: TempSigningResult
+  ): Promise<ScreenParticipantResult> => {
+    return await screenParticipantInBC({
+      _smartContractAddress: survey.contractAddress as Address,
+      _participantWalletAddress: participant?.walletAddress as Address,
+      _chainId: chainId,
+      _signature: signatureResult.signature as string,
+      _nonce: BigInt(signatureResult.nonce as string),
+      _surveyId: survey.id,
+    });
+  };
+
+  /**
+   * Updates the database with booking information.
+   *
+   * @param {Survey} survey - The survey being booked
+   * @param {BlockchainResult} blockchainResult - Blockchain transaction result
+   * @param {SignatureResult} signatureResult - Signature information
+   * @returns {Promise<boolean>} - True if successful, false otherwise
+   */
+  const updateBookingDatabase = async (
+    survey: Survey,
+    blockchainResult: ScreenParticipantResult,
+    signatureResult: TempSigningResult
+  ): Promise<boolean> => {
+    return await screenParticipantInDB({
+      _participant: participant as Participant,
+      _survey: survey,
+      _transactionHash: blockchainResult.transactionHash as string,
+      _signature: signatureResult.signature as string,
+      _nonce: signatureResult.nonce as string,
+    });
+  };
+
+  /**
+   * Handles successful booking completion.
+   *
+   * @param {Survey} survey - The booked survey
+   */
+  const handleSuccessfulBooking = (survey: Survey): void => {
+    toaster.dismiss(toasterIds.bookingInProgress);
+    toaster.create({
+      id: toasterIds.bookingSuccess,
+      description:
+        "Booking success. You are being redirected to the survey page... ",
+      duration: 9000,
+      type: "success",
+    });
+
+    router.push(`/survey/${survey.id}`);
+
+    trackAmplitudeEvent("Survey booked", {
+      walletAddress: address,
+      surveyId: survey.id,
+    });
+  };
+
+  /**
+   * Handles failure during blockchain transaction.
+   *
+   * @param {Survey} survey - The survey being booked
+   */
+  const handleBlockchainFailure = (survey: Survey): void => {
+    toaster.dismiss(toasterIds.bookingInProgress);
+    toaster.create({
+      id: toasterIds.onchainBookingFailed,
+      description:
+        'On-chain booking failed. Kindly reach out to support via the "More" tab. ',
+      duration: 6000,
+      type: "warning",
+    });
+
+    trackAmplitudeEvent("Survey on-chain booking failed", {
+      walletAddress: address,
+      surveyId: survey.id,
+    });
+
+    router.refresh();
+  };
+
+  /**
+   * Handles failure during database update.
+   *
+   * @param {Survey} survey - The survey being booked
+   */
+  const handleDatabaseFailure = (survey: Survey): void => {
+    toaster.dismiss(toasterIds.bookingInProgress);
+    toaster.create({
+      id: toasterIds.bookingRecordCreationFailed,
+      description:
+        'Booking record creation failed. Kindly reach out to support via the "More" tab. ',
+      duration: 3000,
+      type: "warning",
+    });
+
+    trackAmplitudeEvent("Survey booking record creation failed", {
+      walletAddress: address,
+      surveyId: survey.id,
+    });
+
+    router.refresh();
+  };
+
+  /**
+   * Handles unexpected errors during booking.
+   *
+   * @param {unknown} error - The error that occurred
+   */
+  const handleBookingError = (error: unknown): void => {
+    console.error("Booking error:", error);
+    toaster.dismiss(toasterIds.bookingInProgress);
+    toaster.create({
+      description: "An error occurred during booking. Try again later.",
+      duration: 6000,
+      type: "warning",
+    });
+  };
 
   // Show loading state while initializing
   if (!authInitialized || !isInitialized || participantLoading) {
@@ -612,6 +654,24 @@ interface BlockchainResult {
                     <CanvassingUserIconC />
                   ) : null}
                 </>
+              )}
+              {!isWhitelistedIdentity && (
+                <Box ml={1} flexDirection="row">
+                  <BotUserIconC />
+                </Box>
+              )}
+              {!isWhitelistedIdentity && (
+                <Box ml={1} flexDirection="row">
+                  <Chip
+                    // onClick={async () => {
+                    //   const link = await createFaceVerificationLink();
+                    //   console.log(link);
+                    // }}
+                    size="sm"
+                  >
+                    Get verified
+                  </Chip>
+                </Box>
               )}
             </Flex>
             <Text fontSize={14} mb={2} color="white">
