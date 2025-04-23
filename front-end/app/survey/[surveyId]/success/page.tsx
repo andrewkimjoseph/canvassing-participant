@@ -100,8 +100,11 @@ export default function SuccessPage() {
    * await processRewardClaimByParticipantFn();
    */
   const processRewardClaimByParticipantFn = async (): Promise<void> => {
+    // Set processing state to prevent multiple claim attempts
     setIsProcessingRewardClaim(true);
 
+    // VALIDATION SECTION
+    // Step 1: Validate survey ID existence and format
     if (!surveyId || typeof surveyId !== "string") {
       toaster.create({
         id: toasterIds.invalidOrUndetectedSurveyId,
@@ -114,6 +117,7 @@ export default function SuccessPage() {
       return;
     }
 
+    // Step 2: Validate wallet connection status
     if (!isConnected) {
       toaster.create({
         id: toasterIds.connectionLost,
@@ -126,6 +130,8 @@ export default function SuccessPage() {
       return;
     }
 
+    // DATABASE VALIDATION SECTION
+    // Step 3: Validate survey exists in database
     const surveySnapshot = await getDoc(doc(db, "surveys", surveyId));
 
     if (!surveySnapshot.exists()) {
@@ -141,6 +147,8 @@ export default function SuccessPage() {
 
     const fetchedSurvey = surveySnapshot.data() as Survey;
 
+    // BLOCKCHAIN VALIDATION SECTION
+    // Step 4: Check if contract has sufficient balance to pay the reward
     const contractBalance = await getTokenContractBalance(address, {
       _contractAddress: fetchedSurvey.contractAddress as Address,
       _chainId: chainId,
@@ -148,7 +156,7 @@ export default function SuccessPage() {
     });
 
     if (contractBalance < (fetchedSurvey.rewardAmountIncUSD as number)) {
-      toaster.dismiss();
+      toaster.dismiss(); // Clear any existing toasts
       toaster.create({
         id: toasterIds.notEnoughBalance,
         description:
@@ -160,6 +168,8 @@ export default function SuccessPage() {
       return;
     }
 
+    // CLAIM PROCESS SECTION
+    // Step 5: Notify user that claim process has started
     toaster.create({
       id: toasterIds.claimProcessInitiated,
       description: "Claim process initiated. Please wait ...",
@@ -167,8 +177,11 @@ export default function SuccessPage() {
       type: "info",
     });
 
+    // Add a small delay to allow the user to see the notification
+    // This also helps spread out sequential operations for better UX
     await new Promise((resolve) => setTimeout(resolve, 5250));
 
+    // Step 6: Find the reward record in the database
     const rewardsQuery = query(
       collection(db, "rewards"),
       where("surveyId", "==", surveyId),
@@ -177,6 +190,7 @@ export default function SuccessPage() {
 
     const rewardQueryDocs = await getDocs(rewardsQuery);
 
+    // Handle case where reward record does not exist
     if (rewardQueryDocs.empty) {
       toaster.dismiss(toasterIds.claimProcessInitiated);
       toaster.create({
@@ -188,9 +202,11 @@ export default function SuccessPage() {
       setIsProcessingRewardClaim(false);
       return;
     } else {
+      // Clear the "processing" toast as we're moving to next step
       toaster.dismiss(toasterIds.claimProcessInitiated);
     }
 
+    // Step 7: Notify user that reward record was found and prepare for blockchain interaction
     toaster.create({
       id: toasterIds.rewardRecordFound,
       description:
@@ -199,13 +215,18 @@ export default function SuccessPage() {
       type: "success",
     });
 
+    // Get reference to the reward document for later update
     const rewardRef = rewardQueryDocs.docs[0].ref;
 
     try {
+      // Step 8: Get fresh data from server to ensure we have the latest state
+      // This prevents potential issues with cached or stale data
       const reward = (
         await getDocsFromServer(rewardsQuery)
       ).docs[0].data() as Reward;
 
+      // Step 9: Process the blockchain transaction to claim the reward
+      // This triggers the wallet signature request and blockchain interaction
       const claimIsProcessed = await processRewardClaimByParticipant(address, {
         _participantWalletAddress: address as Address,
         _smartContractAddress: fetchedSurvey.contractAddress as Address,
@@ -215,9 +236,12 @@ export default function SuccessPage() {
         _chainId: chainId,
       });
 
+      // Step 10: Handle the blockchain transaction result
       if (claimIsProcessed.success) {
+        // Clear the previous toast notification
         toaster.dismiss(toasterIds.rewardRecordFound);
 
+        // Step 11: Update the reward record in the database to reflect claimed status
         await updateDoc(rewardRef, {
           isClaimed: true,
           transactionHash: claimIsProcessed.transactionHash,
@@ -225,6 +249,7 @@ export default function SuccessPage() {
           timeUpdated: Timestamp.now(),
         });
 
+        // Step 12: Notify user of successful claim
         toaster.create({
           id: toasterIds.rewardClaimedSuccessfully,
           description: "Reward claimed successfully!",
@@ -232,17 +257,20 @@ export default function SuccessPage() {
           type: "success",
         });
 
-        // Wait for user feedback before navigating
+        // Brief delay to allow user to see success message before redirect
         await new Promise((resolve) => setTimeout(resolve, 1500));
 
+        // Step 13: Track the successful claim event for analytics
         trackAmplitudeEvent("Reward claimed", {
           participantWalletAddress: participant?.walletAddress,
           participantId: participant?.id,
           surveyId: survey?.id,
         });
 
+        // Step 14: Redirect user to success page
         window.location.replace(`/survey/${surveyId}/transaction-successful`);
       } else {
+        // Handle case where blockchain transaction failed
         toaster.dismiss(toasterIds.rewardRecordFound);
         toaster.create({
           description:
@@ -250,6 +278,8 @@ export default function SuccessPage() {
           duration: 6000,
           type: "error",
         });
+
+        // Track the failed claim event for analytics
         trackAmplitudeEvent("Reward claim failed", {
           participantWalletAddress: participant?.walletAddress,
           participantId: participant?.id,
@@ -257,6 +287,7 @@ export default function SuccessPage() {
         });
       }
     } catch (error) {
+      // Handle unexpected errors during claim process
       toaster.dismiss(toasterIds.rewardRecordFound);
       toaster.create({
         description:
@@ -266,9 +297,9 @@ export default function SuccessPage() {
       });
     }
 
+    // Reset processing state regardless of outcome
     setIsProcessingRewardClaim(false);
   };
-
   if (!isMounted)
     return (
       <Flex justify="center" align="center" minH="100%">
