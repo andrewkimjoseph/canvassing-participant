@@ -130,6 +130,21 @@ export default function Home() {
     }
   };
 
+  const generateFVLink = async () => {
+    if (isWhitelisted === false) {
+      try {
+        const link = await identitySDK?.generateFVLink(
+          false,
+          window.location.href,
+          chainId
+        );
+        if (link) {
+          window.location.href = link;
+        }
+      } catch (error) {}
+    }
+  };
+
   // Initialize app state after auth is initialized
   useEffect(() => {
     let isMounted = true;
@@ -640,19 +655,7 @@ export default function Home() {
               )}
               {isWhitelisted === false && (
                 <Box ml={1} flexDirection="row">
-                  <Chip
-                    onClick={async () => {
-                      const link = await identitySDK?.generateFVLink(
-                        false,
-                        window.location.href,
-                        chainId
-                      );
-                      if (link) {
-                        window.location.href = link;
-                      }
-                    }}
-                    size="sm"
-                  >
+                  <Chip onClick={async () => await generateFVLink()} size="sm">
                     Get verified
                   </Chip>
                 </Box>
